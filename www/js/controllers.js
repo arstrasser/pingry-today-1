@@ -401,11 +401,7 @@ angular.module('app.controllers', [])
 
   $scope.resetView = function(){
     if(!modify){
-      for(var key in defaultCls){
-        if(defaultCls.hasOwnProperty(key)){
-          $scope.cls[key] = defaultCls[key];
-        }
-      }
+      $scope.cls = {"name":"", "type":"", "firstLunch":false, "takesFlex":false, "firstFlex":true, "timeType":"", "time":{"day":"", "id":false}};
       angular.element(document.getElementsByClassName("selected-color")[0]).removeClass("selected-color");
     }
   }
@@ -443,9 +439,9 @@ angular.module('app.controllers', [])
     console.log(MySchedule.getAll());
     MySchedule.save();
     if(modify){
-      $scope.addSuccess("Class saved!");
+      
     }else{
-      $scope.addSuccess("Class added!");
+      MySchedule.addClass(cls);
       $ionicHistory.goBack();
     }
     $scope.resetView();
@@ -460,46 +456,25 @@ angular.module('app.controllers', [])
 
   $scope.submit = function(cls){
     if($scope.isValid(cls)){
-      if(cls.type == "block"){
-        if(!modify){
-          MySchedule.addClass("block", {"name":cls.name, "color":cls.color, "firstLunch":cls.firstLunch, "takesFlex":cls.takesFlex,"time":cls.time});
-        }
-        finishSubmit();
-        return;
-      }
-      else if(cls.type == "flex"){
-        if(cls.timeType == "letter"){
-          if(!modify){
-            MySchedule.addClass("flex", {"name":cls.name, "color":cls.color, "timeType":cls.timeType, "time":{"day":cls.time.day,"id":cls.time.id}});
-          }
-          finishSubmit();
-        }else if(cls.timeType=="weekday"){
-          if(!modify){
-            MySchedule.addClass("flex", {"name":cls.name, "color":cls.color, "timeType":cls.timeType, "time":{"day":cls.time.day,"id":cls.time.id}});
-          }
-          finishSubmit();
-        }
-      }
-      else if(cls.type == "CP"){
-        if(cls.timeType == "letter"){
-          if(!modify){
-            MySchedule.addClass("CP", {"name":cls.name, "color":cls.color, "timeType":cls.timeType, "time":{"day":cls.letterDay}});
-          }
-          finishSubmit();
-        }else if(cls.timeType=="weekday"){
-          if(!modify){
-            MySchedule.addClass("CP", {"name":cls.name, "color":cls.color, "timeType":cls.timeType, "time":{"day":cls.weekDay}});
-          }
-          finishSubmit();
-        }
-      }
-    }else{
-      return false;
+      finishSubmit();
+      $scope.addSuccess("Class saved!");
+      return true;
     }
-    return true;
+    return false;
+  }
+
+  $scope.update = function(cls){
+    if($scope.isValid(cls)){
+      MySchedule.removeClass($stateParams.clsType, $stateParams.clsId);
+      MySchedule.addClass(cls.timeType, cls)
+      if(!!window.plugins){
+        window.plugins.toast.show("Updated!", "short", "bottom");
+      }
+    }
   }
 
   $scope.isValid = function(cls){
+    console.log(cls);
     if(cls.name == ""){
       return false;
     }
@@ -509,7 +484,7 @@ angular.module('app.controllers', [])
     }
 
     if(cls.type == "block"){
-      if(cls.time != ""){
+      if(cls.time.id != "" && cls.time.id != false && cls.time.id !== true){
         return true;
       }
       return false;
@@ -517,17 +492,16 @@ angular.module('app.controllers', [])
 
 
     else if(cls.type == "flex"){
-      if(cls.timeType == "letter" || cls.timeType == "weekDay"){
-        if(cls.time.day != "" && cls.time.day != undefined){
+      if(cls.timeType == "letter" || cls.timeType == "weekday"){
+        if(cls.time.day !== "" && cls.time.day != undefined){
           return true;
         }
       }
       return false;
     }
 
-
     else if(cls.type == "CP"){
-      if(cls.timeType == "letter" || cls.timeType == "weekDay"){
+      if(cls.timeType == "letter" || cls.timeType == "weekday"){
         if(cls.time.day != "" && cls.time.day != undefined){
           return true;
         }
@@ -537,27 +511,19 @@ angular.module('app.controllers', [])
     return false;
   }
 
-  $scope.$on('$ionicView.leave', function(){
-    if(modify){
-      MySchedule.save();
-    }
-  });
+  $scope.$on('$ionicView.leave', function(){});
 
 
   $scope.classType = "";
   var modify = false;
   if($stateParams.clsType == undefined || $stateParams.clsType == "" || MySchedule.getAll()[$stateParams.clsType] == undefined || MySchedule.getAll()[$stateParams.clsType].length <= parseInt($stateParams.clsId)){
     modify = false;
-    $scope.cls = {"name":"", "type":"", "firstLunch":true, "flex":false, "block":"1", "firstFlex":true, "timeType":"", "letterDay":"A", "weekDay":"1", "time":{"id":false}};
+    $scope.cls = {"name":"", "type":"", "firstLunch":false, "takesFlex":false, "firstFlex":true, "timeType":"", "time":{"day":"", "id":false}};
   }else{
     modify = true;
-    $scope.cls = MySchedule.getAll()[$stateParams.clsType][parseInt($stateParams.clsId)];
+    $scope.cls = JSON.parse(JSON.stringify(MySchedule.getAll()[$stateParams.clsType][parseInt($stateParams.clsId)]));
     $scope.cls.type = $stateParams.clsType;
     console.log($scope.cls)
-    //$scope.changeSelectType($scope.cls.type);
-    //if($scope.cls.timeType){
-    //  $scope.changeTimeType($scope.cls.timeType);
-    //}
   }
   $scope.modify = modify;
 })

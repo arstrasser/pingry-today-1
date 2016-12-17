@@ -747,9 +747,13 @@ angular.module('app.services', [])
       }
       return false;
     },
-    addClass: function(type, cls){
+    addClass: function(cls){
+      myClasses[cls.timeType].push(cls);
+    },
+    addClassWithType: function(type, cls){
+      //Deprecated function to add a class to a specific place
+      console.warn("Add Class with Type is deprecated, please use Add Class");
       myClasses[type].push(cls);
-      return myClasses[type];
     },
     save: function(){
       localStorage.setItem("myClasses", JSON.stringify(myClasses));
