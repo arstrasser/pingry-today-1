@@ -1,0 +1,874 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"cordova",
+				"cordovaInAppBrowser"
+			],
+			[
+				"cord",
+				"cordovaNetwork"
+			],
+			[
+				"month",
+				"monthNames"
+			],
+			[
+				"ionic",
+				"ionicSideMenuDelegate"
+			],
+			[
+				"ionci",
+				"ionicView"
+			],
+			[
+				"faculty",
+				"facultyCollabDays"
+			],
+			[
+				"facult",
+				"facultyCollabDays"
+			],
+			[
+				"Facu",
+				"FacultyCollabDays"
+			],
+			[
+				"update",
+				"updateCurrentSchedule"
+			],
+			[
+				"ioni",
+				"ionicSideMenuDelegate"
+			],
+			[
+				"schedul",
+				"scheduledDays"
+			],
+			[
+				"date",
+				"dateToDayString"
+			],
+			[
+				"Date",
+				"dateToDayString"
+			],
+			[
+				"data",
+				"dataDirectory"
+			],
+			[
+				"getEle",
+				"getElementById"
+			],
+			[
+				"assem",
+				"assembly30Schedule"
+			],
+			[
+				"getElem",
+				"getElementsByClassName"
+			],
+			[
+				"CP",
+				"CPs"
+			],
+			[
+				"getE",
+				"getElementById"
+			],
+			[
+				"D",
+				"D"
+			],
+			[
+				"Htt",
+				"HttpResponseBadRequest"
+			],
+			[
+				"assignm",
+				"assignment_set"
+			],
+			[
+				"updateClassPopup",
+				"updateClassPopup"
+			],
+			[
+				"addClassForm",
+				"addClassFormInput"
+			],
+			[
+				"getElme",
+				"getElementsByClassName"
+			],
+			[
+				"is",
+				"is_authenticated"
+			],
+			[
+				"Http",
+				"HttpResponse"
+			],
+			[
+				"assig",
+				"assignments"
+			],
+			[
+				"overflow",
+				"overflow"
+			],
+			[
+				"background",
+				"background-color"
+			],
+			[
+				"_",
+				"_progressBar"
+			],
+			[
+				"inline",
+				"inline-block"
+			],
+			[
+				"top",
+				"margin-top"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "www/js/app.js",
+			"settings":
+			{
+				"buffer_size": 1275,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "www/js/controllers.js",
+			"settings":
+			{
+				"buffer_size": 19703,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "www/js/routes.js",
+			"settings":
+			{
+				"buffer_size": 2808,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "www/templates/add-reminder.html",
+			"settings":
+			{
+				"buffer_size": 2701,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "www/templates/add-class.html",
+			"settings":
+			{
+				"buffer_size": 4565,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "www/templates/reminders.html",
+			"settings":
+			{
+				"buffer_size": 408,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "www/js/services.js",
+			"settings":
+			{
+				"buffer_size": 57101,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "www/templates/menu.html",
+			"settings":
+			{
+				"buffer_size": 1455,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "www/templates/settings.html",
+			"settings":
+			{
+				"buffer_size": 729,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 784.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 784.0
+	},
+	"console":
+	{
+		"height": 0.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/resources",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/css",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/js",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates"
+	],
+	"file_history":
+	[
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/config.xml",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/menu.html",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/schedule.html",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/reminders.html",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/add-reminder.html",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/css/style.css",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/index.html",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/js/services.js",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/js/routes.js",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/about.html",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/add-class.html",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/js/app.js",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/settings.html",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/article.html",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/home.html",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/js/directives.js",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/announcements.html",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/js/controllers.js",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/lunch.html",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/class-manage.html",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/ionic.config.json",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/ClassManagerChromeExtention/manifest.json",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/ClassManagerChromeExtention/main.js",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/ClassManagerChromeExtention/main.html",
+		"/S/Downloads/HoC_student_quiz.docx",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/README.md",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/settings/templates/settings/settings.html",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/settings/static/settings/settings.js",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/settings/urls.py",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/settings/views.py",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/main/models.py",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/main/views.py",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/login/views.py",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/settings/static/settings/settings.css",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/ClassQuilt/settings.py",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/main/migrations/0001_initial.py",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/google_client_secrets.json",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/main/auth.py",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/settings/forms.py",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/client_id.json",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/login/forms.py",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/login/static/login/login.css",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/main/templates/default/default.html",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/login/templates/login/register.html",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/login/static/login/register.css",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/login/templates/login/login.html",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/login/urls.py",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/login/templates/login/Register.html",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/ClassQuilt/urls.py",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/main/urls.py",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/Notes.jpg",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/main/templates/main/index.html",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/main/static/main/main.css",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/main/static/main/settings.css",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/main/templates/main/settings.html",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/main/templates/main/login.html",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/main/static/main/login.css",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/main/static/default/header.css",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/main/static/main/main.js",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/main/static/default/default.html",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/main/migrations/0003_auto_20161015_2355.py",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/main/migrations/__init__.py",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/main/static/main/main.html",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/static/main/main.css",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/static/main/main.html",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/main.css",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/main.html",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/main/index.html",
+		"/S/Documents/Coding/CurrentProject/ClassQuilt/ClassQuilt/wsgi.py",
+		"/S/Documents/Coding/CurrentProject/Trackime/www/downloadDB.json",
+		"/S/Documents/Coding/CurrentProject/Trackime/config.xml",
+		"/S/Documents/Coding/CurrentProject/Trackime/www/js/directives.js",
+		"/S/Documents/Coding/CurrentProject/Trackime/www/templates/oST.html",
+		"/S/Documents/Coding/CurrentProject/Trackime/www/templates/main-player.html",
+		"/S/Documents/Coding/CurrentProject/Trackime/www/js/routes.js",
+		"/S/Documents/Coding/CurrentProject/Trackime/www/js/app.js",
+		"/S/Documents/Coding/CurrentProject/Trackime/www/js/controllers.js",
+		"/S/Documents/Coding/CurrentProject/Trackime/www/templates/video-popover.html",
+		"/S/Documents/Coding/CurrentProject/Trackime/www/css/style.css",
+		"/S/Documents/Coding/CurrentProject/Trackime/www/templates/ostAlbum.html",
+		"/S/Documents/Coding/CurrentProject/Trackime/plugins/cordova-plugin-music-controls/src/android/MusicControls.java",
+		"/S/Documents/Coding/CurrentProject/Trackime/plugins/cordova-plugin-music-controls/src/android/MusicControlsNotification.java",
+		"/C/Users/arstr/AppData/Roaming/Sublime Text 3/Packages/Default/Preferences.sublime-settings",
+		"/S/Documents/Coding/CurrentProject/genXML2.js",
+		"/S/Documents/Coding/CurrentProject/TrackimeMobile/platforms/android/AndroidManifest.xml",
+		"/S/Documents/Coding/CurrentProject/TrackimeMobile/config.xml",
+		"/S/Documents/Coding/CurrentProject/TrackimeMobile/www/js/controllers.js",
+		"/S/Documents/Coding/CurrentProject/TrackimeMobile/www/js/app.js",
+		"/S/Documents/Coding/CurrentProject/TrackimeMobile/www/index.html",
+		"/S/Documents/Coding/CurrentProject/TrackimeMobile/www/js/directives.js",
+		"/S/Documents/Coding/CurrentProject/TrackimeMobile/www/css/style.css",
+		"/S/Documents/Coding/CurrentProject/TrackimeMobile/www/templates/opedAlbum.html",
+		"/S/Documents/Coding/CurrentProject/TrackimeMobile/www/templates/main-player.html",
+		"/S/Documents/Coding/CurrentProject/TrackimeMobile/www/templates/oPED.html",
+		"/S/Documents/Coding/CurrentProject/TrackimeMobile/www/templates/video-popover.html",
+		"/S/Documents/Coding/CurrentProject/TrackimeMobile/www/templates/ostAlbum.html",
+		"/S/Documents/Coding/CurrentProject/TrackimeMobile/www/templates/oST.html",
+		"/S/Documents/Coding/CurrentProject/TrackimeMobile/www/js/routes.js",
+		"/S/Documents/Coding/CurrentProject/TrackimeMobile/www/templates/home.html"
+	],
+	"find":
+	{
+		"height": 64.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"AddclassCtrl",
+			"inAppB",
+			"window.plugins.toast",
+			"$cordovaToast",
+			"$cor",
+			"weekDays",
+			"$cordova",
+			"refreshing",
+			"Alex",
+			"Pingry app",
+			"toast",
+			"includes",
+			"TODO",
+			"console",
+			"temp",
+			"Schedule.getDay",
+			"getDay",
+			"getNextSame",
+			"TODO",
+			"US",
+			"refreshData",
+			"//",
+			"cordovaFile",
+			".includes",
+			"console",
+			"$cordovaFile",
+			"http",
+			" == ",
+			" || ",
+			"set",
+			"includes",
+			"MySchedule",
+			"tClass.name",
+			"tClass",
+			"Schedule.get(i)",
+			"\"id\":\"Flex",
+			"Period",
+			"Flex",
+			"Class",
+			"type",
+			"Test",
+			"vclassid",
+			"self",
+			"userid",
+			"input",
+			"\\'",
+			"\"",
+			"'",
+			"_UpdateClassPopup_",
+			"id_",
+			"addClassForm",
+			"classAdded",
+			"print",
+			"classCreated",
+			"addClassForm",
+			".errors",
+			"classCreated",
+			"userfinfo",
+			"classes",
+			"http",
+			"cordFile",
+			"cdvfile",
+			"playPlayer",
+			"calcS",
+			"progress",
+			"log",
+			"download(",
+			"load",
+			"updateNotification",
+			"playPlayer",
+			"/*\"",
+			"MusicControls",
+			"4",
+			"TODO",
+			"big-progress-bar-container",
+			".song-in-songlist",
+			"updateDro",
+			"playThis",
+			"                  \n"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"window.plugins.toast",
+			"recId",
+			"==",
+			"||",
+			"addClass",
+			"LetterDay",
+			"newName",
+			"tClass",
+			"\"type\":\"flex\", \"id\":\"",
+			"",
+			"Flex2",
+			"Flex1",
+			"Period4",
+			"Period3",
+			"Period2",
+			"Period1",
+			"Period4",
+			"Period3",
+			"Period2",
+			"Period1",
+			"Period3",
+			"Period2",
+			"Period1",
+			"id",
+			"cls",
+			"\"",
+			"'",
+			"\\\"",
+			"_updateClassPopup_",
+			"id_UpdateClassPopup_",
+			"updateClassForm",
+			"classUpdated",
+			"classConfigured",
+			"classAdded",
+			"addClassOldFormErrors",
+			".0.message",
+			".message",
+			"classAdded"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"folders":
+	[
+		{
+			"path": "C:\\Users\\arstr\\Documents\\Coding\\CurrentProject\\PingryApp"
+		}
+	],
+	"groups":
+	[
+		{
+			"selected": 6,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "www/js/app.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1275,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								781,
+								781
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 288.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "www/js/controllers.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 19703,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								16104,
+								16104
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 16251.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "www/js/routes.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2808,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								32,
+								32
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 649.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "www/templates/add-reminder.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2701,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2555,
+								2555
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1393.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "www/templates/add-class.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4565,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4043,
+								4043
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 676.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "www/templates/reminders.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 408,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								28,
+								28
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "www/js/services.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 57101,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								31876,
+								31876
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 46332.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "www/templates/menu.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1455,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1187,
+								1187
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "www/templates/settings.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 729,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								536,
+								536
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 48.0
+	},
+	"input":
+	{
+		"height": 71.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "",
+	"replace":
+	{
+		"height": 120.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 449.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

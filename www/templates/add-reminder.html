@@ -1,0 +1,59 @@
+<ion-view title="Add a Reminder">
+	<ion-content padding="true" class="has-header">
+		<div class="list">
+			<div id="messages">
+				
+			</div>
+			<label class="item item-input" id="className">
+				<span class="input-label">Description</span>
+				<input type="text" ng-model="rem.description">
+			</label>
+			<label class="item item-input item-select">
+			    <div class="input-label">
+			     	Type
+			    </div>
+			    <select ng-model="rem.type" ng-change="rem.time.day = ''">
+			      	<option value="letter">Letter Day</option>
+			      	<option value="weekday">Weekday</option>
+			      	<option value="single">Single Event</option>
+			    </select>
+			</label>
+			<label class="item item-input item-select myform" ng-show="rem.type=='letter'">
+			    <div class="input-label">
+			     	Letter
+			    </div>
+			    <select ng-model="rem.time.day">
+			      	<option value="A">A</option>
+			      	<option value="B">B</option>
+			      	<option value="C">C</option>
+			      	<option value="D">D</option>
+			      	<option value="E">E</option>
+			      	<option value="F">F</option>
+			      	<option value="G">G</option>
+			    </select>
+			</label>
+			<label class="item item-input item-select myform" ng-show="rem.type=='weekday'">
+			    <div class="input-label">
+			     	Day
+			    </div>
+			    <select ng-model="rem.time.day">
+			      	<option value="1">Monday</option>
+			      	<option value="2">Tuesday</option>
+			      	<option value="3">Wednesday</option>
+			      	<option value="4">Thursday</option>
+			      	<option value="5">Friday</option>
+			    </select>
+			</label>
+			<div class="item" style="padding-top:5px;padding-bottom:6px;padding-right:10px;padding-left:16px" ng-show="rem.type == 'single'">
+			  <div style="display:inline-block;padding:7px;padding-left:0px;">Date: </div>
+			  <span ng-bind="formatDate(rem.time.date)" ng-click="openDatePicker(rem.time.date)" style="display:inline-block;float:right;padding:8px"></span>
+			</div>
+			<div class="item" style="padding-top:5px;padding-bottom:6px;padding-right:10px;padding-left:16px" ng-show="rem.type!=''">
+			  <div style="display:inline-block;padding:7px;padding-left:0px;">Time: </div>
+			  <span ng-bind="formatTime(rem.time.time)" ng-click="openTimePicker(rem.time.time)" style="display:inline-block;float:right;padding:8px"></span>
+			</div>
+			<button class="button button-full button-assertive" ng-click="delete(rem)" ng-show="modify">Delete Reminder</button>
+			<button class="button button-full button-balanced" ng-click="submit(rem)" ng-show="(rem.type != '' && rem.description != '' && (rem.time.day != '' || rem.type == 'single')) && modify == false">Submit</button>
+		</div>
+	</ion-content>
+</ion-view>

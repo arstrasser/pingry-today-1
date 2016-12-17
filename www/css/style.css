@@ -1,0 +1,118 @@
+/* Empty. Add your own CSS if you like */
+
+#messages {
+	padding:10px;
+}
+
+.error {
+	color:#f00;
+	margin:5px;
+	display:block;
+}
+
+.success {
+	color:#0c0;
+	margin:5px;
+	display:block;
+}
+
+.color-select {
+	display:inline-block;
+	margin:2px;
+	height:32px;
+	width:32px;
+}
+
+.selected-color {
+	border: 3px solid blue;
+}
+
+.color-label {
+	padding-bottom:5px;
+}
+
+.class-manage-header {
+	font-size: 25px;
+	padding:10px;
+}
+
+.class-manage-spacer {
+	width:100%;
+	height:30px;
+}
+
+.delete-button {
+	display:inline-block;
+	float:right;
+	font-size:20px;
+	padding:5px;
+}
+
+#nonSchoolDay {
+	font-weight:bold;
+	font-size:25px;
+	text-align:center;
+	padding:30px;
+}
+
+#changeDayMenu {
+	display:inline-block;
+	width:calc(100% - 54px);
+	height:55px;
+	text-align:center;
+}
+
+#currentDay {
+	display:inline-block;
+	padding-top:10px;
+	padding-bottom:10px;
+}
+
+#changeDayLeft, #changeDayRight {
+	font-size:40px;
+	display:inline-block;
+	padding:10px;
+}
+
+#changeDayLeft {
+	float:left;
+}
+
+#changeDayRight {
+	float:right;
+}
+
+#letterMenu {
+	float:right;
+	text-align:center;
+	background-color:#ddd;
+	padding:10px;
+	padding-bottom:0px;
+}
+
+#letter {
+	font-family:sans-serif;
+	font-size:35px;
+	padding-top:5px;
+}
+
+#periods {
+	font-size:10px;
+}
+
+.rssTitle {
+	text-overflow: ellipsis;
+	overflow: hidden;
+	font-weight:bold;
+	display:inline;
+}
+
+.rssDescription {
+	font-size: 15px;
+	white-space: normal;
+	padding-left:6px;
+}
+
+.article img {
+	width:100%;
+}

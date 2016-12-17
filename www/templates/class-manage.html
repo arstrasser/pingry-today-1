@@ -1,0 +1,24 @@
+<ion-view title="Class Management">
+	<ion-content padding="true" class="has-header">
+		<div class="list">
+			<a class="item" ui-sref="main.addClass">Add a Class</a>
+
+			<div class="class-manage-spacer"></div>
+			<div class="class-manage-header item item-divider" ng-show="myclasses.length > 0">Class Periods</div>
+			<a ng-repeat="cls in myclasses track by $index" class="item" href="#/main/settings/addClass/block/{{$index}}" style="background-color:{{cls.color}};">
+				<div ng-bind="cls.name" style="display:inline-block;"></div>
+			</a>
+
+
+			<div class="class-manage-spacer" ng-show="myclasses.length > 0"></div>
+			<div class="class-manage-header item item-divider" ng-show="myflexes.length > 0">Flexes</div>
+			<a ng-repeat="cls in myflexes track by $index" class="item" href="#/main/settings/addClass/flex/{{$index}}" style="background-color:{{cls.color}};" ng-bind="cls.name"></a>
+
+
+			<div class="class-manage-spacer" ng-show="myflexes.length > 0"></div>
+			<div class="class-manage-header item item-divider" ng-show="mycps.length > 0">Conference Periods</div>
+			<a ng-repeat="cls in mycps track by $index" class="item" href="#/main/settings/addClass/CP/{{$index}}" style="background-color:{{cls.color}};" ng-bind="cls.name"></a>
+			
+		</div>
+	</ion-content>
+</ion-view>

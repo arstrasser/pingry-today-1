@@ -1,0 +1,21 @@
+<ion-view title="Announcements">
+	<ion-content padding="true" class="has-header">
+		<ion-refresher
+	    	pulling-text="Pull to refresh..."
+	    	on-refresh="refresh();">
+	  	</ion-refresher>
+		<div id="announce-messages">
+				
+		</div>
+		<div class="list">
+			<div class="item" ng-repeat="feedItem in rss track by $index" ng-click="toggleHide($index)" on>
+				<i id="rss-close-{{$index}}" style="" class="icon ion-arrow-right-b"></i>
+				<i id="rss-open-{{$index}}" style="display:none;" class="icon ion-arrow-down-b"></i>
+				<div class="rssTitle" ng-bind="feedItem.title"></div>
+				<div id="rss-desc-{{$index}}" class="rssDescription" ng-bind="feedItem.description" style="display:none;"></div>
+			</div>
+			<div class="spacer" style="height:10px"></div>
+			<div class="item" ng-click="openSystemLink('https://goo.gl/forms/xCkWNZLQE8YOS2823')">Submit an Announcement</div>
+		</div>
+	</ion-content>
+</ion-view>
