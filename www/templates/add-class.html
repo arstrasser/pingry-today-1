@@ -1,0 +1,117 @@
+<ion-view title="Add a Class">
+	<ion-content padding="true" class="has-header">
+		<div class="list">
+			<div id="messages">
+				
+			</div>
+			<label class="item item-input" id="className">
+				<span class="input-label">Name:</span>
+				<input type="text" ng-model="cls.name">
+			</label>
+			<div class="item">
+				<div class="color-label">Color:</div>
+				<ion-scroll direction="x">
+					<div ng-repeat="color in colors track by $index" id="color-{{$index}}" value="{{color}}" class="color-select" style="background-color: {{color}}" ng-class="{'selected-color': cls.color == color}" ng-click="cls.color = color"></div> 
+				</ion-scroll>
+			</div>
+			<label class="item item-input item-select">
+			    <div class="input-label">
+			     	Type
+			    </div>
+			    <select ng-model="cls.type">
+			      	<option value="block">Class</option>
+			      	<option value="flex">Flex</option>
+			      	<option value="CP">CP</option>
+			    </select>
+			</label>
+			<div class="item item-toggle myform" style="pointer-events:initial !important" ng-show="cls.type=='block'">
+				<span ng-click="lunchHelp()">First Lunch: <i class="icon ion-help-circled"></i></span>
+				<label class="toggle toggle-assertive">
+			       <input ng-model="cls.firstLunch" type="checkbox">
+			       <div class="track">
+			         <div class="handle"></div>
+			       </div>
+			    </label>
+			</div>
+			<div class="item item-toggle myform" ng-show="cls.type=='block'">
+				Science: 
+				<label class="toggle toggle-assertive">
+			       <input ng-model="cls.takesFlex" type="checkbox">
+			       <div class="track">
+			         <div class="handle"></div>
+			       </div>
+			    </label>
+			</div>
+			<label class="item item-input item-select myform" ng-show="cls.type=='block'">
+			    <div class="input-label">
+			     	Period
+			    </div>
+			    <select ng-model="cls.time">
+			      	<option value="1">1</option>
+			      	<option value="2">2</option>
+			      	<option value="3">3</option>
+			      	<option value="4">4</option>
+			      	<option value="5">5</option>
+			      	<option value="6">6</option>
+			      	<option value="7">7</option>
+			    </select>
+			</label>
+			<div class="item item-toggle myform" ng-show="cls.type=='flex'">
+				First Flex: 
+				<label class="toggle toggle-assertive toggle-selected">
+			       <input ng-model="cls.time.id" type="checkbox">
+			       <div class="track">
+			         <div class="handle"></div>
+			       </div>
+			    </label>
+			</div>
+			<label class="item item-input item-select myform" ng-show="cls.type=='flex'||cls.type=='CP'">
+			    <div class="input-label">
+			     	Timing Type
+			    </div>
+			    <select ng-model="cls.timeType">
+			      	<option value="weekday">Day of the Week</option>
+			      	<option value="letter">Letter Day</option>
+			    </select>
+			</label>
+			<label class="item item-input item-select myform" ng-show="(cls.type=='flex'||cls.type=='CP')&&cls.timeType=='letter'">
+			    <div class="input-label">
+			     	Letter
+			    </div>
+			    <select ng-model="cls.time.day">
+			      	<option value="A">A</option>
+			      	<option value="B">B</option>
+			      	<option value="C">C</option>
+			      	<option value="D">D</option>
+			      	<option value="E">E</option>
+			      	<option value="F">F</option>
+			      	<option value="G">G</option>
+			    </select>
+			</label>
+			<label class="item item-input item-select myform" ng-show="(cls.type=='flex'||cls.type=='CP')&&cls.timeType=='weekday'">
+			    <div class="input-label">
+			     	Day
+			    </div>
+			    <select ng-model="cls.time.day">
+			      	<option value="1">Monday</option>
+			      	<option value="2">Tuesday</option>
+			      	<option value="3">Wednesday</option>
+			      	<option value="4">Thursday</option>
+			      	<option value="5">Friday</option>
+			    </select>
+			</label>
+			<button class="button button-full button-assertive myform" ng-click="delete(cls)" ng-show="modify">Delete Class</button>
+			<button class="button button-full button-balanced myform" ng-click="submit(cls)" ng-disabled="!isValid(cls)">Submit</button>
+			<!-- Type Dropdown               Class, Flex, CP, -->
+			<!-- Timing Selection -->
+				<!-- First Lunch Toggle      Class    -->
+				<!-- Takes Flex Toggle       Class    -->
+				<!-- Block Period            Class    -->
+				<!-- Repeating Toggle        Flex, CP -->
+				<!-- Flex 1st/2nd            Flex     -->
+				<!-- Letter vs Day           Flex, CP -->
+					<!-- Letter Selection        Flex, CP -->
+					<!-- Day Selection           Flex, CP -->
+		</div>
+	</ion-content>
+</ion-view>

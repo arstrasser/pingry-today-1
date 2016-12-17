@@ -1,0 +1,11 @@
+<ion-view title="Reminders">
+	<ion-content padding="true" class="has-header">
+		<div class="list">
+			<a class="item" ui-sref="main.addReminder">Add a Reminder</a>
+			<div class="reminder-add-spacer" style="height:20px"></div>
+			<a class="item" ng-repeat="remind in reminders track by $index" ng-href="#/main/reminders/add/{{$index}}">
+				{{remind.description}}
+			</a>
+		</div>
+	</ion-content>
+</ion-view>

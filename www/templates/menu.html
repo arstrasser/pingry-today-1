@@ -1,0 +1,29 @@
+<ion-side-menus>
+    <ion-side-menu-content>
+        <ion-nav-bar class="bar-positive">
+            <ion-nav-back-button></ion-nav-back-button>
+            <ion-nav-buttons side="left">
+                <button class="button button-icon button-clear ion-navicon" menu-toggle="left"></button>
+            </ion-nav-buttons>
+        </ion-nav-bar>
+        <ion-nav-view name="sideMenu"></ion-nav-view>
+    </ion-side-menu-content>
+    <ion-side-menu side="left" id="sideMenu">
+        <ion-header-bar class="bar-positive">
+            <div class="title">Menu</div>
+        </ion-header-bar>
+        <ion-content padding="false" class="side-menu-left has-header">
+            <div class="list">
+                <a class="item" ui-sref="main.home" menu-close>News</a>
+                <a class="item" ui-sref="main.schedule" menu-close>Schedule</a>
+                <a class="item" ui-sref="main.reminders" menu-close>Reminders</a>
+                <a class="item" ui-sref="main.lunch" menu-close>Lunch Menu</a>
+                <a class="item" ui-sref="main.announcements" menu-close>Announcements</a>
+                <a class="item" ng-click="openForeignLink('https://www.pingry.org/pingrytoday')" menu-close>Online Portal</a>
+                <a class="item" ui-sref="main.settings" menu-close>Settings</a>
+                <a class="item" ui-sref="main.about" menu-close>About</a>
+            </div>
+        </ion-content>
+    </ion-side-menu>
+
+</ion-side-menus>

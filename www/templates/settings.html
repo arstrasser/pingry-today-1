@@ -1,0 +1,15 @@
+<ion-view title="Settings">
+	<ion-content padding="true" class="has-header">
+		<div class="list">
+			<a class="item" ui-sref="main.classManage">Class Management</a>
+			<!--label class="item item-select">
+			    <div class="input-label" style="width:30%;">Schedule Override: </div>
+			    <select ng-model="scheduleType" ng-change="" style="width:80%;">
+			      	<option ng-repeat="sched in scheduleTypes track by $index" value="{{$index}}" ng-bind="sched[0]" ng-selected="$index == scheduleType"></option>
+			    </select>
+			</label-->
+			<div class="item" ng-click="forceRefresh()">Force Calendar Refresh</div>
+			<div class="item" ng-click="letterRefresh()">Force Letter Day Refresh</div>
+		</div>
+	</ion-content>
+</ion-view>
