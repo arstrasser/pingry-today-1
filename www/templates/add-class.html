@@ -18,7 +18,7 @@
 			    <div class="input-label">
 			     	Type
 			    </div>
-			    <select ng-model="cls.type">
+			    <select ng-model="cls.type" ng-change="cls.time.id=false; cls.time.day='';">
 			      	<option value="block">Class</option>
 			      	<option value="flex">Flex</option>
 			      	<option value="CP">CP</option>
@@ -46,7 +46,7 @@
 			    <div class="input-label">
 			     	Period
 			    </div>
-			    <select ng-model="cls.time">
+			    <select ng-model="cls.time.id">
 			      	<option value="1">1</option>
 			      	<option value="2">2</option>
 			      	<option value="3">3</option>
@@ -69,7 +69,7 @@
 			    <div class="input-label">
 			     	Timing Type
 			    </div>
-			    <select ng-model="cls.timeType">
+			    <select ng-model="cls.timeType" ng-change="cls.time.day=''">
 			      	<option value="weekday">Day of the Week</option>
 			      	<option value="letter">Letter Day</option>
 			    </select>
@@ -100,8 +100,9 @@
 			      	<option value="5">Friday</option>
 			    </select>
 			</label>
+			<button class="button button-full button-balanced" ng-click="update(cls)" ng-show="modify" ng-disabled="!isValid(cls)">Update</button>
 			<button class="button button-full button-assertive myform" ng-click="delete(cls)" ng-show="modify">Delete Class</button>
-			<button class="button button-full button-balanced myform" ng-click="submit(cls)" ng-disabled="!isValid(cls)">Submit</button>
+			<button class="button button-full button-balanced myform" ng-click="submit(cls)" ng-show="!modify" ng-disabled="!isValid(cls)">Submit</button>
 			<!-- Type Dropdown               Class, Flex, CP, -->
 			<!-- Timing Selection -->
 				<!-- First Lunch Toggle      Class    -->
