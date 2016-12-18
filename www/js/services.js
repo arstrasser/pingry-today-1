@@ -1318,6 +1318,7 @@ angular.module('app.services', [])
   }
 })
 
+//Messaging provider through cordova toast
 .factory("Messages", function($cordovaToast){
   function hide(){
     //Forces all the current toast messages to hide
