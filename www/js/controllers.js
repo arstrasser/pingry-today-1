@@ -116,10 +116,8 @@ angular.module('app.controllers', [])
   }
 
   function refresh(){
-    console.log("refreshing");
     $scope.classes = [];
     $scope.letter = LetterDay.letter();
-    console.log($scope.letter);
     if($scope.letter !== undefined && $scope.letter.length == 1){
       for(i = 0; i < Schedule.getToday().length; i++){
         var tClass = Schedule.get(i);
@@ -160,13 +158,12 @@ angular.module('app.controllers', [])
       $scope.periodList = c;
     }else{
       if($scope.letter == "empty"){
-        console.log($cordovaNetwork.connection);
-          if($cordovaNetwork.connection != "none"){
-            Messages.showNormal("Refreshing...")
-          }
-          else{
-            Messages.showError("Please connect to the internet");
-          }
+        if($cordovaNetwork.connection == "none" || $cordovaNetwork.connection == undefined){
+          Messages.showError("Please connect to the internet!");
+        }
+        else{
+          Messages.showNormal("Refreshing...");
+        }
       }
       $scope.letter = "";
     }
