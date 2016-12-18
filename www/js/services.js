@@ -215,6 +215,9 @@ angular.module('app.services', [])
     refreshData();
   }
 
+  //Schedule override mode disables dynamic schedule determination
+  var schedOverride = false;
+
   /*
       Schedule types are listed below
     Format: an array of classes
@@ -325,7 +328,7 @@ angular.module('app.services', [])
   ];
 
   var unknownSchedule = [
-    {"name":"Warning - Couldn't figure out schedule", "type":"Other", "startTime":"00:00", "endTime":"00:00"},
+    {"name":"WARN: Unknown Assembly today", "type":"Other", "startTime":"00:00", "endTime":"00:00"},
     {"name":"Attendence", "type":"Other", "startTime":"08:05", "endTime":"08:10"},
     {"name":"Period 1", "type":"block", "id":"1", "startTime":"08:10", "endTime":"09:15"},
     {"name":"Flex 1", "type":"flex", "id":"1", "startTime":"09:20", "endTime":"09:40"},
@@ -346,7 +349,7 @@ angular.module('app.services', [])
   var curDay = new Date();
 
   //Variable to store all the schedule types
-  var typeList = [["Normal",normalSchedule], ["Faculty Collaboration",facultyCollabSchedule], ["Assembly 30 Minutes", assembly30Schedule], ["Assembly 35 Mintues", assembly35Schedule], ["Assembly 60 Minutes",assembly60Schedule], ["Winter Festival",winterFestivalSchedule], "Unknown Assembly", unknownSchedule];
+  var typeList = [["Normal",normalSchedule], ["Faculty Collaboration",facultyCollabSchedule], ["Assembly 30 Minutes", assembly30Schedule], ["Assembly 35 Mintues", assembly35Schedule], ["Assembly 60 Minutes",assembly60Schedule], ["Winter Festival", winterFestivalSchedule], ["Unknown Assembly", unknownSchedule]];
 
   //Community Time event schedule
   var CTSchedule = localStorage.getItem("CTSchedule");
@@ -370,24 +373,28 @@ angular.module('app.services', [])
 
   //Checks the scheduled days array for the current day and updates the current schedule to reflect it
   function updateCurrentSchedule(){
-    //If today has a special schedule
-    curSchedule = 0;
-    if(scheduledDays != null && scheduledDays[dateToDayString(curDay)] != undefined){
-      //Iterate over the schedule types
-      for(i = 0; i < typeList.length; i++){
-        //if found the respective schedule for the day
-        if(typeList[i][0] == scheduledDays[dateToDayString(curDay)]){
-          curSchedule = i;
-          break;
+    console.log(!schedOverride);
+    //If not in Schedule override mode
+    if(!schedOverride){
+      //If today has a special schedule
+      curSchedule = 0;
+      if(scheduledDays != null && scheduledDays[dateToDayString(curDay)] != undefined){
+        //Iterate over the schedule types
+        for(i = 0; i < typeList.length; i++){
+          //if found the respective schedule for the day
+          if(typeList[i][0] == scheduledDays[dateToDayString(curDay)]){
+            curSchedule = i;
+            break;
+          }
         }
       }
-    }
-    //Check if it's a faculty collaboration day
-    else if(facultyCollabDays != null){
-      for(var i = 0; i < facultyCollabDays.length; i++){
-        if(facultyCollabDays[i] == dateToDayString(curDay)){
-          curSchedule = 1;
-          break;
+      //Check if it's a faculty collaboration day
+      else if(facultyCollabDays != null){
+        for(var i = 0; i < facultyCollabDays.length; i++){
+          if(facultyCollabDays[i] == dateToDayString(curDay)){
+            curSchedule = 1;
+            break;
+          }
         }
       }
     }
@@ -572,6 +579,10 @@ angular.module('app.services', [])
     },
     setCurrentType: function(newSched){ //sets the current schedule type to the given type
       curSchedule =  newSched;
+    },
+    setOverride: function(val){ //Turns schedule override mode on or off
+      schedOverride = val;
+      console.log("Changed to "+val);
     },
     changeDay: function(day){ //updates the current date
       curDay = day;
