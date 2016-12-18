@@ -1325,6 +1325,7 @@ angular.module('app.services', [])
     },
     showNormal: function(msg){
       //Shows a normal message
+      hide();
       $cordovaToast.showShortBottom(msg);
     },
     forceHide: hide
