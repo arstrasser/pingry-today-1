@@ -308,9 +308,16 @@ angular.module('app.controllers', [])
   }
 
   $scope.setScheduleType = function(newType){
-    Schedule.setCurrentType(newType);
-    refresh();
+    if(newType == "-1"){
+      Schedule.setOverride(false);
+    }
+    else {
+      Schedule.setOverride(true);
+      Schedule.setCurrentType(parseInt(newType));
+    }
   }
+
+  $scope.overrideSett = "-1";
 
   $scope.scheduleTypes = Schedule.getTypes();
   $scope.scheduleType = Schedule.getCurrentType();
