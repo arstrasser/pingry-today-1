@@ -5,7 +5,7 @@
 				
 			</div>
 			<label class="item item-input" id="className">
-				<span class="input-label">Description</span>
+				<span class="input-label">Name</span>
 				<input type="text" ng-model="rem.description">
 			</label>
 			<label class="item item-input item-select">
@@ -52,8 +52,9 @@
 			  <div style="display:inline-block;padding:7px;padding-left:0px;">Time: </div>
 			  <span ng-bind="formatTime(rem.time.time)" ng-click="openTimePicker(rem.time.time)" style="display:inline-block;float:right;padding:8px"></span>
 			</div>
-			<button class="button button-full button-assertive" ng-click="delete(rem)" ng-show="modify">Delete Reminder</button>
-			<button class="button button-full button-balanced" ng-click="submit(rem)" ng-show="(rem.type != '' && rem.description != '' && (rem.time.day != '' || rem.type == 'single')) && modify == false">Submit</button>
+			<button class="button button-full button-balanced" ng-click="update(rem)" ng-show="modify" ng-disabled="!isValid(rem)">Update</button>
+			<button class="button button-full button-assertive" ng-click="delete()" ng-show="modify">Delete Reminder</button>
+			<button class="button button-full button-balanced" ng-click="submit(rem)" ng-show="!modify" ng-disabled="!isValid(rem)">Submit</button>
 		</div>
 	</ion-content>
 </ion-view>

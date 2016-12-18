@@ -1,6 +1,8 @@
 var monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 var weekDays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
+var $cordovaToast;
+
 angular.module('app.controllers', [])
 
 .controller("MenuCtrl", function($scope, $cordovaInAppBrowser){
@@ -207,14 +209,12 @@ angular.module('app.controllers', [])
     }else{
       if($scope.letter == "empty"){
         console.log($cordovaNetwork.connection);
-        if(window.plugins){
           if($cordovaNetwork.connection != "none"){
-            if(!!window.plugins){window.plugins.toast.show("Schedule is refreshing...", "long", "bottom");}
+            $cordovaToast.show("Schedule is refreshing...", "long", "bottom");
           }
           else{
-            if(!!window.plugins){window.plugins.toast.show("Please connect to the internet", "long", "bottom");}
+            $cordovaToast.show("Please connect to the internet", "long", "bottom");
           }
-        }
       }
       $scope.letter = "";
     }
@@ -358,30 +358,28 @@ angular.module('app.controllers', [])
   var refreshEnable = true;
   $scope.forceRefresh = function(){
     if(refreshEnable){
-      console.log("refreshing...");
-      if(!!window.plugins){window.plugins.toast.show("Refreshing...", "short", "bottom");}
+      $cordovaToast.show("Refreshing...", "short", "bottom");
       refreshEnable = false;
       Schedule.refresh().then(function(){
         refreshEnable = true;
-        if(!!window.plugins){window.plugins.toast.show("Complete!", "short", "bottom");}
+        $cordovaToast.show("Complete!", "short", "bottom");
       }, function(){
         refreshEnable = true;
-        if(!!window.plugins){window.plugins.toast.show("Error...", "short", "bottom");}
+        $cordovaToast.show("Error...", "short", "bottom");
       });
     }
   }
 
   $scope.letterRefresh = function(){
     if(refreshEnable){
-      console.log("Refreshing...");
-      if(!!window.plugins){window.plugins.toast.show("Refreshing...", "short", "bottom");}
+      $cordovaToast.show("Refreshing...", "short", "bottom");
       refreshEnable = false;
       LetterDay.refresh().then(function(){
         refreshEnable = true;
-        if(!!window.plugins){window.plugins.toast.show("Complete!", "short", "bottom");}
+        $cordovaToast.show("Complete!", "short", "bottom");
       }, function(){
         refreshEnable = true;
-        if(!!window.plugins){window.plugins.toast.show("Error...", "short", "bottom");}
+        $cordovaToast.show("Error...", "short", "bottom");
       });
     }
   }
@@ -396,13 +394,15 @@ angular.module('app.controllers', [])
 
 })
 
-.controller('AddClassCtrl', function($scope, MySchedule, $stateParams, $ionicHistory) {
+.controller('AddClassCtrl', function($scope, MySchedule, $cordovaToast, $stateParams, $ionicHistory) {
   $scope.colors = ["#DC143C", "#FF3E96", "#EE00EE", "#4876FF", "#8EE5EE", "#00EE76", "#71C671", "#EEEE00", "#EE9A00", "#CDB7B5", "#666"];
 
   $scope.resetView = function(){
     if(!modify){
       $scope.cls = {"name":"", "type":"", "firstLunch":false, "takesFlex":false, "firstFlex":true, "timeType":"", "time":{"day":"", "id":false}};
-      angular.element(document.getElementsByClassName("selected-color")[0]).removeClass("selected-color");
+      while(document.getElementsByClassName("selected-color") > 0){
+        angular.element(document.getElementsByClassName("selected-color")[0]).removeClass("selected-color");
+      }
     }
   }
 
@@ -417,102 +417,51 @@ angular.module('app.controllers', [])
     angular.element(document.getElementById("color-"+i)).addClass("selected-color");
   }
 
-  $scope.addError = function(msg){
-    var elem = document.createElement("b");
-    elem.setAttribute("class", "error");
-    elem.innerHTML = msg;
-    document.getElementById("messages").appendChild(elem);
-  }
-
-  $scope.resetMessages = function(){
-    document.getElementById("messages").innerHTML = "";
-  }
-
-  $scope.addSuccess = function(msg){
-    var elem = document.createElement("b");
-    elem.setAttribute("class", "success");
-    elem.innerHTML = msg;
-    document.getElementById("messages").appendChild(elem);
-  }
-
-  function finishSubmit(){
-    console.log(MySchedule.getAll());
-    MySchedule.save();
-    if(modify){
-      
-    }else{
-      MySchedule.addClass(cls);
-      $ionicHistory.goBack();
-    }
-    $scope.resetView();
-  }
-
-  $scope.delete = function(cls){
+  $scope.delete = function(){
     if(window.confirm("Delete this class?")){
-      MySchedule.removeClass(cls.type, cls);
+      MySchedule.removeClassById($stateParams.clsType, $stateParams.clsId);
       $ionicHistory.goBack();
     }
   }
 
   $scope.submit = function(cls){
     if($scope.isValid(cls)){
-      finishSubmit();
-      $scope.addSuccess("Class saved!");
+      MySchedule.addClass(cls);
+      $cordovaToast.show("Class added!", "short", "bottom");
+      MySchedule.save();
+      $ionicHistory.goBack();
       return true;
     }
-    return false;
+    $cordovaToast.show("Error, class wasn't added", "long", "bottom");
   }
 
   $scope.update = function(cls){
     if($scope.isValid(cls)){
-      MySchedule.removeClass($stateParams.clsType, $stateParams.clsId);
-      MySchedule.addClass(cls.timeType, cls)
-      if(!!window.plugins){
-        window.plugins.toast.show("Updated!", "short", "bottom");
-      }
+      MySchedule.removeClassById($stateParams.clsType, $stateParams.clsId);
+      MySchedule.addClass(cls)
+      $cordovaToast.show("Updated!", "short", "bottom");
+      MySchedule.save();
+      $ionicHistory.goBack();
     }
   }
 
   $scope.isValid = function(cls){
-    console.log(cls);
     if(cls.name == ""){
       return false;
     }
-
-    if(document.getElementsByClassName("selected-color").length !== 1){
+    if(document.getElementsByClassName("selected-color").length < 1){
       return false;
     }
-
     if(cls.type == "block"){
-      if(cls.time.id != "" && cls.time.id != false && cls.time.id !== true){
-        return true;
-      }
-      return false;
+      return cls.time.id != "" && cls.time.id != false && cls.time.id !== true;
     }
-
-
-    else if(cls.type == "flex"){
-      if(cls.timeType == "letter" || cls.timeType == "weekday"){
-        if(cls.time.day !== "" && cls.time.day != undefined){
-          return true;
-        }
-      }
-      return false;
-    }
-
-    else if(cls.type == "CP"){
-      if(cls.timeType == "letter" || cls.timeType == "weekday"){
-        if(cls.time.day != "" && cls.time.day != undefined){
-          return true;
-        }
-      }
-      return false;
+    if(cls.type == "flex" || cls.type == "CP"){
+      return (cls.timeType == "letter" || cls.timeType == "weekday") && (cls.time.day !== "" && cls.time.day != undefined);
     }
     return false;
   }
 
-  $scope.$on('$ionicView.leave', function(){});
-
+  $scope.$on('$ionicView.enter', function(){$scope.resetView();})
 
   $scope.classType = "";
   var modify = false;
@@ -562,22 +511,19 @@ angular.module('app.controllers', [])
     $scope.rem = Notifications.get($stateParams.reminderId);
   }
   $scope.modify = modify;
-  $scope.delete = function(reminder){
-    if(window.confirm("Delete this reminder?")){
-      Notifications.remove($stateParams.reminderId);
-      Notifications.update();
-      $ionicHistory.goBack();
-    }
-  }
 
   $scope.formatTime = function(time){
     var hours = time.getHours();
+    var AM = true;
     if(hours > 12){
       hours -= 12;
+      AM = false;
+    }else if(hours == 12){
+      AM = false;
     }else if(hours == 0){
       hours = 12;
     }
-    return (hours) + ":" + ((time.getMinutes()<10)?"0":"")+time.getMinutes()+" "+((time.getHours() <= 12)?"AM":"PM");
+    return (hours) + ":" + ((time.getMinutes()<10)?"0":"")+time.getMinutes()+" "+(AM?"AM":"PM");
   }
 
   $scope.formatDate = function(date){
@@ -602,16 +548,33 @@ angular.module('app.controllers', [])
     })
   }
 
-  $scope.submit = function(reminder){
-    console.log(reminder);
-    Notifications.add(reminder);
-    Notifications.update();
-    $ionicHistory.goBack();
+  $scope.isValid = function(reminder){
+    return reminder.type != '' && reminder.description != '' && (reminder.time.day != '' || reminder.type == 'single');
   }
 
-  $scope.$on('$ionicView.leave', function(){
-    if(modify){
+  $scope.submit = function(reminder){
+    console.log(reminder);
+    if($scope.isValid(reminder)){
+      Notifications.add(reminder);
       Notifications.update();
+      $ionicHistory.goBack();
     }
-  });
+  }
+
+  $scope.update = function(reminder){
+    if($scope.isValid(reminder)){
+      Notifications.remove($stateParams.reminderId);
+      Notifications.add(reminder);
+      Notifications.update();
+      $ionicHistory.goBack();
+    }
+  }
+
+  $scope.delete = function(reminder){
+    if(window.confirm("Delete this reminder?")){
+      Notifications.remove($stateParams.reminderId);
+      Notifications.update();
+      $ionicHistory.goBack();
+    }
+  }
 });
