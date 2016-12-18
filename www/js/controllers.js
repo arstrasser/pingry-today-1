@@ -1,8 +1,6 @@
 var monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 var weekDays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-var $cordovaToast;
-
 angular.module('app.controllers', [])
 
 .controller("MenuCtrl", function($scope, $cordovaInAppBrowser){
@@ -11,13 +9,9 @@ angular.module('app.controllers', [])
   }
 })
 
-.controller("HomeCtrl", function($scope, $cordovaInAppBrowser, $http, rssFeed){
-  $scope.$on("$ionicView.enter", function(){
-    $scope.resetMessages();
-  });
+.controller("HomeCtrl", function($scope, $cordovaInAppBrowser, $http, rssFeed, Messages){
 
   $scope.refresh = function(){
-    $scope.resetMessages();
     $http.get("http://www.pingry.org/rss.cfm?news=14").then(function(data){
       var obj = rssFeed.parseXML(data.data);
       localStorage.setItem("newsRSS", JSON.stringify(obj));
@@ -29,13 +23,11 @@ angular.module('app.controllers', [])
   };
 
   $scope.localRefresh = function(){
-    $scope.resetMessages();
     var obj = localStorage.getItem("newsRSS");
     if(obj != undefined){
       $scope.rss = JSON.parse(obj);
     }else{
-      $scope.resetMessages();
-      $scope.addError("Couldn't connect to the internet!");
+      Messages.showError("Couldn't connect to the internet!");
     }
   };
   
@@ -61,26 +53,6 @@ angular.module('app.controllers', [])
     }
   };
 
-  $scope.addError = function(msg){
-    var elem = document.createElement("b");
-    elem.setAttribute("class", "error");
-    elem.innerHTML = msg;
-    document.getElementById("news-messages").appendChild(elem);
-  }
-
-  $scope.resetMessages = function(){
-    document.getElementById("news-messages").innerHTML = "";
-  }
-
-  $scope.addSuccess = function(msg){
-    var elem = document.createElement("b");
-    elem.setAttribute("class", "success");
-    elem.innerHTML = msg;
-    document.getElementById("news-messages").appendChild(elem);
-  };
-
-
-
   var lastRefresh = localStorage.getItem("pingryNewsRSSRefreshTime");
   if(lastRefresh != null && lastRefresh != ""){
     if(parseInt(lastRefresh) + 360000 < Date.now()){
@@ -98,37 +70,17 @@ angular.module('app.controllers', [])
   $scope.$on('$ionicView.enter', function(){$scope.localRefresh();})
 
   $scope.localRefresh = function(){
-    $scope.resetMessages();
     var obj = localStorage.getItem("newsRSS");
     if(obj != undefined && $stateParams.articleId != ""){
       $scope.art = JSON.parse(obj)[$stateParams.articleId];
       document.getElementById("article-content").innerHTML = rssFeed.parseRawDescription($scope.art.rawDescription);
     }else{
-      $scope.resetMessages();
-      $scope.addError("Couldn't find that article!");
+      Messages.showError("Couldn't find that article!");
     }
-  };
-
-  $scope.addError = function(msg){
-    var elem = document.createElement("b");
-    elem.setAttribute("class", "error");
-    elem.innerHTML = msg;
-    document.getElementById("art-messages").appendChild(elem);
-  }
-
-  $scope.resetMessages = function(){
-    document.getElementById("art-messages").innerHTML = "";
-  }
-
-  $scope.addSuccess = function(msg){
-    var elem = document.createElement("b");
-    elem.setAttribute("class", "success");
-    elem.innerHTML = msg;
-    document.getElementById("art-messages").appendChild(elem);
   };
 })
 
-.controller('ScheduleCtrl', function($scope, $cordovaToast, $cordovaNetwork, Schedule, LetterDay, MySchedule, $ionicSideMenuDelegate, $ionicGesture) {
+.controller('ScheduleCtrl', function($scope, $cordovaNetwork, Schedule, LetterDay, MySchedule, $ionicSideMenuDelegate, $ionicGesture, Messages) {
   var elem = angular.element(document.querySelector("#scheduleContent"));
   $ionicGesture.on("swipeleft", $scope.nextDay, elem);
   $ionicGesture.on("swiperight", $scope.prevDay, elem);
@@ -210,10 +162,10 @@ angular.module('app.controllers', [])
       if($scope.letter == "empty"){
         console.log($cordovaNetwork.connection);
           if($cordovaNetwork.connection != "none"){
-            $cordovaToast.show("Schedule is refreshing...", "long", "bottom");
+            Messages.showNormal("Refreshing...")
           }
           else{
-            $cordovaToast.show("Please connect to the internet", "long", "bottom");
+            Messages.showError("Please connect to the internet");
           }
       }
       $scope.letter = "";
@@ -268,17 +220,12 @@ angular.module('app.controllers', [])
   }, element);
 })
 
-.controller("AnnouncementsCtrl", function($scope, $cordovaInAppBrowser, $http, rssFeed){
-  $scope.$on("$ionicView.enter", function(){
-    $scope.resetMessages();
-  });
-
+.controller("AnnouncementsCtrl", function($scope, $cordovaInAppBrowser, $http, rssFeed, Messages){
   $scope.openSystemLink = function(url){
     var browse = new $cordovaInAppBrowser(url, '_system', null)
   }
 
   $scope.refresh = function(){
-    $scope.resetMessages();
     $http.get("http://www.pingry.org/rss.cfm?news=16").then(function(data){
       var obj = rssFeed.parseXML(data.data);
       localStorage.setItem("announceRSS", JSON.stringify(obj));
@@ -290,13 +237,11 @@ angular.module('app.controllers', [])
   };
 
   $scope.localRefresh = function(){
-    $scope.resetMessages();
     var obj = localStorage.getItem("announceRSS");
     if(obj != undefined){
       $scope.rss = JSON.parse(obj);
     }else{
-      $scope.resetMessages();
-      $scope.addError("Couldn't connect to the internet!");
+      Messages.showError("Couldn't connect to the internet!");
     }
   };
 
@@ -321,25 +266,6 @@ angular.module('app.controllers', [])
     }
   };
 
-  $scope.addError = function(msg){
-    var elem = document.createElement("b");
-    elem.setAttribute("class", "error");
-    elem.innerHTML = msg;
-    document.getElementById("announce-messages").appendChild(elem);
-  }
-
-  $scope.resetMessages = function(){
-    document.getElementById("announce-messages").innerHTML = "";
-  }
-
-  $scope.addSuccess = function(msg){
-    var elem = document.createElement("b");
-    elem.setAttribute("class", "success");
-    elem.innerHTML = msg;
-    document.getElementById("announce-messages").appendChild(elem);
-  }
-
-
 
   var lastRefresh = localStorage.getItem("pingryRSSRefreshTime");
   if(lastRefresh != null && lastRefresh != ""){
@@ -354,32 +280,32 @@ angular.module('app.controllers', [])
 
 })
 
-.controller('SettingsCtrl', function($scope, $cordovaToast, MySchedule, Schedule, LetterDay) {
+.controller('SettingsCtrl', function($scope, MySchedule, Schedule, LetterDay, Messages) {
   var refreshEnable = true;
   $scope.forceRefresh = function(){
     if(refreshEnable){
-      $cordovaToast.show("Refreshing...", "short", "bottom");
+      Messages.showNormal("Refreshing...");
       refreshEnable = false;
       Schedule.refresh().then(function(){
         refreshEnable = true;
-        $cordovaToast.show("Complete!", "short", "bottom");
+        Messages.showSuccess("Complete!");
       }, function(){
         refreshEnable = true;
-        $cordovaToast.show("Error...", "short", "bottom");
+        Messages.showError("Couldn't connect");
       });
     }
   }
 
   $scope.letterRefresh = function(){
     if(refreshEnable){
-      $cordovaToast.show("Refreshing...", "short", "bottom");
+      Messages.showNormal("Refreshing...");
       refreshEnable = false;
       LetterDay.refresh().then(function(){
         refreshEnable = true;
-        $cordovaToast.show("Complete!", "short", "bottom");
+        Messages.showNormal("Complete!");
       }, function(){
         refreshEnable = true;
-        $cordovaToast.show("Error...", "short", "bottom");
+        Messages.showError("Couldn't connect");
       });
     }
   }
@@ -394,7 +320,7 @@ angular.module('app.controllers', [])
 
 })
 
-.controller('AddClassCtrl', function($scope, MySchedule, $cordovaToast, $stateParams, $ionicHistory) {
+.controller('AddClassCtrl', function($scope, MySchedule, $stateParams, $ionicHistory, Messages) {
   $scope.colors = ["#DC143C", "#FF3E96", "#EE00EE", "#4876FF", "#8EE5EE", "#00EE76", "#71C671", "#EEEE00", "#EE9A00", "#CDB7B5", "#666"];
 
   $scope.resetView = function(){
@@ -427,19 +353,19 @@ angular.module('app.controllers', [])
   $scope.submit = function(cls){
     if($scope.isValid(cls)){
       MySchedule.addClass(cls);
-      $cordovaToast.show("Class added!", "short", "bottom");
+      Messages.showNormal("Class added!");
       MySchedule.save();
       $ionicHistory.goBack();
       return true;
     }
-    $cordovaToast.show("Error, class wasn't added", "long", "bottom");
+    Messages.showError("Error, class wasn't added");
   }
 
   $scope.update = function(cls){
     if($scope.isValid(cls)){
       MySchedule.removeClassById($stateParams.clsType, $stateParams.clsId);
       MySchedule.addClass(cls)
-      $cordovaToast.show("Updated!", "short", "bottom");
+      Messages.showSuccess("Updated!");
       MySchedule.save();
       $ionicHistory.goBack();
     }
@@ -508,7 +434,10 @@ angular.module('app.controllers', [])
     $scope.rem = {"description":"", "time":{"day":"", "time":(new Date(1970, 0, 1, 8, 0, 0)), "date":(new Date())}};
   }else{
     modify = true;
-    $scope.rem = Notifications.get($stateParams.reminderId);
+    var rem = JSON.parse(JSON.stringify(Notifications.get($stateParams.reminderId)));
+    rem.time.time = new Date(rem.time.time);
+    rem.time.date = new Date(rem.time.date);
+    $scope.rem = rem;
   }
   $scope.modify = modify;
 
