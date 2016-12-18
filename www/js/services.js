@@ -664,6 +664,7 @@ angular.module('app.services', [])
               newName = flexes[i].name;
               modified = true;
             }
+            tClass.color = flexes[i].color;
           }
         }
         //If this is first flex
@@ -747,8 +748,13 @@ angular.module('app.services', [])
       }
       return false;
     },
+    removeClassById: function(type, id){
+      myClasses[type].splice(id,1);
+    },
     addClass: function(cls){
-      myClasses[cls.timeType].push(cls);
+      console.log(cls);
+      console.log(myClasses);
+      myClasses[cls.type].push(cls);
     },
     addClassWithType: function(type, cls){
       //Deprecated function to add a class to a specific place

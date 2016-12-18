@@ -5,7 +5,9 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-angular.module('app', ['ionic', 'ionic.native', 'app.routes', 'app.controllers', 'app.services', 'app.directives'])
+
+
+angular.module('app', ['ionic', 'ionic.native', 'ngCordova', 'app.routes', 'app.controllers', 'app.services', 'app.directives'])
 .config(function($ionicConfigProvider)   {
     if (ionic.Platform.isAndroid()){
       $ionicConfigProvider.scrolling.jsScrolling(true);
@@ -18,8 +20,13 @@ angular.module('app', ['ionic', 'ionic.native', 'app.routes', 'app.controllers',
   ]);
 })
 
-.run(function($ionicPlatform, LetterDay, Schedule) {
+.run(function($ionicPlatform, $cordovaToast, $ionicHistory, LetterDay, Schedule) {
   $ionicPlatform.ready(function() {
+
+    try{
+      $cordovaToast.show("test", "bottom", 0);
+    }catch(e){$cordovaToast.show = function(msg){console.log(msg);}}
+
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
     if (window.cordova && window.cordova.plugins && window.cordova.plugins.Keyboard) {
