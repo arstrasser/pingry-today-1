@@ -1,7 +1,10 @@
+// Allows us to set the weekday of the provided date
 Date.prototype.setDay = function(dayOfWeek) {
     this.setDate(this.getDate() - this.getDay() + dayOfWeek);
 };
 
+
+// If Array doesn't have the includes function (older web browsers) then add it in
 if (!Array.prototype.includes) {
   Array.prototype.includes = function(searchElement) {
     'use strict';
@@ -1302,6 +1305,30 @@ angular.module('app.services', [])
 
     }
   }
+})
+
+.factory("Messages", function($cordovaToast){
+  function hide(){
+    //Forces all the current toast messages to hide
+    $cordovaToast.hide();
+  }
+  return {
+    showError: function(msg){
+      //Shows a message in the center of the screen with a red background and white text
+      hide();
+      $cordovaToast.showWithOptions({message:msg, position:"middle", duration:"long", styling:{backgroundColor:"#F73333", textColor:"FFFFFF"}});
+    },
+    showSuccess: function(msg){
+      //Shows a message at the bottom of the screen with a green background
+      hide();
+      $cordovaToast.showWithOptions({message:msg, position:"bottom", duration:"short", styling:{backgroundColor:"#53ed53"}});
+    },
+    showNormal: function(msg){
+      //Shows a normal message
+      $cordovaToast.showShortBottom(msg);
+    },
+    forceHide: hide
+  }
 });
 
 //STRUCTURES OF LOCAL STORAGE OBJECTS:
@@ -1309,8 +1336,8 @@ angular.module('app.services', [])
 //Reminder List Structure
 /*
 [
-  {"name":, "description":, "time":{"day":, "time":"HH:MM"}, "type":"letter"/"weekday"/"single"}
-  {"name":, "description":, "time":{"date":, "time":"HH:MM"}, "type":"single"}
+  {"name":, "description":, "time":{"day":, "time":}, "type":"letter"/"weekday"}
+  {"name":, "description":, "time":{"date":, "time":}, "type":"single"}
 ]
 */
 

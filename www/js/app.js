@@ -25,7 +25,11 @@ angular.module('app', ['ionic', 'ionic.native', 'ngCordova', 'app.routes', 'app.
 
     try{
       $cordovaToast.show("test", "bottom", 0);
-    }catch(e){$cordovaToast.show = function(msg){console.log(msg);}}
+    }catch(e){
+      $cordovaToast.show = function(msg){console.log(msg);}
+      $cordovaToast.showShortBottom = function(msg){console.log(msg);}
+      $cordovaToast.showWithOptions = function(obj){console.log(obj.message);}
+    }
 
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
