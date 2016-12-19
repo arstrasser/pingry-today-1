@@ -2,7 +2,7 @@
 	<ion-content padding="true" class="has-header" id="scheduleContent" on-swipe-right="prevDay()" on-swipe-left="nextDay()">
 		<div id="changeDayMenu">
 			<div id="changeDayLeft" ng-click="prevDay()"><i class="icon ion-arrow-left-b"></i></div>
-			<div id="currentDay" ng-bind="displayDate"></div>
+			<div id="currentDay" ng-bind="displayDate" ng-click="openDatePicker()" on-hold="resetDate()"></div>
 			<div id="changeDayRight" ng-click="nextDay()"><i class="icon ion-arrow-right-b"></i></div>
 		</div>
 		<div id="letterMenu" ng-hide="letter==''">

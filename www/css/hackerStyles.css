@@ -1,0 +1,12 @@
+html *, .item, .input-label, .input-label option{
+   color: #00FF00;
+   font-family:monospace;
+}
+
+ion-content, .item, .item-select select {
+	background-color: #000000;
+}
+
+ion-header-bar {
+	background-color: #003300 !important;
+}

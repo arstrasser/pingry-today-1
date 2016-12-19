@@ -41,7 +41,7 @@ function dateToDayString(d){
   return d.getFullYear()+" "+(d.getMonth()+1)+" "+d.getDate();
 };
 
-angular.module('app.services', [])
+angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
 
 .factory('LetterDay', function($http, icalFeed) {
   var time = localStorage.getItem("lastLetterRefresh");
@@ -373,7 +373,6 @@ angular.module('app.services', [])
 
   //Checks the scheduled days array for the current day and updates the current schedule to reflect it
   function updateCurrentSchedule(){
-    console.log(!schedOverride);
     //If not in Schedule override mode
     if(!schedOverride){
       //If today has a special schedule
@@ -887,6 +886,12 @@ angular.module('app.services', [])
         //Name of the event
         var title = event.substring(event.indexOf("SUMMARY:")+8);
         title = title.substring(0, title.indexOf("\n"));
+        //Location of the event
+        var loc = "";
+        if(event.indexOf("LOCATION") != -1){
+          loc = event.substring(event.indexOf("LOCATION:")+9);
+          loc = loc.substring(0, loc.indexOf("\n"));
+        }
         //Start time of the event
         var dtstart = event.substring(event.indexOf("DTSTART")+7);
         dtstart = dtstart.substring(0,dtstart.indexOf("\n"));
@@ -957,7 +962,7 @@ angular.module('app.services', [])
           recId = new Date(recId.substring(0,4)+" "+recId.substring(4,6)+" "+recId.substring(6,8)+" "+recId.substring(9,11)+":"+recId.substring(11,13)+":"+recId.substring(13,15));
           
           //Add the object to the list to be dealt with later after parsing
-          var obj = {"uid":uid, "title":title, "type":type, "recurrenceId":recId};
+          var obj = {"uid":uid, "title":title, "type":type, "location":loc, "recurrenceId":recId};
           if(type == "day"){
             obj.time = dtstart;
           }else if(type == "time"){
@@ -1052,7 +1057,7 @@ angular.module('app.services', [])
                     //If it isn't a date exception
                     if(!exdates.includes(dateToDayString(curDay))){
                       //add the object to the list of events
-                      var obj = {"uid":uid, "title":title, "type":type, "recurring":true}
+                      var obj = {"uid":uid, "title":title, "type":type, "location":loc, "recurring":true}
                       if(type == "day"){
                         obj.time = curDay;
                       }else if(type == "time"){
@@ -1114,7 +1119,7 @@ angular.module('app.services', [])
                 var exists = false;
                 if(!exdates.includes(dateToDayString(curDay))){
                   //Add the date to the list of events
-                  var obj = {"uid":uid, "title":title, "type":type, "recurring":true}
+                  var obj = {"uid":uid, "title":title, "type":type, "location":loc, "recurring":true}
                   //Figure out timing of the event
                   if(type == "day"){
                     obj.time = curDay;
@@ -1133,7 +1138,7 @@ angular.module('app.services', [])
         //Normal, non-repeating event
         else{
           //Add the object to the array of events
-          var obj = {"uid":uid, "title":title, "type":type};
+          var obj = {"uid":uid, "title":title, "location":loc, "type":type};
           if(type == "day"){
             obj.time = dtstart;
           }else if(type == "time"){
@@ -1180,6 +1185,30 @@ angular.module('app.services', [])
       //Log the list
       console.log(list);
       return list;
+    },
+    //Function to parse through a list of events and returns that list with only future events
+    futureOnly: function(events){
+      //For each event in the list
+      for(var i = 0; i < events.length; i++){
+        //Time type event
+        if(events[i].type == "time"){
+          //If the event end time is less than the current time
+          if(events[i].endTime.getTime() < Date.now()){
+            //Remove the event
+            events.splice(i,1);
+          }
+        }
+        //Day type event
+        else if(events[i].type == "day"){
+          //If the event's time is less than the current time and the event isn't today
+          if(events[i].time.getTime() < Date.now() && dateToDayString(events[i]) != dateToDayString(new Date())){
+            //Remove the event
+            events.splice(i,1);
+          }
+        }
+      }
+      //Returns the new array
+      return events;
     }
   }
 })
@@ -1341,6 +1370,78 @@ angular.module('app.services', [])
       $cordovaToast.showShortBottom(msg);
     },
     forceHide: hide
+  }
+})
+
+.factory("Settings", function(){
+  var superMode = localStorage.getItem("superMode");
+  if(superMode != "" && superMode != undefined && superMode != "false"){
+    superMode = true;
+  }else{
+    superMode = false;
+  }
+
+  var extraOptions = localStorage.getItem("extraOptions");
+  if(extraOptions != "" && extraOptions != undefined){
+    extraOptions = JSON.parse(extraOptions);
+  }else{
+    extraOptions = [];
+  }
+
+  function refreshExtraOptions(){
+    console.log(extraOptions);
+    if(extraOptions.includes("hackerTheme")){
+      console.log("yes");
+      var elem = document.createElement("link");
+      elem.rel = "stylesheet";
+      elem.href = "css/hackerStyles.css";
+      elem.id = "hacker-style";
+      document.body.appendChild(elem);
+    }else{
+      if(document.getElementById("hacker-style") != null){
+        document.body.removeChild(document.getElementById("hacker-style"));
+      }
+    }
+  }
+
+  refreshExtraOptions();
+
+
+  return {
+    getSuperMode: function(){
+      return superMode;
+    },
+    setSuperMode: function(val){
+      superMode = val;
+      if(val){
+        localStorage.setItem("superMode", "true");
+      }else{
+        localStorage.setItem("superMode", "false");
+      }
+    },
+    setExtraOptions: function(options){
+      extraOptions = options;
+      localStorage.setItem("extraOptions", JSON.stringify(extraOptions));
+      refreshExtraOptions();
+    },
+    getExtraOptions: function(){
+      return extraOptions;
+    },
+    addExtraOption: function(option){
+      extraOptions.push(option);
+      localStorage.setItem("extraOptions", JSON.stringify(extraOptions));
+      refreshExtraOptions();
+    },
+    removeExtraOption: function(option){
+      for(var i = 0; i < extraOptions.length; i++){
+        if(extraOptions[i] == option){
+          extraOptions.splice(i, 1);
+          break;
+        }
+      }
+      localStorage.setItem("extraOptions", JSON.stringify(extraOptions));
+      refreshExtraOptions();
+    }
   }
 });
 
