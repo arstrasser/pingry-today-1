@@ -460,8 +460,12 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   $scope.addClick = function(){
     clicks++;
     if(clicks == 15){
-      Settings.setSuperMode(true);
-      Messages.showNormal("Super Mode Activated!");
+      window.setTimeout(function(){
+        if(clicks == 15){
+          Settings.setSuperMode(true);
+          Messages.showNormal("Super Mode Activated!");
+        }
+      }, 2000);
     }
   }
 })
