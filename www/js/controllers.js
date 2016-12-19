@@ -1,15 +1,19 @@
 var monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 var weekDays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-angular.module('app.controllers', [])
+angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
 
 .controller("MenuCtrl", function($scope, $cordovaInAppBrowser){
   $scope.openForeignLink = function(addr){
-    var browse = new $cordovaInAppBrowser(addr, '_system');
+    $cordovaInAppBrowser.open(addr, '_system');
+  }
+
+  $scope.openLocalLink = function(addr){
+    $cordovaInAppBrowser.open(addr, '_self');
   }
 })
 
-.controller("HomeCtrl", function($scope, $cordovaInAppBrowser, $http, rssFeed, Messages){
+.controller("HomeCtrl", function($scope, $http, rssFeed, Messages){
 
   $scope.refresh = function(){
     $http.get("http://www.pingry.org/rss.cfm?news=14").then(function(data){
@@ -80,7 +84,7 @@ angular.module('app.controllers', [])
   };
 })
 
-.controller('ScheduleCtrl', function($scope, $cordovaNetwork, Schedule, LetterDay, MySchedule, $ionicSideMenuDelegate, $ionicGesture, Messages) {
+.controller('ScheduleCtrl', function($scope, $cordovaNetwork, Schedule, LetterDay, MySchedule, $ionicSideMenuDelegate, $ionicGesture, Messages, $cordovaDatePicker) {
   var elem = angular.element(document.querySelector("#scheduleContent"));
   $ionicGesture.on("swipeleft", $scope.nextDay, elem);
   $ionicGesture.on("swiperight", $scope.prevDay, elem);
@@ -187,6 +191,21 @@ angular.module('app.controllers', [])
     }
   })
 
+  $scope.resetDate = function(){
+    curDay = new Date();
+    updateDate();
+  }
+
+  $scope.openDatePicker = function(){
+    $cordovaDatePicker.show({
+      mode:"date",
+      date:curDay,
+    }).then(function(date){
+      curDay = date;
+      updateDate();
+    });
+  }
+
   $scope.formatTime = function(str){
     hour = parseInt(str.substring(0,2));
     minute = parseInt(str.substring(3,5));
@@ -219,7 +238,7 @@ angular.module('app.controllers', [])
 
 .controller("AnnouncementsCtrl", function($scope, $cordovaInAppBrowser, $http, rssFeed, Messages){
   $scope.openSystemLink = function(url){
-    var browse = new $cordovaInAppBrowser(url, '_system', null)
+    $cordovaInAppBrowser.open(url, '_system')
   }
 
   $scope.refresh = function(){
@@ -277,7 +296,7 @@ angular.module('app.controllers', [])
 
 })
 
-.controller('SettingsCtrl', function($scope, MySchedule, Schedule, LetterDay, Messages) {
+.controller('SettingsCtrl', function($scope, MySchedule, Schedule, LetterDay, Messages, Settings) {
   var refreshEnable = true;
   $scope.forceRefresh = function(){
     if(refreshEnable){
@@ -317,6 +336,20 @@ angular.module('app.controllers', [])
     }
   }
 
+  $scope.addExtra = function(option){
+    if(!Settings.getExtraOptions().includes(option)){
+      Settings.addExtraOption(option);
+    }
+  }
+
+  $scope.removeExtra = function(option){
+    if(Settings.getExtraOptions().includes(option)){
+      Settings.removeExtraOption(option);
+    }
+  }
+
+  $scope.superMode = Settings.getSuperMode();
+  $scope.hackerTheme = Settings.getExtraOptions().includes("hackerTheme");
   $scope.overrideSett = "-1";
 
   $scope.scheduleTypes = Schedule.getTypes();
@@ -416,11 +449,21 @@ angular.module('app.controllers', [])
   });
 })
 
-.controller("AboutCtrl", function($scope, $cordovaAppVersion){
+.controller("AboutCtrl", function($scope, $cordovaAppVersion, Settings, Messages){
   $scope.appVersion = "Loading...";
-  $cordovaAppVersion.getVersionNumber().then(function (version) {
+  /*$cordovaAppVersion.getVersionNumber().then(function (version) {
     $scope.appVersion = version;
-  });
+  });*/
+
+  $scope.$on("$ionicView.enter", function(){clicks = 0;})
+  var clicks = 0;
+  $scope.addClick = function(){
+    clicks++;
+    if(clicks == 15){
+      Settings.setSuperMode(true);
+      Messages.showNormal("Super Mode Activated!");
+    }
+  }
 })
 
 .controller("ReminderCtrl", function($scope, $cordovaDevice, Notifications){
@@ -509,5 +552,120 @@ angular.module('app.controllers', [])
       Notifications.update();
       $ionicHistory.goBack();
     }
+  }
+})
+
+.controller("AthleticsCtrl", function($scope, $http, $cordovaInAppBrowser, icalFeed, Messages){
+  function fixTime(hours, minutes){
+    var AM = true;
+    if(hours > 12){
+      hours -= 12;
+      AM = false;
+    }else if(hours == 12){
+      AM = false;
+    }else if(hours == 0){
+      hours = 12;
+    }
+    return (hours) + ":" + ((minutes<10)?"0":"")+minutes+" "+(AM?"AM":"PM");
+  }
+
+  $scope.formatTime = function(time){
+    time = new Date(time);
+    if(time.getHours() == 0 && time.getMinutes() == 0){
+      return (time.getMonth()+1)+"/"+time.getDate()
+    }
+    return fixTime(time.getHours(), time.getMinutes())+" "+(time.getMonth()+1)+"/"+time.getDate();
+  }
+
+  $scope.openMapsLocation = function(loc){
+    $cordovaInAppBrowser.open("http://maps.google.com/?q="+loc, '_system');
+  }
+
+  function resort(){
+    var events = $scope.events;
+    for(var i = 0; i < events.length; i++){
+      //Time type event
+      if(events[i].type == "time"){
+        events[i].startTime = new Date(events[i].startTime);
+        events[i].endTime = new Date(events[i].endTime);
+        //If the event end time is less than the current time
+        if(events[i].startTime.getTime() < Date.now()){
+          //Remove the event
+          events.splice(i,1);
+          i--;
+        }
+      }
+      //Day type event
+      else if(events[i].type == "day"){
+        events[i].time = new Date(events[i].time);
+        //If the event's time is less than the current time and the event isn't today
+        if(events[i].time.getTime() < Date.now() && dateToDayString(events[i]) != dateToDayString(new Date())){
+          //Remove the event
+          events.splice(i,1);
+          i--;
+        }
+        else{
+          events[i].startTime = events[i].time;
+        }
+      }
+    }
+
+    events.sort(
+      function(a,b){
+        if(a.startTime==b.startTime){
+          return 0;
+        }
+        else{
+          return a.startTime>b.startTime?1:-1
+        }
+      }
+    );
+    if(events.length > 15){
+      events = events.slice(0,15);
+    }
+    for(var i = 0; i < events.length; i++){
+      var title = events[i].title;
+      var desc = title.substring(title.indexOf(" - ")+3);
+      var title = title.substring(0, title.indexOf(" - "));
+      console.log(title);
+      console.log(desc);
+      events[i].title = title;
+      events[i].desc = desc;
+    }
+    $scope.events = events;
+  }
+
+
+  $scope.refresh = function(){
+    $http.get("http://www.pingry.org/calendar/team_125.ics").then(function(data){
+      var obj = icalFeed.parseCalendar(data.data);
+      localStorage.setItem("athleticEvents", JSON.stringify(obj));
+      localStorage.setItem("athleticEventsRefreshTime", Date.now());
+      $scope.events = obj;
+      resort();
+    }, $scope.localRefresh).finally(function(){
+       $scope.$broadcast('scroll.refreshComplete');
+    });
+  };
+
+  $scope.localRefresh = function(){
+    var obj = localStorage.getItem("athleticEvents");
+    if(obj != undefined){
+      $scope.events = JSON.parse(obj);
+      resort();
+    }else{
+      Messages.showError("Couldn't connect to the internet!");
+    }
+  };
+
+  var lastRefresh = localStorage.getItem("athleticEventsRefreshTime");
+  if(lastRefresh != null && lastRefresh != ""){
+    if(parseInt(lastRefresh) + 360000 < Date.now()){
+      $scope.refresh();
+    }else{
+      $scope.localRefresh();
+    }
+  }else{
+    $scope.refresh();
   }
 });

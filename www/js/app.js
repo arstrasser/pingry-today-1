@@ -16,22 +16,23 @@ angular.module('app', ['ionic', 'ionic.native', 'ngCordova', 'app.routes', 'app.
 
 .config(function($sceDelegateProvider){
   $sceDelegateProvider.resourceUrlWhitelist([
-    'self'
+    'self',
+    'http://www.sagedining.com/menus/pingry'
   ]);
 })
 
-.run(function($ionicPlatform, $cordovaToast, $ionicHistory, LetterDay, Schedule) {
+.run(function($ionicPlatform, $cordovaToast, $ionicHistory, LetterDay, Schedule, Settings) {
   $ionicPlatform.ready(function() {
-
+    /*
     try{
-      $cordovaToast.show("test", "bottom", 0);
+      $cordovaToast.show("test", "bottom", 10);
     }catch(e){
       //Override the cordova toast functionality if on computer or unsupported platform
       $cordovaToast.show = function(msg){console.log(msg);}
       $cordovaToast.showShortBottom = function(msg){console.log(msg);}
       $cordovaToast.showWithOptions = function(obj){console.log(obj.message);}
     }
-
+    */
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
     if (window.cordova && window.cordova.plugins && window.cordova.plugins.Keyboard) {

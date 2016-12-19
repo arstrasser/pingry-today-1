@@ -11,6 +11,15 @@
 			</label>
 			<div class="item" ng-click="forceRefresh()">Force Calendar Refresh</div>
 			<div class="item" ng-click="letterRefresh()">Force Letter Day Refresh</div>
+			<div class="item item-toggle" ng-show="superMode">
+				Hacker Theme
+				<label class="toggle toggle-balanced">
+			       <input ng-model="hackerTheme" ng-change="hackerTheme?addExtra('hackerTheme'):removeExtra('hackerTheme')" type="checkbox">
+			       <div class="track">
+			         <div class="handle"></div>
+			       </div>
+			    </label>
+			</div>
 		</div>
 	</ion-content>
 </ion-view>

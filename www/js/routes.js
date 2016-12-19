@@ -116,6 +116,15 @@ angular.module('app.routes', [])
         controller: 'AddReminderCtrl'
       }
     }
+  })
+  .state('main.athletics', {
+    url: '/athletics',
+    views: {
+      'sideMenu': {
+        templateUrl: 'templates/athletics.html',
+        controller: 'AthleticsCtrl'
+      }
+    }
   });
 
   // if none of the above states are matched, use this as the fallback

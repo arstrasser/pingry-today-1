@@ -1,21 +1,5 @@
 /* Empty. Add your own CSS if you like */
 
-#messages {
-	padding:10px;
-}
-
-.error {
-	color:#f00;
-	margin:5px;
-	display:block;
-}
-
-.success {
-	color:#0c0;
-	margin:5px;
-	display:block;
-}
-
 .color-select {
 	display:inline-block;
 	margin:2px;
@@ -96,6 +80,10 @@
 	padding-top:5px;
 }
 
+#mySchedule div{
+	color:#000 !important;
+}
+
 #periods {
 	font-size:10px;
 }
@@ -115,4 +103,23 @@
 
 .article img {
 	width:100%;
+}
+
+.athleticEvent {
+
+}
+
+.athleticEventTitle {
+	font-weight: bold;
+	display:inline-block;
+}
+
+.athleticEventTime {
+	display:inline-block;
+	float:right;
+}
+
+.athleticEventDesc {
+	display:block;
+	white-space:normal;
 }
