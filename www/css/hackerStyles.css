@@ -1,6 +1,10 @@
-html *, .item, .input-label, .input-label option{
-   color: #00FF00;
-   font-family:monospace;
+html *, .item, .input-label, .input-label option, input{
+	color: #00FF00;
+	font-family:monospace;
+}
+
+input, .item-select select {
+	color: #00FF00 !important;
 }
 
 ion-content, .item, .item-select select {
