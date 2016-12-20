@@ -3,7 +3,6 @@ Date.prototype.setDay = function(dayOfWeek) {
     this.setDate(this.getDate() - this.getDay() + dayOfWeek);
 };
 
-
 // If Array doesn't have the includes function (older web browsers) then add it in
 if (!Array.prototype.includes) {
   Array.prototype.includes = function(searchElement) {
@@ -83,10 +82,12 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
         //Ensures that it is a day long event
         if(calEvents[i].type == "day"){
           //Adds the first letter of that event to the calendar
-          //TODO: Double check that it is an actual day
-          obj[calEvents[i].title.substring(0,1)].push(dateToDayString(calEvents[i].time));
+          if(calEvents[i].title.length == 2 && obj.hasOwnProperty(calEvents[i].title.substring(0,1))){
+            obj[calEvents[i].title.substring(0,1)].push(dateToDayString(calEvents[i].time));
+          }
         }
       }
+
       //Update localStorage items
       localStorage.setItem("letterDayDates", JSON.stringify(obj));
       localStorage.setItem("lastLetterRefresh", JSON.stringify(Date.now()));
@@ -196,8 +197,10 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
       return dates;
     },
     classesOf: function(day){ //Returns the classes of the given date
-      //TODO: check for index of -1
-      return times[getIndexOf(dateToDayString(day))].schedule;
+      var ind = getIndexOf(dateToDayString(day));
+      if(ind != -1)
+        return times[ind].schedule;
+      return [];
     },
     dayOfWeek: function(){ //Returns the current date's day of the week
       return d.getDay();
@@ -629,118 +632,6 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
         }
       }
       return undefined; //Returns undefined if it couldn't find a class
-    },
-    //Main function: gets the name of a class that matches tClass
-    getScheduledClassName: function(MySchedule, tClass){ //TODO: Fix function so that it doesn't need MySchedule as a parameter (Should this really be in services...?)
-      //Gets the type of class
-      if(LetterDay.letter() == undefined){
-        return undefined;
-      }
-      var newName = tClass.name;
-      //If you have a swap class, deals with it by recalling this function with the correct option
-      if(tClass.type == "swap"){
-        //If you have first lunch
-        if(!MySchedule.get("block", LetterDay.classes()[2]) || MySchedule.get("block", LetterDay.classes()[2]).firstLunch){
-          newName = MySchedule.getScheduledClassName(MySchedule, tClass.options[0]);
-        }
-        else{ //Second Lunch
-          newName = MySchedule.getScheduledClassName(MySchedule, tClass.options[1]);
-        }
-      }
-      //If you have a block type class
-      else if(tClass.type == "block"){
-        var blockNum = LetterDay.classes()[tClass.id-1];
-        if(MySchedule.get("block", blockNum) == undefined){
-          newName = "Block "+blockNum;
-        }else{
-          tClass.color = MySchedule.get("block", blockNum).color;
-          newName = MySchedule.get("block", blockNum).name;
-        }
-      }
-      //If you have a Community Time type class
-      else if(tClass.type == "CT"){
-        newName = Schedule.getCTSchedule();
-      }
-      //If you have a flex type class
-      else if(tClass.type == "flex"){
-        //Gets all flex classes
-        var flexes = MySchedule.getAllType("flex");
-        //Variable to check whether to append or overwrite the current name
-        var modified = false;
-        //Iterate through the list for scheudled flex meetings
-        for(var i=0; i < flexes.length; i++){
-          //If the day of the week or the letter day matches and this is the right flex
-          if((flexes[i].time.day == LetterDay.letter() || flexes[i].time.day == LetterDay.dayOfWeek()) && tClass.id == flexes[i].time.id){
-            if(modified){
-              newName += " & "+flexes[i].name;
-            }else{
-              newName = flexes[i].name;
-              modified = true;
-            }
-            tClass.color = flexes[i].color;
-          }
-        }
-        //If this is first flex
-        if(tClass.id == 1){
-          //Checks to see if first period takes flex
-          var adjBlock = MySchedule.get("block", LetterDay.classes()[0]);
-          if(adjBlock !== undefined && adjBlock.takesFlex){
-            if(modified){
-              newName += " & "+adjBlock.name;
-            }else{
-              newName = adjBlock.name;
-              modified = true;
-            }
-            tClass.color = adjBlock.color;
-          }
-        }
-        //If this is second flex (It's a 0 because addClass persistence requires a boolean value which is either a 0 or a 1)
-        else if(tClass.id == 0){
-          //Checks if 3rd class of the day takes the flex
-          var adjBlock = MySchedule.get("block", LetterDay.classes()[2]);
-          if(adjBlock !== undefined && adjBlock.takesFlex){
-            tClass.color = adjBlock.color;
-            if(modified){
-              newName += " & "+adjBlock.name;
-            }else{
-              newName = adjBlock.name;
-              modified = true;
-            }
-          }
-
-          //Checks if the 4th class of the day takes the flex
-          adjBlock = MySchedule.get("block", LetterDay.classes()[3]);
-          if(adjBlock !== undefined && adjBlock.takesFlex){
-            tClass.color = adjBlock.color;
-            if(modified){
-              newName += " & "+adjBlock.name;
-            }else{
-              newName = adjBlock.name;
-              modified = true;
-            }
-          }
-        }
-      }
-      //If you have a Conference Period Type Class
-      else if(tClass.type == "CP"){
-        //Gets the current assembly schedule for scheduled CP's
-        newName = Schedule.getCPSchedule();
-        //Gets user scheduled CP's
-        var CPs = MySchedule.getAllType("CP");
-        //Iterate through user scheduled CP's
-        for(var i=0; i < CPs.length; i++){
-          //If the letter day or weekday line up
-          if(CPs[i].time.day == LetterDay.letter() || CPs[i].time.day == LetterDay.dayOfWeek()){
-            tClass.color = CPs[i].color;
-            if(newName == "CP"){
-              newName = CPs[i].name; //Overwrites if newName hasn't been set yet
-            }else{
-              newName += " & "+CPs[i].name; //Otherwise, appends
-            }
-          }
-        }
-      }
-      return newName;
     },
     set: function(type, cls){
       for(var i = 0; i < myClasses[type].length; i++){
@@ -1221,7 +1112,6 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
   function refresh(){
     //Load reminders from the local storage
     reminders = localStorage.getItem("reminders");
-    console.log(reminders); //TODO: remove
     //If there aren't any reminders stored
     if(reminders == null || reminders == undefined || reminders == ""){reminders = [];} //If no reminders, initialize to an empty array
     else{
@@ -1235,7 +1125,6 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
         reminders[i].time.date = new Date(reminders[i].time.date);
       }
     }
-    console.log(reminders); //TODO: remove
   }
 
   //Refresh the reminders from the local storage
@@ -1373,7 +1262,9 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
   }
 })
 
+//Settings storage
 .factory("Settings", function(){
+  //Super Mode (Easter Egg!)
   var superMode = localStorage.getItem("superMode");
   if(superMode != "" && superMode != undefined && superMode != "false"){
     superMode = true;
@@ -1381,6 +1272,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
     superMode = false;
   }
 
+  //Extra options storage that is unlocked by super mode
   var extraOptions = localStorage.getItem("extraOptions");
   if(extraOptions != "" && extraOptions != undefined){
     extraOptions = JSON.parse(extraOptions);
@@ -1406,11 +1298,12 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
 
   refreshExtraOptions();
 
-
   return {
+    //Gets whether or not super mode is activated
     getSuperMode: function(){
       return superMode;
     },
+    //Sets super mode to true or false
     setSuperMode: function(val){
       superMode = val;
       if(val){
@@ -1419,22 +1312,19 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
         localStorage.setItem("superMode", "false");
       }
     },
-    setExtraOptions: function(options){
-      extraOptions = options;
-      localStorage.setItem("extraOptions", JSON.stringify(extraOptions));
-      refreshExtraOptions();
-    },
-    getExtraOptions: function(){
+    getExtraOptions: function(){ //Gets the extra options
       return extraOptions;
     },
-    addExtraOption: function(option){
+    addExtraOption: function(option){ //Adds an extra option
       extraOptions.push(option);
       localStorage.setItem("extraOptions", JSON.stringify(extraOptions));
       refreshExtraOptions();
     },
-    removeExtraOption: function(option){
+    removeExtraOption: function(option){ //removes and extra option
+      //Parse through to find the option
       for(var i = 0; i < extraOptions.length; i++){
         if(extraOptions[i] == option){
+          //Remove it
           extraOptions.splice(i, 1);
           break;
         }
