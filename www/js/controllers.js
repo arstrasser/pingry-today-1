@@ -133,7 +133,110 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
           }
         }
         tClass.color = undefined;
-        tClass.dispName = MySchedule.getScheduledClassName(MySchedule, tClass);
+        //If you have a swap class, deals with it by recalling this function with the correct option
+        if(tClass.type == "swap"){
+          //If you have first lunch
+          if(!MySchedule.get("block", LetterDay.classes()[2]) || MySchedule.get("block", LetterDay.classes()[2]).firstLunch){
+            tClass = tClass.options[0];
+          }
+          else{ //Second Lunch
+            tClass = tClass.options[1];
+          }
+        }
+
+        //If you have a block type class
+        if(tClass.type == "block"){
+          var blockNum = LetterDay.classes()[tClass.id-1];
+          if(MySchedule.get("block", blockNum) == undefined){
+            tClass.name = "Block "+blockNum;
+          }else{
+            tClass.color = MySchedule.get("block", blockNum).color;
+            tClass.name = MySchedule.get("block", blockNum).name;
+          }
+        }
+        //If you have a Community Time type class
+        else if(tClass.type == "CT"){
+          tClass.name = Schedule.getCTSchedule();
+        }
+        //If you have a flex type class
+        else if(tClass.type == "flex"){
+          //Gets all flex classes
+          var flexes = MySchedule.getAllType("flex");
+          //Variable to check whether to append or overwrite the current name
+          var modified = false;
+          //Iterate through the list for scheudled flex meetings
+          for(var j=0; j < flexes.length; j++){
+            //If the day of the week or the letter day matches and this is the right flex
+            if((flexes[j].time.day == LetterDay.letter() || flexes[j].time.day == LetterDay.dayOfWeek()) && tClass.id == flexes[j].time.id){
+              if(modified){
+                tClass.name += " & "+flexes[j].name;
+              }else{
+                tClass.name = flexes[j].name;
+                modified = true;
+              }
+              tClass.color = flexes[j].color;
+            }
+          }
+          //If this is first flex
+          if(tClass.id == 1){
+            //Checks to see if first period takes flex
+            var adjBlock = MySchedule.get("block", LetterDay.classes()[0]);
+            if(adjBlock !== undefined && adjBlock.takesFlex){
+              if(modified){
+                tClass.name += " & "+adjBlock.name;
+              }else{
+                tClass.name = adjBlock.name;
+                modified = true;
+              }
+              tClass.color = adjBlock.color;
+            }
+          }
+          //If this is second flex (It's a 0 because addClass persistence requires a boolean value which is either a 0 or a 1)
+          else if(tClass.id == 0){
+            //Checks if 3rd class of the day takes the flex
+            var adjBlock = MySchedule.get("block", LetterDay.classes()[2]);
+            if(adjBlock !== undefined && adjBlock.takesFlex){
+              tClass.color = adjBlock.color;
+              if(modified){
+                tClass.name += " & "+adjBlock.name;
+              }else{
+                tClass.name = adjBlock.name;
+                modified = true;
+              }
+            }
+
+            //Checks if the 4th class of the day takes the flex
+            adjBlock = MySchedule.get("block", LetterDay.classes()[3]);
+            if(adjBlock !== undefined && adjBlock.takesFlex){
+              tClass.color = adjBlock.color;
+              if(modified){
+                tClass.name += " & "+adjBlock.name;
+              }else{
+                tClass.name = adjBlock.name;
+                modified = true;
+              }
+            }
+          }
+        }
+        //If you have a Conference Period Type Class
+        else if(tClass.type == "CP"){
+          //Gets the current assembly schedule for scheduled CP's
+          tClass.name = Schedule.getCPSchedule();
+          //Gets user scheduled CP's
+          var CPs = MySchedule.getAllType("CP");
+          //Iterate through user scheduled CP's
+          for(var j=0; j < CPs.length; j++){
+            //If the letter day or weekday line up
+            if(CPs[j].time.day == LetterDay.letter() || CPs[j].time.day == LetterDay.dayOfWeek()){
+              tClass.color = CPs[i].color;
+              if(tClass.name == "CP"){
+                tClass.name = CPs[j].name; //Overwrites if newName hasn't been set yet
+              }else{
+                tClass.name += " & "+CPs[j].name; //Otherwise, appends
+              }
+            }
+          }
+        }
         tClass.dispTime = tClass.dispTime = tClass.startTime+" - "+tClass.endTime;
         if(tClass.color === undefined){
           if(tClass.type == "block"){
@@ -150,6 +253,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
             tClass.color = "#ddd";
           }
         }
+        console.log(tClass);
         $scope.classes.push(tClass);
       }
       var c = "";
