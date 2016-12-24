@@ -2,12 +2,12 @@
 	<ion-content padding="true" class="has-header">
 		<ion-refresher
 	    	pulling-text="Pull to refresh..."
-	    	on-refresh="refresh();">
+	    	on-refresh="forceRefresh();">
 	  	</ion-refresher>
 		<div class="list">
 			<a ng-repeat="feedItem in rss track by $index" class="item item-thumbnail-left" href="#/main/home/article/{{$index}}">
 		      <img fallback-src="build/img/logo2.jpg" ng-src="{{feedItem.image}}">
-		      <b style="">{{feedItem.title}}</b>
+		      <b>{{feedItem.title}}</b>
 		    </a>
 		</div>
 	</ion-content>

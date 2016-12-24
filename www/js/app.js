@@ -10,7 +10,7 @@
 angular.module('app', ['ionic', 'ionic.native', 'ngCordova', 'app.routes', 'app.controllers', 'app.services', 'app.directives'])
 .config(function($ionicConfigProvider)   {
     if (ionic.Platform.isAndroid()){
-      $ionicConfigProvider.scrolling.jsScrolling(true);
+      //$ionicConfigProvider.scrolling.jsScrolling(true);
     }
 })
 
@@ -23,16 +23,11 @@ angular.module('app', ['ionic', 'ionic.native', 'ngCordova', 'app.routes', 'app.
 
 .run(function($ionicPlatform, $cordovaToast, $ionicHistory, LetterDay, Schedule, Settings) {
   $ionicPlatform.ready(function() {
-    /*
-    try{
-      $cordovaToast.show("test", "bottom", 10);
-    }catch(e){
-      //Override the cordova toast functionality if on computer or unsupported platform
-      $cordovaToast.show = function(msg){console.log(msg);}
-      $cordovaToast.showShortBottom = function(msg){console.log(msg);}
-      $cordovaToast.showWithOptions = function(obj){console.log(obj.message);}
-    }
-    */
+          //Override the cordova toast functionality if on computer or unsupported platform
+          //$cordovaToast.show = function(msg){console.log(msg);}
+          //$cordovaToast.showShortBottom = function(msg){console.log(msg);}
+          //$cordovaToast.showWithOptions = function(obj){console.log(obj.message);}
+
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
     if (window.cordova && window.cordova.plugins && window.cordova.plugins.Keyboard) {
