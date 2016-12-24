@@ -691,6 +691,10 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
         var desc = "";
         while(temp.indexOf("CDATA[") != -1){
           temp = temp.substring(temp.indexOf("CDATA[")+6);
+          //Removes any stray brackets from the parse
+          while(temp.indexOf("[")!= -1 && temp.indexOf("[") < temp.indexOf("]")){
+            temp = temp.substring(0, temp.indexOf("["))+temp.substring(temp.indexOf("]")+1)
+          }
           desc += temp.substring(0, temp.indexOf("]"));
           temp = temp.substring(temp.indexOf("]")+3);
         }
@@ -806,12 +810,12 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
           type="time";
           //Eliminate extra colon
           dtstart = dtstart.substring(1);
+          //Parse the strings for javascript dates
+          dtstart = new Date(dtstart.substring(0,4)+" "+dtstart.substring(4,6)+" "+dtstart.substring(6,8)+" "+dtstart.substring(9,11)+":"+dtstart.substring(11,13)+":"+dtstart.substring(13,15)+(dtstart.indexOf("Z")==-1?"":" -0000"));
           //Parse for the event end time
           dtend = event.substring(event.indexOf("DTEND:")+6);
           dtend = dtend.substring(0, dtend.indexOf("\n"));
-          //Parse the strings for javascript dates
-          dtstart = new Date(dtstart.substring(0,4)+" "+dtstart.substring(4,6)+" "+dtstart.substring(6,8)+" "+dtstart.substring(9,11)+":"+dtstart.substring(11,13)+":"+dtstart.substring(13,15)+" -0000");
-          dtend = new Date(dtend.substring(0,4)+" "+dtend.substring(4,6)+" "+dtend.substring(6,8)+" "+dtend.substring(9,11)+":"+dtend.substring(11,13)+":"+dtend.substring(13,15)+" -0000");
+          dtend = new Date(dtend.substring(0,4)+" "+dtend.substring(4,6)+" "+dtend.substring(6,8)+" "+dtend.substring(9,11)+":"+dtend.substring(11,13)+":"+dtend.substring(13,15)+(dtend.indexOf("Z")==-1?"":" -0000"));
         }
 
         //Time-based event that Includes Timezone
@@ -1073,8 +1077,6 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
           }
         }
       }
-      //Log the list
-      console.log(list);
       return list;
     },
     //Function to parse through a list of events and returns that list with only future events
@@ -1264,6 +1266,13 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
 
 //Settings storage
 .factory("Settings", function(){
+  var athleticMaps = localStorage.getItem("athleticMaps");
+  if(athleticMaps == "" || athleticMaps == undefined || athleticMaps == "true"){
+    athleticMaps = true;
+  }else{
+    athleticMaps = false;
+  }
+
   //Super Mode (Easter Egg!)
   var superMode = localStorage.getItem("superMode");
   if(superMode != "" && superMode != undefined && superMode != "false"){
@@ -1299,6 +1308,19 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
   refreshExtraOptions();
 
   return {
+    //Gets whether or not athletic maps are enabled
+    getAthleticMaps: function(){
+      return athleticMaps;
+    },
+    //Sets whether or not athletic maps are enabled
+    setAthleticMaps: function(val){
+      athleticMaps = val;
+      if(val){
+        localStorage.setItem("athleticMaps", "true");
+      }else{
+        localStorage.setItem("athleticMaps", "false");
+      }
+    },
     //Gets whether or not super mode is activated
     getSuperMode: function(){
       return superMode;

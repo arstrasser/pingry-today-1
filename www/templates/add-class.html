@@ -7,8 +7,8 @@
 			</label>
 			<div class="item">
 				<div class="color-label">Color:</div>
-				<ion-scroll direction="x">
-					<div ng-repeat="color in colors track by $index" id="color-{{$index}}" value="{{color}}" class="color-select" style="background-color: {{color}}" ng-class="{'selected-color': cls.color == color}" ng-click="cls.color = color"></div> 
+				<ion-scroll direction="x" overflow-scroll="false" style="width:100%;">
+					<div ng-repeat="color in colors track by $index" id="color-{{$index}}" value="{{color}}" class="color-select" style="background-color: {{color}}" ng-class="{'selected-color': cls.color == color}" ng-click="cls.color = color"></div>
 				</ion-scroll>
 			</div>
 			<label class="item item-input item-select">

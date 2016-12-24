@@ -9,6 +9,15 @@
 			      	<option ng-repeat="sched in scheduleTypes track by $index" value="{{$index}}" ng-bind="sched[0]" ng-selected="$index == scheduleType"></option>
 			    </select>
 			</label>
+			<div class="item item-toggle">
+				Athletic Maps on Tap
+				<label class="toggle toggle-balanced">
+			       <input ng-model="athleticMaps" ng-change="updateAthletic(athleticMaps)" type="checkbox">
+			       <div class="track">
+			         <div class="handle"></div>
+			       </div>
+			    </label>
+			</div>
 			<div class="item" ng-click="forceRefresh()">Force Calendar Refresh</div>
 			<div class="item" ng-click="letterRefresh()">Force Letter Day Refresh</div>
 			<div class="item item-toggle" ng-show="superMode">
