@@ -4,7 +4,7 @@ var weekDays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"
 angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
 
 //Controller for the side menu
-.controller("MenuCtrl", function($scope, $cordovaInAppBrowser){
+.controller("MenuCtrl", function($scope, $cordovaInAppBrowser, Settings, $ionicModal, $timeout){
   $scope.openForeignLink = function(addr){
     $cordovaInAppBrowser.open(addr, '_system');
   }
@@ -87,6 +87,10 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     if (element.tagName == 'A') {
       console.log("Caught")
       $cordovaInAppBrowser.open(element.href, "_system");
+      return false;
+    }
+    else if(element.parentNode.tagName =='A') {
+      $cordovaInAppBrowser.open(element.parentNode.href, "_system");
       return false;
     }
   };
@@ -388,7 +392,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
 })
 
 //Announcements contrller
-.controller("AnnouncementsCtrl", function($scope, $cordovaInAppBrowser, $http, rssFeed, Messages){
+.controller("AnnouncementsCtrl", function($scope, $cordovaInAppBrowser, $ionicModal, $http, rssFeed, Messages){
   //Open a web link in the browser
   $scope.openSystemLink = function(url){
     $cordovaInAppBrowser.open(url, '_system')
@@ -416,30 +420,25 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     }
   };
 
-  //toggles hiding a specific menu
-  $scope.toggleHide = function(idName){
-    //hides/unhides the description
-    var cur = document.getElementById("rss-desc-"+idName);
-    if(cur.style.display == "none"){
-      cur.style.display = "block";
-    }else{
-      cur.style.display = "none";
-    }
-    //hides/unhides the open button
-    cur = document.getElementById("rss-open-"+idName);
-    if(cur.style.display == "none"){
-      cur.style.display = "inline";
-    }else{
-      cur.style.display = "none";
-    }
-    //hides/unhides the close button
-    cur = document.getElementById("rss-close-"+idName);
-    if(cur.style.display == "none"){
-      cur.style.display = "inline";
-    }else{
-      cur.style.display = "none";
-    }
-  };
+  $scope.openAnnounce = function(index){
+    $scope.modal.scope.announcement = $scope.rss[index];
+    $scope.modal.modalEl.onclick = function (e) {
+      e = e ||  window.event;
+      var element = e.target || e.srcElement;
+
+      if (element.tagName == 'A') {
+        console.log("Caught")
+        $cordovaInAppBrowser.open(element.href, "_system");
+        return false;
+      }
+      else if(element.parentNode.tagName =='A') {
+        $cordovaInAppBrowser.open(element.parentNode.href, "_system");
+        return false;
+      }
+    };
+    $scope.modal.show();
+    console.log($scope.modal);
+  }
 
   //Finds the last refresh time
   var lastRefresh = localStorage.getItem("pingryRSSRefreshTime");
@@ -454,6 +453,11 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     $scope.refresh();
   }
 
+  $ionicModal.fromTemplateUrl("templates/announcement-popup.html", {
+    scope: $scope
+  }).then(function(modal){
+    $scope.modal = modal;
+  });
 })
 
 //Settings controller
