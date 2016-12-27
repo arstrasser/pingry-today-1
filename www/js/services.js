@@ -627,7 +627,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
     get: function(type, time){
       //Iterate through all classes of type "type" for one that matches the given time
       for(var i = 0; i < myClasses[type].length; i++){
-        if(myClasses[type][i]["time"] == time){
+        if(myClasses[type][i].time.id == time){
           return myClasses[type][i];
         }
       }
@@ -657,8 +657,8 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
     },
     addClass: function(cls){
       console.log(cls);
-      console.log(myClasses);
       myClasses[cls.type].push(cls);
+      console.log(myClasses);
     },
     addClassWithType: function(type, cls){
       //Deprecated function to add a class to a specific place
