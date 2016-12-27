@@ -85,7 +85,6 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     var element = e.target || e.srcElement;
 
     if (element.tagName == 'A') {
-      console.log("Caught")
       $cordovaInAppBrowser.open(element.href, "_system");
       return false;
     }
@@ -102,7 +101,6 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
       $scope.art = JSON.parse(obj)[$stateParams.articleId];
       //Parses the raw description to fix links and such
       content = rssFeed.parseRawDescription($scope.art.rawDescription)
-      //content = content.replace(/href="(.*)"/,'onclick="console.log(\'yes\');openExternal($event)" link-loc="$1"').replace(/<a/,"<div").replace(/a>/,"div>")
       document.getElementById("article-content").innerHTML = content;
     }else{
       Messages.showError("Couldn't find that article!");
@@ -163,13 +161,6 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     if($scope.letter !== undefined && $scope.letter.length == 1){
       for(i = 0; i < Schedule.getToday().length; i++){
         var tClass = Schedule.get(i);
-        if(tClass.type == "swap"){
-          if(!MySchedule.get("block", LetterDay.classes()[2]) || MySchedule.get("block", LetterDay.classes()[2]).firstLunch){
-            tClass = tClass.options[0];
-          }else{
-            tClass = tClass.options[1];
-          }
-        }
         tClass.color = undefined;
         //If you have a swap class, deals with it by recalling this function with the correct option
         if(tClass.type == "swap"){
@@ -427,7 +418,6 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
       var element = e.target || e.srcElement;
 
       if (element.tagName == 'A') {
-        console.log("Caught")
         $cordovaInAppBrowser.open(element.href, "_system");
         return false;
       }
@@ -437,7 +427,6 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
       }
     };
     $scope.modal.show();
-    console.log($scope.modal);
   }
 
   //Finds the last refresh time
