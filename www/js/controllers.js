@@ -160,7 +160,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     //If today is a valid letter day
     if($scope.letter !== undefined && $scope.letter.length == 1){
       for(i = 0; i < Schedule.getToday().length; i++){
-        var tClass = Schedule.get(i);
+        var tClass = JSON.parse(JSON.stringify(Schedule.get(i)));
         tClass.color = undefined;
         //If you have a swap class, deals with it by recalling this function with the correct option
         if(tClass.type == "swap"){
@@ -196,9 +196,11 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
           //Variable to check whether to append or overwrite the current name
           var modified = false;
           //Iterate through the list for scheudled flex meetings
+          console.log(flexes);
           for(var j=0; j < flexes.length; j++){
             //If the day of the week or the letter day matches and this is the right flex
             if((flexes[j].time.day == LetterDay.letter() || flexes[j].time.day == LetterDay.dayOfWeek()) && tClass.id == flexes[j].time.id){
+              console.log("today")
               if(modified){
                 tClass.name += " & "+flexes[j].name;
               }else{
@@ -206,6 +208,8 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
                 modified = true;
               }
               tClass.color = flexes[j].color;
+            }else {
+              console.log("not today");
             }
           }
           //If this is first flex
@@ -480,7 +484,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
       LetterDay.refresh().then(
       function(){ //Success
         refreshEnable = true;
-        Messages.showNormal("Complete!");
+        Messages.showSuccess("Complete!");
       }, function(){ //Failure
         refreshEnable = true;
         Messages.showError("Couldn't connect");
@@ -687,8 +691,8 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     //Gets the reminder (JSON parse and stringify allow pass by value instead of pass by reference)
     var rem = JSON.parse(JSON.stringify(Notifications.get($stateParams.reminderId)));
     //sets the dates to JS dates (JSON stores only the string)
-    rem.time.time = new Date(rem.time.time);
-    rem.time.date = new Date(rem.time.date);
+    rem.time.time = parseStringForDate(rem.time.time);
+    rem.time.date = parseStringForDate(rem.time.date);
     $scope.rem = rem;
   }
   $scope.modify = modify;
@@ -791,7 +795,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
 
   //Formats a date and time
   $scope.formatTime = function(time){
-    time = new Date(time);
+    time = new Date(time.getTime());
     if(time.getHours() == 0 && time.getMinutes() == 0){
       return (time.getMonth()+1)+"/"+time.getDate()
     }
@@ -813,8 +817,8 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     for(var i = 0; i < events.length; i++){
       //Time type event
       if(events[i].type == "time"){
-        events[i].startTime = new Date(events[i].startTime);
-        events[i].endTime = new Date(events[i].endTime);
+        events[i].startTime = parseStringForDate(events[i].startTime);
+        events[i].endTime = parseStringForDate(events[i].endTime);
         //If the event end time is less than the current time
         if(events[i].startTime.getTime() < Date.now()){
           //Remove the event
@@ -824,7 +828,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
       }
       //Day type event
       else if(events[i].type == "day"){
-        events[i].time = new Date(events[i].time);
+        events[i].time = parseStringForDate(events[i].time);
         //If the event's time is less than the current time and the event isn't today
         if(events[i].time.getTime() < Date.now() && dateToDayString(events[i].time) != dateToDayString(new Date())){
           //Remove the event
