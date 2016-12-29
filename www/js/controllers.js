@@ -259,7 +259,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
           for(var j=0; j < CPs.length; j++){
             //If the letter day or weekday line up
             if(CPs[j].time.day == LetterDay.letter() || CPs[j].time.day == LetterDay.dayOfWeek()){
-              tClass.color = CPs[i].color;
+              tClass.color = CPs[j].color;
               if(tClass.name == "CP"){
                 tClass.name = CPs[j].name; //Overwrites if newName hasn't been set yet
               }else{
