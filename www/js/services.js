@@ -3,6 +3,101 @@ Date.prototype.setDay = function(dayOfWeek) {
     this.setDate(this.getDate() - this.getDay() + dayOfWeek);
 };
 
+function monthNameToInt(str){
+  switch(str){
+    case "Jan":
+      return 0;
+    case "Feb":
+      return 1;
+    case "Mar":
+      return 2;
+    case "Apr":
+      return 3;
+    case "May":
+      return 4;
+    case "Jun":
+      return 5;
+    case "Jul":
+      return 6;
+    case "Aug":
+      return 7;
+    case "Sep":
+      return 8;
+    case "Oct":
+      return 9;
+    case "Nov":
+      return 10;
+    case "Dec":
+      return 11;
+  }
+}
+
+function parseStringForTime(str){
+  var d = new Date(86400000);
+  if(str.indexOf("T") != -1){
+    str = str.substring(str.indexOf("T")+1);
+  }
+  //Replace all spaces
+  str = str.replace(/ /g, "");
+  //Replace all colons
+  str = str.replace(/:/g, "");
+  d.setHours(parseInt(str.substring(0,2)));
+  d.setMinutes(parseInt(str.substring(2,4)));
+  d.setSeconds(parseInt(str.substring(4,6)));
+  if(str.substring(6,7) == "-" || str.substring(6,7) == "+"){
+    d.setTime(d.getTime() - (d.getTimezoneOffset()/60 + parseInt(str.substring(6))/100)*1000*60*60);
+  }
+  //If this is already in EST, disable over-compensation for timezones
+  if(str.substring(6,7) == "Z"){
+    d.setTime(d.getTime() - d.getTimezoneOffset()*1000*60)
+  }
+  return d.getTime();
+}
+
+//Parses a string for a date
+function parseStringForDate(str){
+  var d = new Date(0);
+  if(str.indexOf(" ") == -1){
+    d.setYear(parseInt(str.substring(0,4)));
+    d.setDate(parseInt(str.substring(6,8)));
+    d.setMonth(parseInt(str.substring(4,6))-1);
+    console.log(new Date(d.getTime()))
+    d.setHours(0);
+    d.setMinutes(0);
+    d.setSeconds(0);
+    if(str.length > 8){
+      str = str.substring(8);
+      d.setTime(d.getTime() + parseStringForTime(str));
+    }
+  }else if(str.substring(3,4) == ","){
+    str = str.substring(4);
+    d.setDate(parseInt(str.substring(0,2)));
+    d.setMonth(monthNameToInt(str.substring(3,6)));
+    d.setYear(parseInt(str.substring(7,11)));
+    if(str.length > 11){
+      str = str.substring(11);
+      d.setTime(d.getTIme() + parseStringForTime(str));
+    }
+  }else if(str.indexOf(" ") == 4){
+    d.setYear(parseInt(str.substring(0,4)));
+    str = str.substring(str.indexOf(" ")+1);
+    d.setDate(parseInt(str.substring(0,str.indexOf(" "))));
+    str = str.substring(str.indexOf(" ")+1);
+    d.setMonth(parseInt(str.substring(0,str.indexOf(" ")))-1);
+    str = str.substring(str.indexOf(" ")+1);
+    console.log(new Date(d.getTime()))
+    if(str.length > 8){
+      str = str.substring(8);
+      d.setTime(d.getTIme() + parseStringForTime(str));
+    }else{
+      d.setHours(0);
+      d.setMinutes(0);
+      d.setSeconds(0);
+    }
+  }
+  return d;
+}
+
 // If Array doesn't have the includes function (older web browsers) then add it in
 if (!Array.prototype.includes) {
   Array.prototype.includes = function(searchElement) {
@@ -37,7 +132,7 @@ if (!Array.prototype.includes) {
 }
 
 function dateToDayString(d){
-  return d.getFullYear()+" "+(d.getMonth()+1)+" "+d.getDate();
+  return ""+d.getFullYear()+(d.getMonth()+1<10?"0":"")+(d.getMonth()+1)+(d.getDate()<10?"0":"")+d.getDate();
 };
 
 angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
@@ -183,18 +278,6 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
     },
     getDatesOf: function(letter){ //Gets all the dates for a given letter day
       return times[letterToNumber(letter)].dates;
-    },
-    getDatesOfGreaterThan: function(letter, date){ //Returns the dates for the given letter day that are greater than the given date
-      var dates = times[letterToNumber(letter)].dates;
-      console.log(dates);
-      //Set to time of 0 so that you can schedule notifications for today
-      for(var i = 0; i < dates.length; i++){
-        if(new Date(dates[i]) < date){ //Removes all past dates
-          dates.splice(i,1);
-          i--;
-        }
-      }
-      return dates;
     },
     classesOf: function(day){ //Returns the classes of the given date
       var ind = getIndexOf(dateToDayString(day));
@@ -566,7 +649,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
     },
     getCPSchedule: function(){ //Returns the scheduled activity for conference for the current day
       if(CPSchedule != null && CPSchedule[dateToDayString(curDay)] != undefined){
-        return CPScheudle[dateToDayString(curDay)];
+        return CPSchedule[dateToDayString(curDay)];
       }
       return "CP";
     },
@@ -802,7 +885,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
             dtstart = dtstart.substring(5);
           }
           //Parses the start time and converts it to a javascript date
-          dtstart = new Date(dtstart.substring(0,4)+" "+dtstart.substring(4,6)+" "+dtstart.substring(6,8));
+          dtstart = new Date(dtstart.substring(0,4), dtstart.substring(4,6), dtstart.substring(6,8));
         }
         
         //Normal Time-type event:
@@ -811,11 +894,22 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
           //Eliminate extra colon
           dtstart = dtstart.substring(1);
           //Parse the strings for javascript dates
-          dtstart = new Date(dtstart.substring(0,4)+" "+dtstart.substring(4,6)+" "+dtstart.substring(6,8)+" "+dtstart.substring(9,11)+":"+dtstart.substring(11,13)+":"+dtstart.substring(13,15)+(dtstart.indexOf("Z")==-1?"":" -0000"));
+          var oc = false;
+          if(dtstart.indexOf("Z")!= -1)
+            oc = true;
+          dtstart = new Date(dtstart.substring(0,4), dtstart.substring(4,6), dtstart.substring(6,8), dtstart.substring(9,11), dtstart.substring(11,13), dtstart.substring(13,15));
+          if(oc)
+            dtstart.setTime(dtstart.getTime() - dtstart.getTimezoneOffset()*1000*60);
+
           //Parse for the event end time
           dtend = event.substring(event.indexOf("DTEND:")+6);
           dtend = dtend.substring(0, dtend.indexOf("\n"));
-          dtend = new Date(dtend.substring(0,4)+" "+dtend.substring(4,6)+" "+dtend.substring(6,8)+" "+dtend.substring(9,11)+":"+dtend.substring(11,13)+":"+dtend.substring(13,15)+(dtend.indexOf("Z")==-1?"":" -0000"));
+          oc = false;
+          if(dtend.indexOf("Z")!= -1)
+            oc = true;
+          dtend = new Date(dtend.substring(0,4), dtend.substring(4,6), dtend.substring(6,8), dtend.substring(9,11), dtend.substring(11,13), dtend.substring(13,15));
+          if(oc)
+            dtend.setTime(dtend.getTime() - dtend.getTimezoneOffset()*1000*60);
         }
 
         //Time-based event that Includes Timezone
@@ -833,8 +927,8 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
             dtstart = dtstart.substring(17);
             dtend = dtend.substring(17);
             //Parse for times
-            dtstart = new Date(dtstart.substring(0,4)+" "+dtstart.substring(4,6)+" "+dtstart.substring(6,8)+" "+dtstart.substring(9,11)+":"+dtstart.substring(11,13)+":"+dtstart.substring(13,15));      
-            dtend = new Date(dtend.substring(0,4)+" "+dtend.substring(4,6)+" "+dtend.substring(6,8)+" "+dtend.substring(9,11)+":"+dtend.substring(11,13)+":"+dtend.substring(13,15));
+            dtstart = new Date(dtstart.substring(0,4), dtstart.substring(4,6), dtstart.substring(6,8), dtstart.substring(9,11), dtstart.substring(11,13), dtstart.substring(13,15));      
+            dtend = new Date(dtend.substring(0,4), dtend.substring(4,6), dtend.substring(6,8), dtend.substring(9,11), dtend.substring(11,13), dtend.substring(13,15));
           }else{
             //If a time zone other than America/New_York
             type="unknown";
@@ -854,7 +948,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
           recId = recId.substring(0, recId.indexOf("\n"));
           recId = recId.substring(recId.indexOf(":")+1);
           //Parse for JS Date
-          recId = new Date(recId.substring(0,4)+" "+recId.substring(4,6)+" "+recId.substring(6,8)+" "+recId.substring(9,11)+":"+recId.substring(11,13)+":"+recId.substring(13,15));
+          recId = new Date(recId.substring(0,4), recId.substring(4,6), recId.substring(6,8), recId.substring(9,11), recId.substring(11,13), recId.substring(13,15));
           
           //Add the object to the list to be dealt with later after parsing
           var obj = {"uid":uid, "title":title, "type":type, "location":loc, "recurrenceId":recId};
@@ -877,7 +971,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
           var until = recurrence.substring(recurrence.indexOf("UNTIL")+6);
           until = until.substring(0, until.indexOf(";"));
           //Convert the string into a JS date
-          until = new Date(until.substring(0,4)+" "+until.substring(4,6)+" "+until.substring(6,8)+" "+until.substring(9,11)+":"+until.substring(11,13)+":"+until.substring(13,15));      
+          until = new Date(until.substring(0,4), until.substring(4,6), until.substring(6,8), until.substring(9,11), until.substring(11,13), until.substring(13,15));      
           
           //The frequency of the repeat (Yearly, Monthly, Weekly, or Daily)
           var freq = recurrence.substring(recurrence.indexOf("FREQ")+5);
@@ -917,7 +1011,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
                 var temp = parse.substring(parse.indexOf("EXDATE")+7, parse.indexOf("\n"));
                 temp = temp.substring(temp.indexOf(":")+1);
                 //Parse for a date
-                temp = new Date(temp.substring(0,4)+" "+temp.substring(4,6)+" "+temp.substring(6,8)+" "+temp.substring(9,11)+":"+temp.substring(11,13)+":"+temp.substring(13,15));
+                temp = new Date(temp.substring(0,4), temp.substring(4,6), temp.substring(6,8), temp.substring(9,11), temp.substring(11,13), temp.substring(13,15));
                 //Add the date to an array
                 exdates.push(dateToDayString(temp));
                 //Remove the parsed date from the string
@@ -989,7 +1083,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
               //Eliminate extra padding
               temp = temp.substring(temp.indexOf(":")+1);
               //Parse the string for a JS date
-              temp = new Date(temp.substring(0,4)+" "+temp.substring(4,6)+" "+temp.substring(6,8)+" "+temp.substring(9,11)+":"+temp.substring(11,13)+":"+temp.substring(13,15));
+              temp = new Date(temp.substring(0,4), temp.substring(4,6), temp.substring(6,8), temp.substring(9,11), temp.substring(11,13), temp.substring(13,15));
               //Add the date in string form to the array
               exdates.push(dateToDayString(temp));
               //Move to the next event
@@ -1076,6 +1170,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
             }
           }
         }
+        console.log(list[i]);
       }
       return list;
     },
