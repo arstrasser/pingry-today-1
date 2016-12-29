@@ -32,10 +32,14 @@ function monthNameToInt(str){
   }
 }
 
-function parseStringForTime(str){
+function parseStringForTime(str, oc){
+  //Initializes the date to be 1 day ahead because setting the time goes backwards a day for some reason...
   var d = new Date(86400000);
   if(str.indexOf("T") != -1){
     str = str.substring(str.indexOf("T")+1);
+  }
+  if(str.indexOf(".") != -1){
+    str = str.substring(0, str.indexOf(".")) + str.substring(str.indexOf(".")+4);
   }
   //Replace all spaces
   str = str.replace(/ /g, "");
@@ -48,7 +52,10 @@ function parseStringForTime(str){
     d.setTime(d.getTime() - (d.getTimezoneOffset()/60 + parseInt(str.substring(6))/100)*1000*60*60);
   }
   //If this is already in EST, disable over-compensation for timezones
-  if(str.substring(6,7) == "Z"){
+  else {
+    d.setTime(d.getTime() - d.getTimezoneOffset()*1000*60)
+  }
+  if(!!oc){
     d.setTime(d.getTime() - d.getTimezoneOffset()*1000*60)
   }
   return d.getTime();
@@ -56,18 +63,27 @@ function parseStringForTime(str){
 
 //Parses a string for a date
 function parseStringForDate(str){
+  if(str instanceof Date){
+    return str;
+  }
   var d = new Date(0);
+  console.log(str);
+  var oc = false;
+  if(str.indexOf("Z") != -1){
+    oc = true;
+  }
+  //Replace all dashes
+  str = str.replace(/-/g, "");
   if(str.indexOf(" ") == -1){
     d.setYear(parseInt(str.substring(0,4)));
     d.setDate(parseInt(str.substring(6,8)));
     d.setMonth(parseInt(str.substring(4,6))-1);
-    console.log(new Date(d.getTime()))
     d.setHours(0);
     d.setMinutes(0);
     d.setSeconds(0);
-    if(str.length > 8){
+    if(str.length > 9){
       str = str.substring(8);
-      d.setTime(d.getTime() + parseStringForTime(str));
+      d.setTime(d.getTime() + parseStringForTime(str, oc));
     }
   }else if(str.substring(3,4) == ","){
     str = str.substring(4);
@@ -76,24 +92,15 @@ function parseStringForDate(str){
     d.setYear(parseInt(str.substring(7,11)));
     if(str.length > 11){
       str = str.substring(11);
-      d.setTime(d.getTIme() + parseStringForTime(str));
+      d.setTime(d.getTime() + parseStringForTime(str, oc));
     }
-  }else if(str.indexOf(" ") == 4){
-    d.setYear(parseInt(str.substring(0,4)));
-    str = str.substring(str.indexOf(" ")+1);
-    d.setDate(parseInt(str.substring(0,str.indexOf(" "))));
-    str = str.substring(str.indexOf(" ")+1);
-    d.setMonth(parseInt(str.substring(0,str.indexOf(" ")))-1);
-    str = str.substring(str.indexOf(" ")+1);
-    console.log(new Date(d.getTime()))
-    if(str.length > 8){
-      str = str.substring(8);
-      d.setTime(d.getTIme() + parseStringForTime(str));
-    }else{
-      d.setHours(0);
-      d.setMinutes(0);
-      d.setSeconds(0);
-    }
+  }
+  else{
+    console.warn("INVALID: "+str);
+  }
+  console.log(new Date(d.getTime()))
+  if(d.getTime() == NaN){
+    console.warn(str);
   }
   return d;
 }
@@ -885,7 +892,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
             dtstart = dtstart.substring(5);
           }
           //Parses the start time and converts it to a javascript date
-          dtstart = new Date(dtstart.substring(0,4), dtstart.substring(4,6), dtstart.substring(6,8));
+          dtstart = parseStringForDate(dtstart);
         }
         
         //Normal Time-type event:
@@ -894,22 +901,14 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
           //Eliminate extra colon
           dtstart = dtstart.substring(1);
           //Parse the strings for javascript dates
-          var oc = false;
-          if(dtstart.indexOf("Z")!= -1)
-            oc = true;
-          dtstart = new Date(dtstart.substring(0,4), dtstart.substring(4,6), dtstart.substring(6,8), dtstart.substring(9,11), dtstart.substring(11,13), dtstart.substring(13,15));
-          if(oc)
-            dtstart.setTime(dtstart.getTime() - dtstart.getTimezoneOffset()*1000*60);
+          
+          dtstart = parseStringForDate(dtstart);
+          
 
           //Parse for the event end time
           dtend = event.substring(event.indexOf("DTEND:")+6);
           dtend = dtend.substring(0, dtend.indexOf("\n"));
-          oc = false;
-          if(dtend.indexOf("Z")!= -1)
-            oc = true;
-          dtend = new Date(dtend.substring(0,4), dtend.substring(4,6), dtend.substring(6,8), dtend.substring(9,11), dtend.substring(11,13), dtend.substring(13,15));
-          if(oc)
-            dtend.setTime(dtend.getTime() - dtend.getTimezoneOffset()*1000*60);
+          dtend = parseStringForDate(dtend); //new Date(dtend.substring(0,4), parseInt(dtend.substring(4,6))-1, dtend.substring(6,8), dtend.substring(9,11), dtend.substring(11,13), dtend.substring(13,15));
         }
 
         //Time-based event that Includes Timezone
@@ -927,8 +926,9 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
             dtstart = dtstart.substring(17);
             dtend = dtend.substring(17);
             //Parse for times
-            dtstart = new Date(dtstart.substring(0,4), dtstart.substring(4,6), dtstart.substring(6,8), dtstart.substring(9,11), dtstart.substring(11,13), dtstart.substring(13,15));      
-            dtend = new Date(dtend.substring(0,4), dtend.substring(4,6), dtend.substring(6,8), dtend.substring(9,11), dtend.substring(11,13), dtend.substring(13,15));
+            dtstart = parseStringForDate(dtstart);
+            //dtstart = new Date(dtstart.substring(0,4), parseInt(dtstart.substring(4,6))-1, dtstart.substring(6,8), dtstart.substring(9,11), dtstart.substring(11,13), dtstart.substring(13,15));      
+            dtend = parseStringForDate(dtend);
           }else{
             //If a time zone other than America/New_York
             type="unknown";
@@ -948,7 +948,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
           recId = recId.substring(0, recId.indexOf("\n"));
           recId = recId.substring(recId.indexOf(":")+1);
           //Parse for JS Date
-          recId = new Date(recId.substring(0,4), recId.substring(4,6), recId.substring(6,8), recId.substring(9,11), recId.substring(11,13), recId.substring(13,15));
+          recId = new Date(recId.substring(0,4), parseInt(recId.substring(4,6))-1, recId.substring(6,8), recId.substring(9,11), recId.substring(11,13), recId.substring(13,15));
           
           //Add the object to the list to be dealt with later after parsing
           var obj = {"uid":uid, "title":title, "type":type, "location":loc, "recurrenceId":recId};
@@ -971,8 +971,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
           var until = recurrence.substring(recurrence.indexOf("UNTIL")+6);
           until = until.substring(0, until.indexOf(";"));
           //Convert the string into a JS date
-          until = new Date(until.substring(0,4), until.substring(4,6), until.substring(6,8), until.substring(9,11), until.substring(11,13), until.substring(13,15));      
-          
+          until = parseStringForDate(until);
           //The frequency of the repeat (Yearly, Monthly, Weekly, or Daily)
           var freq = recurrence.substring(recurrence.indexOf("FREQ")+5);
           freq = freq.substring(0, freq.indexOf(";"));
@@ -1011,7 +1010,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
                 var temp = parse.substring(parse.indexOf("EXDATE")+7, parse.indexOf("\n"));
                 temp = temp.substring(temp.indexOf(":")+1);
                 //Parse for a date
-                temp = new Date(temp.substring(0,4), temp.substring(4,6), temp.substring(6,8), temp.substring(9,11), temp.substring(11,13), temp.substring(13,15));
+                temp = parseStringForDate(temp);
                 //Add the date to an array
                 exdates.push(dateToDayString(temp));
                 //Remove the parsed date from the string
@@ -1083,7 +1082,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
               //Eliminate extra padding
               temp = temp.substring(temp.indexOf(":")+1);
               //Parse the string for a JS date
-              temp = new Date(temp.substring(0,4), temp.substring(4,6), temp.substring(6,8), temp.substring(9,11), temp.substring(11,13), temp.substring(13,15));
+              temp = parseStringForDate(temp);
               //Add the date in string form to the array
               exdates.push(dateToDayString(temp));
               //Move to the next event
@@ -1113,7 +1112,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
                   if(type == "day"){
                     obj.time = curDay;
                   }else if(type == "time"){
-                    obj.startTime = new Date(curDay);
+                    obj.startTime = new Date(curDay.getTime());
                     obj.endTime = new Date(curDay.getTime() + timeDiff);
                   }
                   list.push(obj);
@@ -1170,33 +1169,9 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
             }
           }
         }
-        console.log(list[i]);
       }
+      console.log(list);
       return list;
-    },
-    //Function to parse through a list of events and returns that list with only future events
-    futureOnly: function(events){
-      //For each event in the list
-      for(var i = 0; i < events.length; i++){
-        //Time type event
-        if(events[i].type == "time"){
-          //If the event end time is less than the current time
-          if(events[i].endTime.getTime() < Date.now()){
-            //Remove the event
-            events.splice(i,1);
-          }
-        }
-        //Day type event
-        else if(events[i].type == "day"){
-          //If the event's time is less than the current time and the event isn't today
-          if(events[i].time.getTime() < Date.now() && dateToDayString(events[i]) != dateToDayString(new Date())){
-            //Remove the event
-            events.splice(i,1);
-          }
-        }
-      }
-      //Returns the new array
-      return events;
     }
   }
 })
@@ -1216,10 +1191,10 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
       reminders = JSON.parse(reminders);
       //Fix the JSON parse of dates
       for(var i = 0; i < reminders.length; i++){
-        reminders[i].time.time = new Date(reminders[i].time.time);
+        reminders[i].time.time = parseStringForDate(reminders[i].time.time);
 
         //Convert the date (since a single date is stored) to a JS Date
-        reminders[i].time.date = new Date(reminders[i].time.date);
+        reminders[i].time.date = parseStringForDate(reminders[i].time.date);
       }
     }
   }
