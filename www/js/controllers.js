@@ -196,11 +196,9 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
           //Variable to check whether to append or overwrite the current name
           var modified = false;
           //Iterate through the list for scheudled flex meetings
-          console.log(flexes);
           for(var j=0; j < flexes.length; j++){
             //If the day of the week or the letter day matches and this is the right flex
             if((flexes[j].time.day == LetterDay.letter() || flexes[j].time.day == LetterDay.dayOfWeek()) && tClass.id == flexes[j].time.id){
-              console.log("today")
               if(modified){
                 tClass.name += " & "+flexes[j].name;
               }else{
@@ -208,8 +206,6 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
                 modified = true;
               }
               tClass.color = flexes[j].color;
-            }else {
-              console.log("not today");
             }
           }
           //If this is first flex
