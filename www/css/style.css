@@ -50,6 +50,7 @@
 	display:inline-block;
 	padding-top:10px;
 	padding-bottom:10px;
+	width: calc(100% - 80px);
 }
 
 #changeDayLeft, #changeDayRight {

@@ -67,7 +67,7 @@ function parseStringForDate(str){
     return str;
   }
   var d = new Date(0);
-  console.log(str);
+  //console.log(str);
   var oc = false;
   if(str.indexOf("Z") != -1){
     oc = true;
@@ -98,10 +98,7 @@ function parseStringForDate(str){
   else{
     console.warn("INVALID: "+str);
   }
-  console.log(new Date(d.getTime()))
-  if(d.getTime() == NaN){
-    console.warn(str);
-  }
+  //console.log(new Date(d.getTime()))
   return d;
 }
 
