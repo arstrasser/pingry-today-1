@@ -15,10 +15,10 @@
 				<div class="col col-33 class-time">
 					<div style="display: inline" class="startTime" ng-bind="formatTime(cls.startTime)"></div>
 					<div style="display: inline" ng-show="cls.type == 'block'"><br><br></div>
-					<div style="display: inline" ng-show="cls.type != 'block'"> - </div>
+					<div style="display: inline" ng-show="cls.type != 'block' && cls.startTime != ''"> - </div>
 					<div style="display: inline" class="endTime" ng-bind="formatTime(cls.endTime)"></div>
 				</div>
-				<div class="col col-67 class-name col-center">{{cls.name}}</div>
+				<div class="col col-67 class-name col-center" style="white-space:initial;">{{cls.name}}</div>
 			</div>
 		</div>
 	</ion-content>

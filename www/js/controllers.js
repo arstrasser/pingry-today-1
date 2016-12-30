@@ -160,6 +160,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     //If today is a valid letter day
     if($scope.letter !== undefined && $scope.letter.length == 1){
       for(i = 0; i < Schedule.getToday().length; i++){
+        //Fix pass by refrence by converting it to and back from a string
         var tClass = JSON.parse(JSON.stringify(Schedule.get(i)));
         tClass.color = undefined;
         //If you have a swap class, deals with it by recalling this function with the correct option
@@ -295,6 +296,13 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
         }
       }
       $scope.periodList = c;
+
+      if(Schedule.getTypes()[Schedule.getCurrentType()][0] == "Unknown Assembly"){
+        alert("Warning:\n"+
+              "This day has an assembly schedule that is not recognized.\n"+
+              "A normal schedule is shown, but please only use it as a guideline.")
+      }
+
     }
     //If today is not a valid letter day
     else{
@@ -356,6 +364,10 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
 
   //Formats the time for classes in 12 hour format
   $scope.formatTime = function(str){
+    //Compensate for special events that don't have a time
+    if(str == "" || str == undefined){
+      return str;
+    }
     hour = parseInt(str.substring(0,2));
     minute = parseInt(str.substring(3,5));
     if(hour > 12){
@@ -771,7 +783,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
 })
 
 //Athletics Controller
-.controller("AthleticsCtrl", function($scope, $http, $cordovaInAppBrowser, icalFeed, Messages, Settings){
+.controller("AthleticsCtrl", function($scope, $http, $cordovaInAppBrowser, $ionicLoading, icalFeed, Messages, Settings){
   //Keep track of downloads so that a reload can be both synchronous and asynchronous (download everything at once, THEN finish loading)
   var curDownloads = 0;
 
@@ -808,13 +820,14 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
 
   //Resorts the list of events
   function resort(events){
-
+    console.log(events);
     //Iterate over the events to fix Javscript Time objecs and such (also removing past events)
     for(var i = 0; i < events.length; i++){
       //Time type event
       if(events[i].type == "time"){
         events[i].startTime = parseStringForDate(events[i].startTime);
-        events[i].endTime = parseStringForDate(events[i].endTime);
+        if(!!events[i].endTime)
+          events[i].endTime = parseStringForDate(events[i].endTime);
         //If the event end time is less than the current time
         if(events[i].startTime.getTime() < Date.now()){
           //Remove the event
@@ -837,6 +850,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
         }
       }
     }
+    console.log(events);
 
     //Add descriptions for each event and fix titles
     for(var i = 0; i < events.length; i++){
@@ -869,10 +883,14 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     if(events.length > 15){
       events = events.slice(0,15);
     }
+    console.log(events);
+    console.log(JSON.stringify(events));
     //Update local storage
     localStorage.setItem("athleticEvents", JSON.stringify(events));
     localStorage.setItem("athleticEventsRefreshTime", Date.now());
+    console.log(events);
     $scope.events = events;
+    $ionicLoading.hide();
     $scope.$broadcast('scroll.refreshComplete');
   }
 
@@ -984,8 +1002,8 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
 //      "http://www.pingry.org/calendar/team_180.ics",  //Wrestling - Boys MS
       "http://www.pingry.org/calendar/team_181.ics",  //Wrestling - Boys Varsity
     ]
+    curDownloads = calendars.length;
     for(var i = 0; i < calendars.length; i++){
-      curDownloads++;
       $http.get(calendars[i]).then(function(data){
         var obj = icalFeed.parseCalendar(data.data);
         //List of raw events to be parsed in the resort function
@@ -997,6 +1015,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
         curDownloads--;
         //If this was the last remaining downoad, resort the events to apply them to the scope
         if(curDownloads == 0){
+          console.log($scope.rawEvents);
           resort($scope.rawEvents);
         }
       })
@@ -1020,11 +1039,13 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   if(lastRefresh != null && lastRefresh != ""){
     //If it's been over an hour
     if(parseInt(lastRefresh) + 360000 < Date.now()){
+      $ionicLoading.show({template: 'Loading...'});
       $scope.refresh();
     }else{
       $scope.localRefresh();
     }
   }else{
+    $ionicLoading.show({template: 'Loading...'});
     $scope.refresh();
   }
 });

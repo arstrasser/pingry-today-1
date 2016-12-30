@@ -32,9 +32,12 @@ function monthNameToInt(str){
   }
 }
 
-function parseStringForTime(str, oc){
+function parseStringForTime(d, str){
+  var local = false;
+  if(str.indexOf("Z") == -1){
+    local = true;
+  }
   //Initializes the date to be 1 day ahead because setting the time goes backwards a day for some reason...
-  var d = new Date(86400000);
   if(str.indexOf("T") != -1){
     str = str.substring(str.indexOf("T")+1);
   }
@@ -49,13 +52,11 @@ function parseStringForTime(str, oc){
   d.setMinutes(parseInt(str.substring(2,4)));
   d.setSeconds(parseInt(str.substring(4,6)));
   if(str.substring(6,7) == "-" || str.substring(6,7) == "+"){
-    d.setTime(d.getTime() - (d.getTimezoneOffset()/60 + parseInt(str.substring(6))/100)*1000*60*60);
+    d.setTime(d.getTime() - (d.getTimezoneOffset()/60.0 + parseInt(str.substring(6))/100.0)*1000*60*60);
   }
   //If this is already in EST, disable over-compensation for timezones
-  else {
-    d.setTime(d.getTime() - d.getTimezoneOffset()*1000*60)
-  }
-  if(!!oc){
+
+  if(!local){
     d.setTime(d.getTime() - d.getTimezoneOffset()*1000*60)
   }
   return d.getTime();
@@ -68,12 +69,9 @@ function parseStringForDate(str){
   }
   var d = new Date(0);
   //console.log(str);
-  var oc = false;
-  if(str.indexOf("Z") != -1){
-    oc = true;
-  }
+  
   //Replace all dashes
-  str = str.replace(/-/g, "");
+  str = str.substring(0,10).replace(/-/g, "") + str.substring(10);
   if(str.indexOf(" ") == -1){
     d.setYear(parseInt(str.substring(0,4)));
     d.setDate(parseInt(str.substring(6,8)));
@@ -83,7 +81,7 @@ function parseStringForDate(str){
     d.setSeconds(0);
     if(str.length > 9){
       str = str.substring(8);
-      d.setTime(d.getTime() + parseStringForTime(str, oc));
+      parseStringForTime(d, str);
     }
   }else if(str.substring(3,4) == ","){
     str = str.substring(4);
@@ -92,7 +90,7 @@ function parseStringForDate(str){
     d.setYear(parseInt(str.substring(7,11)));
     if(str.length > 11){
       str = str.substring(11);
-      d.setTime(d.getTime() + parseStringForTime(str, oc));
+      parseStringForTime(d, str);
     }
   }
   else{
@@ -181,7 +179,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
         //Ensures that it is a day long event
         if(calEvents[i].type == "day"){
           //Adds the first letter of that event to the calendar
-          if(calEvents[i].title.length == 2 && obj.hasOwnProperty(calEvents[i].title.substring(0,1))){
+          if(calEvents[i].title.length == 1 && obj.hasOwnProperty(calEvents[i].title.substring(0,1))){
             obj[calEvents[i].title.substring(0,1)].push(dateToDayString(calEvents[i].time));
           }
         }
@@ -418,7 +416,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
   ];
 
   var unknownSchedule = [
-    {"name":"WARN: Unknown Assembly today", "type":"Other", "startTime":"00:00", "endTime":"00:00"},
+    {"name":"Unknown Assembly Today", "type":"Other", "startTime":"", "endTime":""},
     {"name":"Attendence", "type":"Other", "startTime":"08:05", "endTime":"08:10"},
     {"name":"Period 1", "type":"block", "id":"1", "startTime":"08:10", "endTime":"09:15"},
     {"name":"Flex 1", "type":"flex", "id":"1", "startTime":"09:20", "endTime":"09:40"},
@@ -531,7 +529,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
       //Iterate over the calendar events
       for(i=0; i < calEvents.length; i++){
         //If it's a timed event (not a day-long event)
-        if(calEvents[i].type == "time"){
+        if(calEvents[i].type == "time" && !!calEvents[i].endTime){
           //Community Time
           if(
             ((calEvents[i].startTime.getHours() == 9 && calEvents[i].startTime.getMinutes() == 45) ||   //Starts at 9:45
@@ -591,6 +589,8 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
                 }
                 //Unknown assembly
                 else{
+                  console.log("Unknown Assembly:");
+                  console.log(calEvents[i]);
                   specialSchedule[dateToDayString(calEvents[i].endTime)] = "Unknown Assembly";
                 }
                 break;
@@ -604,7 +604,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
         else if(calEvents[i].type == "day"){
           /*
           // Faculty Collaboration day implementation commented out since using alternate calendar.
-          // For faster performance but lower accuracy, uncomment this.
+          // For faster performance but lower accuracy, uncomment this and remove the first calendar parse.
           if(calEvents[i].title.indexOf("Collab") != -1 && calEvents[i].title.indexOf("Fac") != -1){
             collabDays.push(dateToDayString(calEvents[i].time));
           }*/
@@ -864,19 +864,19 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
         var event = data.substring(data.indexOf("BEGIN:VEVENT"), data.indexOf("END:VEVENT"));
         //Unique identifier of the event
         var uid = event.substring(event.indexOf("UID:")+4);
-        uid = uid.substring(0, uid.indexOf("\n"));
+        uid = uid.substring(0, Math.min(uid.indexOf("\r"), uid.indexOf("\n")));
         //Name of the event
         var title = event.substring(event.indexOf("SUMMARY:")+8);
-        title = title.substring(0, title.indexOf("\n"));
+        title = title.substring(0, Math.min(title.indexOf("\r"), title.indexOf("\n")));
         //Location of the event
         var loc = "";
         if(event.indexOf("LOCATION") != -1){
           loc = event.substring(event.indexOf("LOCATION:")+9);
-          loc = loc.substring(0, loc.indexOf("\n"));
+          loc = loc.substring(0, Math.min(loc.indexOf("\r"), loc.indexOf("\n")));
         }
         //Start time of the event
         var dtstart = event.substring(event.indexOf("DTSTART")+7);
-        dtstart = dtstart.substring(0,dtstart.indexOf("\n"));
+        dtstart = dtstart.substring(0, Math.min(dtstart.indexOf("\r"), dtstart.indexOf("\n")));
         var dtend; //End time of the event
         var type; //type of event (day long or time-based) (This is a custom field not found in the ical file)
 
@@ -903,9 +903,13 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
           
 
           //Parse for the event end time
-          dtend = event.substring(event.indexOf("DTEND:")+6);
-          dtend = dtend.substring(0, dtend.indexOf("\n"));
-          dtend = parseStringForDate(dtend); //new Date(dtend.substring(0,4), parseInt(dtend.substring(4,6))-1, dtend.substring(6,8), dtend.substring(9,11), dtend.substring(11,13), dtend.substring(13,15));
+          if(event.indexOf("DTEND") != -1){
+            dtend = event.substring(event.indexOf("DTEND:")+6);
+            dtend = dtend.substring(0, Math.min(dtend.indexOf("\r"), dtend.indexOf("\n")));
+            dtend = parseStringForDate(dtend); 
+          }else{
+            dtend = "";
+          }
         }
 
         //Time-based event that Includes Timezone
@@ -914,18 +918,25 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
           //Eliminate extra content
           dtstart = dtstart.substring(dtstart.indexOf("TZID=")+5);
           //Parse the end time
-          dtend = event.substring(event.indexOf("DTEND")+6);
-          dtend = dtend.substring(0, dtend.indexOf("\n"));
-          dtend = dtend.substring(dtend.indexOf("TZID=")+5);
+          if(event.indexOf("DTEND") != -1){
+            dtend = event.substring(event.indexOf("DTEND")+6);
+            dtend = dtend.substring(0, Math.min(dtend.indexOf("\r"), dtend.indexOf("\n")));
+            dtend = dtend.substring(dtend.indexOf("TZID=")+5);
+          }else{
+            dtend = "";
+          }
           //Assuming EST time zone -- otherwise fails
           if(dtstart.substring(0,17) == "America/New_York:"){
             //Remove the America/New_York time zone identifier
             dtstart = dtstart.substring(17);
-            dtend = dtend.substring(17);
             //Parse for times
             dtstart = parseStringForDate(dtstart);
-            //dtstart = new Date(dtstart.substring(0,4), parseInt(dtstart.substring(4,6))-1, dtstart.substring(6,8), dtstart.substring(9,11), dtstart.substring(11,13), dtstart.substring(13,15));      
-            dtend = parseStringForDate(dtend);
+
+            if(dtend != ""){
+              dtend = dtend.substring(17);
+              //dtstart = new Date(dtstart.substring(0,4), parseInt(dtstart.substring(4,6))-1, dtstart.substring(6,8), dtstart.substring(9,11), dtstart.substring(11,13), dtstart.substring(13,15));      
+              dtend = parseStringForDate(dtend);
+            }
           }else{
             //If a time zone other than America/New_York
             type="unknown";
@@ -942,7 +953,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
         //We just add a "reccurenceId" attribute to the object during parsing and after parsing remove the incorrect object
         if(event.indexOf("RECURRENCE-ID") != -1){
           var recId = event.substring(event.indexOf("RECURRENCE-ID")+14);
-          recId = recId.substring(0, recId.indexOf("\n"));
+          recId = recId.substring(0, Math.min(recId.indexOf("\r"), recId.indexOf("\n")));
           recId = recId.substring(recId.indexOf(":")+1);
           //Parse for JS Date
           recId = new Date(recId.substring(0,4), parseInt(recId.substring(4,6))-1, recId.substring(6,8), recId.substring(9,11), recId.substring(11,13), recId.substring(13,15));
@@ -953,7 +964,9 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
             obj.time = dtstart;
           }else if(type == "time"){
             obj.startTime = dtstart;
-            obj.endTime = dtend;
+            if(dtend != ""){
+              obj.endTime = dtend;
+            }
           }
           list.push(obj);
         }
@@ -962,7 +975,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
         else if(event.indexOf("RRULE:") != -1){
           //A string to help with parsing of the next objects
           var recurrence = event.substring(event.indexOf("RRULE:"));
-          recurrence = recurrence.substring(0, recurrence.indexOf("\n"));
+          recurrence = recurrence.substring(0, Math.min(recurrence.indexOf("\r"), recurrence.indexOf("\n")));
 
           //The date the pattern repeats until
           var until = recurrence.substring(recurrence.indexOf("UNTIL")+6);
@@ -1004,7 +1017,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
               //While there are still dates left to parse for
               while(parse.indexOf("EXDATE") != -1){
                 //Temporarily hold the current exdate in temp variable
-                var temp = parse.substring(parse.indexOf("EXDATE")+7, parse.indexOf("\n"));
+                var temp = parse.substring(parse.indexOf("EXDATE")+7, Math.min(parse.indexOf("\r"), parse.indexOf("\n")));
                 temp = temp.substring(temp.indexOf(":")+1);
                 //Parse for a date
                 temp = parseStringForDate(temp);
@@ -1016,7 +1029,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
 
               //repetition starts at the current day
               var curDay = dtstart;
-              if(type=="time"){
+              if(type=="time" && dtend != ""){
                 //Length of the event (in milliseconds) (if applicable)
                 timeDiff = dtend.getTime() - dtstart.getTime();
               }
@@ -1047,7 +1060,9 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
                         obj.time = curDay;
                       }else if(type == "time"){
                         obj.startTime = new Date(curDay);
-                        obj.endTime = new Date(curDay.getTime() + timeDiff); //Add the time difference back on
+                        if(!!timeDiff){
+                          obj.endTime = new Date(curDay.getTime() + timeDiff); //Add the time difference back on
+                        }
                       }
                       list.push(obj);
                     }
@@ -1087,7 +1102,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
             }
             //gets the start time of the repeating event
             var curDay = dtstart;
-            if(type=="time"){
+            if(type=="time" && dtend != ""){
               //If there is a time based repeating event, store the event length
               timeDiff = dtend.getTime() - dtstart.getTime();
             }
@@ -1110,7 +1125,9 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
                     obj.time = curDay;
                   }else if(type == "time"){
                     obj.startTime = new Date(curDay.getTime());
-                    obj.endTime = new Date(curDay.getTime() + timeDiff);
+                    if(!!timeDiff){
+                      obj.endTime = new Date(curDay.getTime() + timeDiff);
+                    }
                   }
                   list.push(obj);
                 }
@@ -1128,7 +1145,8 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
             obj.time = dtstart;
           }else if(type == "time"){
             obj.startTime = dtstart;
-            obj.endTime = dtend;
+            if(dtend != "")
+              obj.endTime = dtend;
           }else{
             //Log unknown event types to the console
             //Still adds them but doesn't 
@@ -1151,12 +1169,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
           for(var j=0; j < list.length; j++){
             //If it matches times and it is not the object we just got
             if(list[j].type == "time" && i!=j){
-              if(list[i].recurrenceId.getYear() == list[j].startTime.getYear() &&
-                list[i].recurrenceId.getMonth() == list[j].startTime.getMonth() &&
-                list[i].recurrenceId.getDate() == list[j].startTime.getDate() &&
-                list[i].recurrenceId.getHours() == list[j].startTime.getHours() &&
-                list[i].recurrenceId.getMinutes() == list[j].startTime.getMinutes()){
-
+              if(list[i].recurrenceId.getTime() == list[j].startTime.getTime()){
                 //Delete the object (since it's been overridden)
                 list.splice(j,1);
 

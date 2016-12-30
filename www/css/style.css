@@ -41,7 +41,8 @@
 
 #changeDayMenu {
 	display:inline-block;
-	width:calc(100% - 54px);
+	max-width:calc(100% - 62px);
+	min-width:calc(100% - 62px);
 	height:55px;
 	text-align:center;
 }
@@ -73,6 +74,7 @@
 	background-color:#ddd;
 	padding:10px;
 	padding-bottom:0px;
+	width:61px;
 }
 
 #letter {
