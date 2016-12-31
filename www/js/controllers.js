@@ -10,7 +10,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   }
 
   $scope.openLocalLink = function(addr){
-    $cordovaInAppBrowser.open(addr, '_self');
+    $cordovaInAppBrowser.open(addr, '_blank');
   }
 })
 

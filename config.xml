@@ -8,7 +8,8 @@
       Alex Strasser
     </author>
   <content src="index.html"/>
-  <access origin="*"/>
+  <access origin="http://*.pingry.org/*" />
+  <access origin="http://calendar.google.com/calendar/ical/*" />
   <preference name="webviewbounce" value="false"/>
   <preference name="UIWebViewBounce" value="false"/>
   <preference name="DisallowOverscroll" value="true"/>

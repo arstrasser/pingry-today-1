@@ -314,7 +314,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
 
   */
   var normalSchedule = [
-    {"name":"Attendence", "type":"Other", "startTime":"08:05", "endTime":"08:10"},
+    {"name":"Attendance", "type":"Other", "startTime":"08:05", "endTime":"08:10"},
     {"name":"Period 1", "type":"block", "id":"1", "startTime":"08:10", "endTime":"09:15"},
     {"name":"Flex 1", "type":"flex", "id":"1", "startTime":"09:20", "endTime":"09:40"},
     {"name":"Community Time", "type":"CT", "startTime":"09:45", "endTime":"10:10"},
@@ -332,7 +332,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
 
   var facultyCollabSchedule = [
     {"name":"Faculty Meetings", "type":"Other", "startTime":"08:05", "endTime":"09:30"},
-    {"name":"Attendence", "type":"Other", "startTime":"09:35", "endTime":"09:40"},
+    {"name":"Attendance", "type":"Other", "startTime":"09:35", "endTime":"09:40"},
     {"name":"Period 1", "type":"block", "id":"1", "startTime":"09:40", "endTime":"10:40"},
     {"name":"Flex 1", "type":"flex", "id":"1", "startTime":"10:40", "endTime":"11:00"},
     {"name":"Period 2", "type":"block", "id":"2", "startTime":"11:05", "endTime":"12:10"},
@@ -348,7 +348,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
   ];
 
   var assembly30Schedule = [
-    {"name":"Attendence", "type":"Other", "startTime":"08:05", "endTime":"08:10"},
+    {"name":"Attendance", "type":"Other", "startTime":"08:05", "endTime":"08:10"},
     {"name":"Period 1", "type":"block", "id":"1", "startTime":"08:10", "endTime":"09:15"},
     {"name":"Flex 1", "type":"flex", "id":"1", "startTime":"09:20", "endTime":"09:40"},
     {"name":"Community Time", "type":"CT", "startTime":"09:45", "endTime":"10:15"},
@@ -365,7 +365,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
   ];
 
   var assembly35Schedule = [
-    {"name":"Attendence", "type":"Other", "startTime":"08:05", "endTime":"08:10"},
+    {"name":"Attendance", "type":"Other", "startTime":"08:05", "endTime":"08:10"},
     {"name":"Period 1", "type":"block", "id":"1", "startTime":"08:10", "endTime":"09:15"},
     {"name":"Flex 1", "type":"flex", "id":"1", "startTime":"09:15", "endTime":"09:35"},
     {"name":"Community Time", "type":"CT", "startTime":"09:40", "endTime":"10:15"},
@@ -382,7 +382,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
   ];
 
   var assembly60Schedule = [
-    {"name":"Attendence", "type":"Other", "startTime":"08:05", "endTime":"08:10"},
+    {"name":"Attendance", "type":"Other", "startTime":"08:05", "endTime":"08:10"},
     {"name":"Period 1", "type":"block", "id":"1", "startTime":"08:10", "endTime":"09:10"},
     {"name":"Flex 1", "type":"flex", "id":"1", "startTime":"09:10", "endTime":"09:30"},
     {"name":"Assembly", "type":"CT", "startTime":"09:35", "endTime":"10:35"},
@@ -399,7 +399,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
   ];
 
   var winterFestivalSchedule = [
-    {"name":"Attendence", "type":"Other", "startTime":"08:05", "endTime":"08:10"},
+    {"name":"Attendance", "type":"Other", "startTime":"08:05", "endTime":"08:10"},
     {"name":"Period 1", "type":"block", "id":"1", "startTime":"08:10", "endTime":"09:10"},
     {"name":"Flex 1", "type":"flex", "id":"1", "startTime":"09:10", "endTime":"09:30"},
     {"name":"Winter Festival", "type":"Other", "startTime":"09:35", "endTime":"11:00"},
@@ -417,7 +417,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
 
   var unknownSchedule = [
     {"name":"Unknown Assembly Today", "type":"Other", "startTime":"", "endTime":""},
-    {"name":"Attendence", "type":"Other", "startTime":"08:05", "endTime":"08:10"},
+    {"name":"Attendance", "type":"Other", "startTime":"08:05", "endTime":"08:10"},
     {"name":"Period 1", "type":"block", "id":"1", "startTime":"08:10", "endTime":"09:15"},
     {"name":"Flex 1", "type":"flex", "id":"1", "startTime":"09:20", "endTime":"09:40"},
     {"name":"Community Time", "type":"CT", "startTime":"09:45", "endTime":"10:10"},
@@ -493,7 +493,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
   //Refreshes the schedule from the calendar
   function refreshData(){
     //Google school calendar URL
-    var specialScheduleURL = "https://calendar.google.com/calendar/ical/pingry.org_kg3ab8ps5pa70oj41igegj9kjo%40group.calendar.google.com/public/basic.ics";
+    var specialScheduleURL = "http://calendar.google.com/calendar/ical/pingry.org_kg3ab8ps5pa70oj41igegj9kjo%40group.calendar.google.com/public/basic.ics";
     //Faculty Collaboration day calendar URL
     var collabDatesURL = "http://www.pingry.org/calendar/calendar_388.ics";
 
