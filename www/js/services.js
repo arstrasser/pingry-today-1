@@ -1027,14 +1027,15 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
                 parse = parse.substring(parse.indexOf("\n")+1);     
               }
 
-              //repetition starts at the current day
+              //Repetition starts at the current day
               var curDay = dtstart;
               if(type=="time" && dtend != ""){
                 //Length of the event (in milliseconds) (if applicable)
                 timeDiff = dtend.getTime() - dtstart.getTime();
               }
               //While we should add dates
-              while(curDay < until){
+              console.log(until);
+              while(curDay.getTime() <= until.getTime()){
                 //The month we should be in
                 var curMonth = curDay.getMonth();
                 for(var i=0; i<days.length; i++){
@@ -1046,12 +1047,8 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
                               curDay.setDate(((7-curDay.getDay()) + byDays[i]) + (7*(weekNums[i] - 1)) + 1);
                             }
 
-                  //If we reach another month (if there isn't a 5th Wednesday for example)
-                  if(curDay.getMonth() != curMonth){
-                    //Reset the month to the proper month, and don't add this date to the repeating pattern
-                    curDay.setMonth(curMonth);
-                  }
-                  else{
+                  //Makes sure we are in the same month (if there isn't a 5th Wednesday for example so it goes into the next month)
+                  if(curDay.getMonth() == curMonth){
                     //If it isn't a date exception
                     if(!exdates.includes(dateToDayString(curDay))){
                       //add the object to the list of events
@@ -1070,6 +1067,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
                 }
                 //Increments the month
                 curDay.setMonth(curMonth+1);
+                curDay.setDate(1);
               }
             }
           }
@@ -1108,7 +1106,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
             }
 
             //For each event
-            while(curDay < until){
+            while(curDay.getTime() <= until.getTime()){
               //Starts at Sunday
               curDay.setDay(0);
               //For each day of the week the event should repeat for
@@ -1159,24 +1157,40 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
         data = data.substring(data.indexOf("END:VEVENT")+10);
       }
 
+      //Sorting algorithm to sort events by descending order for easy debugging
+      /*list.sort(function(a,b){
+        if(a.type == "unknown"){
+          return -1;
+        }
+        return (a.type=="time"?a.startTime:a.time).getTime() > (b.type=="time"?b.startTime:b.time).getTime()?-1:1;
+      })
+      console.log(list);*/
       //Parsing to fix reccurring events
       //Fixing Recurrence Id to work and override the events
       //For each object in the array
       for(var i =0; i < list.length; i++){
         //If it has a recurrenceId
         if(list[i].recurrenceId !== undefined){
+          found = false
           //Loop through to find the event that the recurrenceId refers to
           for(var j=0; j < list.length; j++){
             //If it matches times and it is not the object we just got
             if(list[j].type == "time" && i!=j){
-              if(list[i].recurrenceId.getTime() == list[j].startTime.getTime()){
+              if(list[i].recurrenceId.getTime() == list[j].startTime.getTime() && list[i].uid == list[j].uid){
                 //Delete the object (since it's been overridden)
                 list.splice(j,1);
-
+                if(j < i){
+                  i--;
+                }
+                found = true;
                 //Break out of the loop and move to the next object
                 break;
               }
             }
+          }
+          if(!found){
+            console.log("Not Found: ");
+            console.log(list[i]);
           }
         }
       }
