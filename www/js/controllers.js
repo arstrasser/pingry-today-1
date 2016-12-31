@@ -108,7 +108,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   };
 })
 
-.controller('ScheduleCtrl', function($scope, $cordovaNetwork, Schedule, LetterDay, MySchedule, $ionicSideMenuDelegate, $ionicGesture, Messages, $cordovaDatePicker) {
+.controller('ScheduleCtrl', function($scope, $cordovaNetwork, Schedule, LetterDay, MySchedule, $ionicSideMenuDelegate, $ionicGesture, Messages, $cordovaDatePicker, $cordovaDeviceFeedback) {
   //Set up triggers to change the day on swipe
   var elem = angular.element(document.querySelector("#scheduleContent"));
   $ionicGesture.on("swipeleft", $scope.nextDay, elem);
@@ -348,6 +348,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   //Reset the current day to today
   $scope.resetDate = function(){
     curDay = new Date();
+    $cordovaDeviceFeedback.haptic(0);
     updateDate();
   }
 
@@ -672,7 +673,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     clicks++;
     if(clicks == 15){
       //Activates super mode if you click 15 times on my name (no more, no less)
-      window.setTimeout(function(){if(clicks == 15){Settings.setSuperMode(true);Messages.showNormal("Super Mode Activated!");}}, 2000);
+      window.setTimeout(function(){if(clicks == 15){Settings.setSuperMode(true);$cordovaDeviceFeedback.haptic(0);Messages.showNormal("Super Mode Activated!");}}, 2000);
     }
   }
 })
