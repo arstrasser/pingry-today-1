@@ -582,6 +582,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     $cordovaDialogs.confirm("Delete this class?").then(function(answer){
       if(answer == 1){
         MySchedule.removeClassById($stateParams.clsType, $stateParams.clsId);
+        MySchedule.save();
         $ionicHistory.goBack();
       }
     });
@@ -625,7 +626,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     //if the class is a block
     if(cls.type == "block"){
       //Makes sure you have a period selected and it's not a flex period
-      return cls.time.id != "" && cls.time.id != false && cls.time.id !== true;
+      return cls.time.id != "" && cls.time.id != false && cls.time.id !== true && MySchedule.get("block", cls.time.id) == undefined;
     }
     //If the class is a flex or a CP
     if(cls.type == "flex" || cls.type == "CP"){
