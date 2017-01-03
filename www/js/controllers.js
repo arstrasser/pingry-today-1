@@ -10,7 +10,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   }
 
   $scope.openLocalLink = function(addr){
-    $cordovaInAppBrowser.open(addr, '_blank');
+    $cordovaInAppBrowser.open(addr, '_blank', {location:"no",enableViewportScale:"yes", zoom:"no"});
   }
 })
 
@@ -108,7 +108,8 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   };
 })
 
-.controller('ScheduleCtrl', function($scope, $cordovaNetwork, Schedule, LetterDay, MySchedule, $ionicSideMenuDelegate, $ionicGesture, Messages, $cordovaDatePicker, $cordovaDeviceFeedback) {
+.controller('ScheduleCtrl', function($scope, $cordovaNetwork, $cordovaDialogs, Schedule, LetterDay, MySchedule, $ionicSideMenuDelegate, $ionicGesture, Messages, $cordovaDatePicker, $cordovaDeviceFeedback) {
+  console.log($scope);
   //Set up triggers to change the day on swipe
   var elem = angular.element(document.querySelector("#scheduleContent"));
   $ionicGesture.on("swipeleft", $scope.nextDay, elem);
@@ -122,19 +123,6 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   var curDay = new Date();
   $scope.letter = "";
   $scope.periodList = [];
-
-  window.setInterval(
-    //Checks every second to see if anything that matters to the schedule has changed
-    function(){
-      if(Schedule.wasChanged() || MySchedule.isChanged() || LetterDay.isChanged()){
-        refresh();
-        Schedule.setChanged(false);
-        LetterDay.setChanged(false);
-        MySchedule.setChanged(false);
-      }
-    },
-    1000
-  );
 
   //Formats the date in the top of the screen
   function formatDate(d){
@@ -298,8 +286,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
       $scope.periodList = c;
 
       if(Schedule.getTypes()[Schedule.getCurrentType()][0] == "Unknown Assembly"){
-        alert("Warning:\n"+
-              "This day has an assembly schedule that is not recognized.\n"+
+        $cordovaDialogs.alert("This day has an assembly schedule that is not recognized.\n"+
               "A normal schedule is shown, but please only use it as a guideline.")
       }
 
@@ -333,6 +320,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     refresh();
   }
 
+  var checker;
   //Resets the current day to today
   $scope.$on('$ionicView.enter', function(){
     //resets the schedule to the current date
@@ -343,7 +331,24 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
       MySchedule.setChanged(false);
     }
     updateDate();
+
+    checker = window.setInterval(
+      //Checks every second to see if anything that matters to the schedule has changed
+      function(){
+        if(Schedule.wasChanged() || MySchedule.isChanged() || LetterDay.isChanged()){
+          refresh();
+          Schedule.setChanged(false);
+          LetterDay.setChanged(false);
+          MySchedule.setChanged(false);
+        }
+      },
+      1000
+    );
   })
+
+  $scope.$on('$ionicView.enter', function(){
+    window.clearInterval(checker);
+  });
 
   //Reset the current day to today
   $scope.resetDate = function(){
@@ -542,7 +547,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
 })
 
 //Add or Modify Class controller
-.controller('AddClassCtrl', function($scope, MySchedule, $stateParams, $ionicHistory, Messages) {
+.controller('AddClassCtrl', function($scope, MySchedule, $cordovaDialogs, $stateParams, $ionicHistory, Messages) {
   //Colors configuration
   $scope.colors = ["#DC143C", "#FF3E96", "#EE00EE", "#4876FF", "#8EE5EE", "#00EE76", "#71C671", "#EEEE00", "#EE9A00", "#CDB7B5", "#666"];
 
@@ -561,7 +566,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
 
   //Lunch help popup
   $scope.lunchHelp = function(e){
-    window.alert('First lunch is for:\nScience, Health, Art, Math, and Economic Classes');
+    $cordovaDialogs.alert('First lunch is for:\nScience, Health, Art, Math, and Economic Classes');
   }
 
   //Updates the selected color to the element with index i
@@ -574,10 +579,12 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
 
   //Deletes the current class
   $scope.delete = function(){
-    if(window.confirm("Delete this class?")){
-      MySchedule.removeClassById($stateParams.clsType, $stateParams.clsId);
-      $ionicHistory.goBack();
-    }
+    $cordovaDialogs.confirm("Delete this class?").then(function(answer){
+      if(answer == 1){
+        MySchedule.removeClassById($stateParams.clsType, $stateParams.clsId);
+        $ionicHistory.goBack();
+      }
+    });
   }
 
   //Submits the class and adds it to the class list
@@ -687,7 +694,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   $scope.reminders = Notifications.getAll();
 })
 
-.controller("AddReminderCtrl", function($scope, $stateParams, $ionicHistory, Notifications, $cordovaDatePicker){
+.controller("AddReminderCtrl", function($scope, $stateParams, $ionicHistory, Notifications, $cordovaDatePicker, $cordovaDialogs){
   //Whether or not we are modifying a reminder
   var modify = false;
   //If we aren't passed parameters or are passed invalid parameters of what reminder to modify
@@ -775,11 +782,13 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
 
   //Deletes this reminder
   $scope.delete = function(reminder){
-    if(window.confirm("Delete this reminder?")){
-      Notifications.remove($stateParams.reminderId);
-      Notifications.update();
-      $ionicHistory.goBack();
-    }
+    $cordovaDialogs.confirm("Delete this reminder?").then(function(answer){
+      if(answer == 1){
+        Notifications.remove($stateParams.reminderId);
+        Notifications.update();
+        $ionicHistory.goBack();
+      }
+    })
   }
 })
 
@@ -881,8 +890,8 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     );
 
     //Only take the first 15 events
-    if(events.length > 15){
-      events = events.slice(0,15);
+    if(events.length > 25){
+      events = events.slice(0,25);
     }
     console.log(events);
     console.log(JSON.stringify(events));

@@ -3,6 +3,26 @@
 // angular.module is a global place for creating, registering and retrieving Angular modules
 
 
+//PLUGINS:
+/*
+AppVersion
+Datepicker
+Device
+Dialogs
+Notification
+InAppBrowser
+Network Information
+Splashscreen
+DeviceFeedback
+Whitelist
+Toast
+LocalNotification
+
+Application Events
+StatusBar
+Keyboard
+*/
+
 angular.module('app', ['ionic', 'ionic.native', 'ngCordova', 'app.routes', 'app.controllers', 'app.services', 'app.directives'])
 
 .run(function($ionicPlatform, $cordovaToast, $ionicHistory, $window, LetterDay, Schedule, Settings) {
