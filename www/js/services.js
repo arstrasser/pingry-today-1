@@ -1135,6 +1135,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
             }
           }
         }
+
         //Normal, non-repeating event
         else{
           //Add the object to the array of events
@@ -1342,7 +1343,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
     showError: function(msg){
       //Shows a message in the center of the screen with a red background and white text
       hide();
-      $cordovaToast.showWithOptions({message:msg, position:"middle", duration:"long", styling:{backgroundColor:"#F73333", textColor:"FFFFFF"}});
+      $cordovaToast.showWithOptions({message:msg, position:"bottom", duration:"short", styling:{backgroundColor:"#F73333"}});
     },
     showSuccess: function(msg){
       //Shows a message at the bottom of the screen with a green background
