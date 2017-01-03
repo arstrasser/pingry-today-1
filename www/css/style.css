@@ -1,4 +1,10 @@
-/* Empty. Add your own CSS if you like */
+@media (max-width: 680px) {
+    .active .modal-backdrop-bg {
+    	opacity: .5;
+    	transition: opacity 300ms ease-in-out;
+    	background-color: #000;
+    }
+}
 
 .color-select {
 	display:inline-block;

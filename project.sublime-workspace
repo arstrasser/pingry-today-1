@@ -4,6 +4,14 @@
 		"selected_items":
 		[
 			[
+				"cordovaDev",
+				"cordovaDeviceFeedback"
+			],
+			[
+				"border",
+				"border-radius"
+			],
+			[
 				"refresh",
 				"refreshExtraOptions"
 			],
@@ -152,10 +160,28 @@
 	"buffers":
 	[
 		{
+			"file": "config.xml",
+			"settings":
+			{
+				"buffer_size": 5645,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
 			"file": "www/js/app.js",
 			"settings":
 			{
-				"buffer_size": 1766,
+				"buffer_size": 1179,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "www/index.html",
+			"settings":
+			{
+				"buffer_size": 2037,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -164,34 +190,7 @@
 			"file": "www/js/controllers.js",
 			"settings":
 			{
-				"buffer_size": 24632,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "www/css/hackerStyles.css",
-			"settings":
-			{
-				"buffer_size": 291,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "www/templates/settings.html",
-			"settings":
-			{
-				"buffer_size": 1156,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "www/templates/schedule.html",
-			"settings":
-			{
-				"buffer_size": 1356,
+				"buffer_size": 40924,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -201,7 +200,6 @@
 			"settings":
 			{
 				"buffer_size": 1583,
-				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
 		},
@@ -209,18 +207,18 @@
 			"file": "www/js/services.js",
 			"settings":
 			{
-				"buffer_size": 57565,
+				"buffer_size": 59773,
 				"encoding": "UTF-8",
-				"line_ending": "Unix"
+				"line_ending": "Windows"
 			}
 		},
 		{
 			"file": "www/css/style.css",
 			"settings":
 			{
-				"buffer_size": 1519,
+				"buffer_size": 1593,
 				"encoding": "UTF-8",
-				"line_ending": "Unix"
+				"line_ending": "Windows"
 			}
 		}
 	],
@@ -260,35 +258,36 @@
 		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www",
 		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/build",
 		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/build/img",
-		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/css",
 		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/js",
 		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates"
 	],
 	"file_history":
 	[
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/announcement-popup.html",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/announcements.html",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/js/controllers.js",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/menu.html",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/portal.html",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/home.html",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/add-class.html",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/schedule.html",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/settings.html",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/css/hackerStyles.css",
 		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/js/routes.js",
 		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/config.xml",
 		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/index.html",
-		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/css/hackerStyles.css",
 		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/athletics.html",
 		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/about.html",
-		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/announcements.html",
 		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/js/services.js",
-		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/menu.html",
-		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/settings.html",
 		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/reminders.html",
-		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/home.html",
 		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/add-reminder.html",
-		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/add-class.html",
 		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/platforms/android/assets/www/lib/ionic/css/ionic.css",
 		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/js/app.js",
 		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/platforms/android/build.gradle",
 		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/platforms/android/gradle/wrapper/gradle-wrapper.properties",
-		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/schedule.html",
 		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/css/style.css",
 		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/article.html",
 		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/js/directives.js",
-		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/js/controllers.js",
 		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/lunch.html",
 		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/class-manage.html",
 		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/ionic.config.json",
@@ -373,7 +372,7 @@
 	],
 	"find":
 	{
-		"height": 64.0
+		"height": 69.0
 	},
 	"find_in_files":
 	{
@@ -387,6 +386,33 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"Attendence",
+			"http://",
+			"until",
+			"oc ",
+			"oc",
+			"curDay",
+			"parseStringFor",
+			"new Date(",
+			"Date(",
+			"console.log",
+			"+\":\"+",
+			"+\" \"+",
+			"Date(",
+			"getDatesOfGre",
+			"new Date(",
+			"MySchedule.get(",
+			"console",
+			"img/",
+			"elem",
+			"eleme",
+			"elem",
+			"createElement",
+			"cordova",
+			"== ",
+			"getCTSchedul",
+			"Community Time",
+			"Unknown Assembly",
 			"TODO",
 			"\\",
 			"$ionicView",
@@ -487,8 +513,7 @@
 			"big-progress-bar-container",
 			".song-in-songlist",
 			"updateDro",
-			"playThis",
-			"                  \n"
+			"playThis"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -496,6 +521,9 @@
 		"regex": false,
 		"replace_history":
 		[
+			"Attendance",
+			", ",
+			",",
 			"/",
 			"window.plugins.toast",
 			"recId",
@@ -545,54 +573,54 @@
 	"groups":
 	[
 		{
-			"selected": 6,
+			"selected": 3,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "www/js/app.js",
+					"file": "config.xml",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1766,
+						"buffer_size": 5645,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								580,
-								580
+								553,
+								553
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"syntax": "Packages/XML/XML.sublime-syntax",
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 8.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 5,
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "www/js/controllers.js",
+					"file": "www/js/app.js",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 24632,
+						"buffer_size": 1179,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								22741,
-								22744
+								1055,
+								1055
 							]
 						],
 						"settings":
@@ -600,34 +628,6 @@
 							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 2.0,
-						"translation.y": 24794.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "www/css/hackerStyles.css",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 291,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								127,
-								127
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/CSS/CSS.sublime-syntax"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -637,67 +637,69 @@
 					"type": "text"
 				},
 				{
-					"buffer": 3,
-					"file": "www/templates/settings.html",
+					"buffer": 2,
+					"file": "www/index.html",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1156,
+						"buffer_size": 2037,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1156,
-								1156
+								1754,
+								1601
 							]
 						],
 						"settings":
 						{
 							"syntax": "Packages/HTML/HTML.sublime-syntax",
-							"translate_tabs_to_spaces": false
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 16.0,
+						"translation.y": 236.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 5,
+					"stack_index": 2,
 					"type": "text"
 				},
 				{
-					"buffer": 4,
-					"file": "www/templates/schedule.html",
+					"buffer": 3,
+					"file": "www/js/controllers.js",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1356,
+						"buffer_size": 40924,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1356,
-								1356
+								16502,
+								16502
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/HTML/HTML.sublime-syntax",
-							"translate_tabs_to_spaces": false
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
-					"buffer": 5,
+					"buffer": 4,
 					"file": "www/templates/menu.html",
-					"semi_transient": false,
+					"semi_transient": true,
 					"settings":
 					{
 						"buffer_size": 1583,
@@ -707,8 +709,8 @@
 						"selection":
 						[
 							[
-								1195,
-								1195
+								1154,
+								1192
 							]
 						],
 						"settings":
@@ -721,24 +723,24 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 6,
+					"stack_index": 1,
 					"type": "text"
 				},
 				{
-					"buffer": 6,
+					"buffer": 5,
 					"file": "www/js/services.js",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 57565,
+						"buffer_size": 59773,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								30067,
-								30071
+								9838,
+								9848
 							]
 						],
 						"settings":
@@ -748,27 +750,27 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 24038.0,
+						"translation.y": 14165.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 4,
 					"type": "text"
 				},
 				{
-					"buffer": 7,
+					"buffer": 6,
 					"file": "www/css/style.css",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1519,
+						"buffer_size": 1593,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1043,
-								1043
+								703,
+								703
 							]
 						],
 						"settings":
@@ -777,10 +779,10 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1968.0,
+						"translation.y": 1617.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 7,
+					"stack_index": 6,
 					"type": "text"
 				}
 			]
@@ -788,7 +790,7 @@
 	],
 	"incremental_find":
 	{
-		"height": 44.0
+		"height": 53.0
 	},
 	"input":
 	{
@@ -825,7 +827,7 @@
 	"project": "project.sublime-project",
 	"replace":
 	{
-		"height": 120.0
+		"height": 130.0
 	},
 	"save_all_on_build": true,
 	"select_file":
