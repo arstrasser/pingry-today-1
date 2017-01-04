@@ -6,6 +6,10 @@
     }
 }
 
+.announcement img {
+	width:100%;
+}
+
 .color-select {
 	display:inline-block;
 	margin:2px;

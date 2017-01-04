@@ -671,7 +671,6 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
     },
     setOverride: function(val){ //Turns schedule override mode on or off
       schedOverride = val;
-      console.log("Changed to "+val);
     },
     changeDay: function(day){ //updates the current date
       curDay = day;
@@ -1195,7 +1194,6 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
           }
         }
       }
-      console.log(list);
       return list;
     }
   }
