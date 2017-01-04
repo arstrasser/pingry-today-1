@@ -322,7 +322,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
 
   var checker;
   //Resets the current day to today
-  $scope.$on('$ionicView.enter', function(){
+  $scope.$on('$ionicView.beforeEnter', function(){
     //resets the schedule to the current date
     curDay = new Date();
     if(Schedule.wasChanged() || MySchedule.isChanged() || LetterDay.isChanged()){
@@ -346,7 +346,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     );
   })
 
-  $scope.$on('$ionicView.enter', function(){
+  $scope.$on('$ionicView.leave', function(){
     window.clearInterval(checker);
   });
 
@@ -362,6 +362,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     $cordovaDatePicker.show({
       mode:"date",
       date:curDay,
+      todayText:"Today"
     }).then(function(date){
       curDay = date;
       updateDate();
@@ -431,6 +432,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
 
   $scope.openAnnounce = function(index){
     $scope.modal.scope.announcement = $scope.rss[index];
+    $scope.modal.scope.announcement.rawDescription = rssFeed.parseRawDescription($scope.modal.scope.announcement.rawDescription);
     $scope.modal.modalEl.onclick = function (e) {
       e = e ||  window.event;
       var element = e.target || e.srcElement;
@@ -468,9 +470,16 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
 })
 
 //Settings controller
-.controller('SettingsCtrl', function($scope, MySchedule, Schedule, LetterDay, Messages, Settings) {
+.controller('SettingsCtrl', function($scope, $cordovaDialogs, MySchedule, Schedule, LetterDay, Messages, Settings) {
   //Stops refresh overload from spam since refreshes are fairly processor intensive
   var refreshEnable = true;
+
+  $scope.scheduleOverrideHelp = function(){
+    console.log("Test");
+    $cordovaDialogs.alert("Use this option only if you have an incorrect schedule shown in the Schedule menu.\n"+
+      "It overrides all schedule types for school days to be the given type.\n"+
+      "This is useful if an incorrect schedule type is given for a specific day.");
+  }
 
   //Refresh teh calendar events
   $scope.forceRefresh = function(){
@@ -556,25 +565,18 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     //Resets the view to a new class
     if(!modify){
       //Resets the values
-      $scope.cls = {"name":"", "type":"", "firstLunch":false, "takesFlex":false, "firstFlex":true, "timeType":"", "time":{"day":"", "id":false}};
-      //Removes any selected colors
-      while(document.getElementsByClassName("selected-color") > 0){
-        angular.element(document.getElementsByClassName("selected-color")[0]).removeClass("selected-color");
-      }
+      $scope.cls = {"name":"", "color":"", "type":"", "firstLunch":false, "takesFlex":false, "firstFlex":true, "timeType":"", "time":{"day":"", "id":false}};
     }
   }
 
   //Lunch help popup
-  $scope.lunchHelp = function(e){
+  $scope.lunchHelp = function(){
     $cordovaDialogs.alert('First lunch is for:\nScience, Health, Art, Math, and Economic Classes');
   }
 
   //Updates the selected color to the element with index i
-  $scope.updateColorSelect = function(i){
-    if(document.getElementsByClassName("selected-color").length > 0){
-      angular.element(document.getElementsByClassName("selected-color")[0]).removeClass("selected-color");
-    }
-    angular.element(document.getElementById("color-"+i)).addClass("selected-color");
+  $scope.updateColorSelect = function(clr){
+    $scope.cls.color = clr;
   }
 
   //Deletes the current class
@@ -620,7 +622,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
       return false;
     }
     //Color is selected
-    if(document.getElementsByClassName("selected-color").length < 1){
+    if(cls.color == ""){
       return false;
     }
     //if the class is a block
@@ -645,7 +647,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   if($stateParams.clsType == undefined || $stateParams.clsType == "" || MySchedule.getAll()[$stateParams.clsType] == undefined || MySchedule.getAll()[$stateParams.clsType].length <= parseInt($stateParams.clsId)){
     modify = false;
     //Default class config
-    $scope.cls = {"name":"", "type":"", "firstLunch":false, "takesFlex":false, "firstFlex":true, "timeType":"", "time":{"day":"", "id":false}};
+    $scope.cls = {"name":"", "color":"", "type":"", "firstLunch":false, "takesFlex":false, "firstFlex":true, "timeType":"", "time":{"day":"", "id":false}};
   }else{
     //Modify a class
     modify = true;
