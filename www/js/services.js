@@ -68,7 +68,6 @@ function parseStringForDate(str){
     return str;
   }
   var d = new Date(0);
-  //console.log(str);
   
   //Replace all dashes
   str = str.substring(0,10).replace(/-/g, "") + str.substring(10);
@@ -96,7 +95,6 @@ function parseStringForDate(str){
   else{
     console.warn("INVALID: "+str);
   }
-  //console.log(new Date(d.getTime()))
   return d;
 }
 
@@ -139,7 +137,7 @@ function dateToDayString(d){
 
 angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
 
-.factory('LetterDay', function($http, icalFeed) {
+.factory('LetterDay', function($http, icalFeed, Schedule) {
   var time = localStorage.getItem("lastLetterRefresh");
   var dates = localStorage.getItem("letterDayDates");
   var isChanged = false; //variable to tell whether or not the letterday schedule has been updated
@@ -166,8 +164,11 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
     {"letter":"G", "schedule":[4,5,6,7], "dates":dates.G}
   ];
 
+  var refreshing = false;
+
   //Function to refresh all data from the letter day ical
   function refreshData(){
+    refreshing = true;
     var letterDayURL = "http://www.pingry.org/calendar/calendar_384.ics"; //URL of the LetterDay calendar for the Upper School
     //Returns a promise so that you can run async functions after this function completes
     //(e.g.Calling LetterDay.refresh.then(function(){code here}))
@@ -202,7 +203,8 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
       isChanged = true;
       //Updates the letter day if there are different letter days for the current date
       updateDay(d);
-    });
+      refreshing = false;
+    },function(){refreshing=false;});
   }
 
   //Function to get the index of the current date in one of the date arrays
@@ -256,6 +258,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
   updateDay(new Date());
 
   return {
+    isRefreshing: function(){return refreshing;},
     refresh: refreshData, //Refresh the LetterDay schedule from the online calendar
     letter: function() {
       if(curDay != -1){
@@ -264,6 +267,9 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
       //If the schedule isn't updated, return an empty string
       else if(times[0].dates.length == 0){
         return "empty";
+      }
+      else if(refreshing || Schedule.isRefreshing()){
+        return "refreshing";
       }
       return undefined;
     },
@@ -439,6 +445,8 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
   //Variable to store all the schedule types
   var typeList = [["Normal",normalSchedule], ["Faculty Collaboration",facultyCollabSchedule], ["Assembly 30 Minutes", assembly30Schedule], ["Assembly 35 Mintues", assembly35Schedule], ["Assembly 60 Minutes",assembly60Schedule], ["Winter Festival", winterFestivalSchedule], ["Unknown Assembly", unknownSchedule]];
 
+  var refreshing = false;
+
   //Community Time event schedule
   var CTSchedule = localStorage.getItem("CTSchedule");
   //Special Schedule day schedule
@@ -492,6 +500,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
 
   //Refreshes the schedule from the calendar
   function refreshData(){
+    refreshing = true;
     //Google school calendar URL
     var specialScheduleURL = "http://calendar.google.com/calendar/ical/pingry.org_kg3ab8ps5pa70oj41igegj9kjo%40group.calendar.google.com/public/basic.ics";
     //Faculty Collaboration day calendar URL
@@ -635,12 +644,14 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
 
       //Update wasChanged variable to trigger a schedule refresh
       wasChanged = true;
-      });
-    }
+      refreshing = false;
+    },function(){refreshing=false;});
+  }
   
   return {
     wasChanged: function(){return wasChanged;}, //WasChanged Accessor
     setChanged: function(val){wasChanged=val;}, //WasChanged Modfier
+    isRefreshing: function(){return refreshing;},
     refresh: refreshData,  //Triggers a full schedule refresh from the internet
     get: function(id){
       return typeList[curSchedule][1][id];  //returns the current schedule list element of index id
@@ -744,7 +755,6 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
     addClass: function(cls){
       console.log(cls);
       myClasses[cls.type].push(cls);
-      console.log(myClasses);
     },
     addClassWithType: function(type, cls){
       //Deprecated function to add a class to a specific place
@@ -1033,7 +1043,6 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
                 timeDiff = dtend.getTime() - dtstart.getTime();
               }
               //While we should add dates
-              console.log(until);
               while(curDay.getTime() <= until.getTime()){
                 //The month we should be in
                 var curMonth = curDay.getMonth();
@@ -1158,13 +1167,15 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
       }
 
       //Sorting algorithm to sort events by descending order for easy debugging
-      /*list.sort(function(a,b){
+      /*
+      list.sort(function(a,b){
         if(a.type == "unknown"){
           return -1;
         }
         return (a.type=="time"?a.startTime:a.time).getTime() > (b.type=="time"?b.startTime:b.time).getTime()?-1:1;
       })
-      console.log(list);*/
+      console.log(list);
+      */
       //Parsing to fix reccurring events
       //Fixing Recurrence Id to work and override the events
       //For each object in the array
@@ -1287,7 +1298,6 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
   }
 
   function scheduleNotification(id, date, desc){
-    console.log("Scheduling "+desc+" at "+date);
     //Schedules a notification with the given parameters
     if(date.getTime() >= Date.now()){
       $cordovaLocalNotifications.schedule({
@@ -1357,6 +1367,124 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
   }
 })
 
+.factory("AthleticCalendars", function(){
+  return {
+    getCalendars: function(){
+      /*
+        Short javascript to run in the console on (http://www.pingry.org/cf_athletics/cms_athletic_feeds.cfm) to get a list of the links:
+
+        var str = "";
+        for(var i = 0; i < document.getElementsByClassName("athletics_alert_btn").length; i++){
+          var t = document.getElementsByClassName("athletics_alert_btn")[i].parentNode.children[2].getAttribute("href");
+          var temp = '["'+document.getElementsByClassName("athletics_alert_btn")[i].parentNode.children[0].innerHTML+'", "http://www.pingry.org/calendar/team_'+t.substring(t.indexOf("eventid=")+8)+'.ics"],\n';
+          if(temp.indexOf("Middle School") != -1 || temp.indexOf("MS") != -1){
+            temp = "//"+temp;
+          }
+          str += temp;
+        }
+        console.log(str);
+
+      */
+      return calendars = [
+        ["Baseball - Boys Junior Varsity", "http://www.pingry.org/calendar/team_119.ics"],
+        //["Baseball - Boys Middle School A", "http://www.pingry.org/calendar/team_210.ics"],
+        //["Baseball - Boys Middle School B", "http://www.pingry.org/calendar/team_211.ics"],
+        //["Baseball - Boys MS", "http://www.pingry.org/calendar/team_223.ics"],
+        ["Baseball - Boys Varsity", "http://www.pingry.org/calendar/team_121.ics"],
+        ["Basketball - Boys Frosh", "http://www.pingry.org/calendar/team_222.ics"],
+        ["Basketball - Boys Junior Varsity", "http://www.pingry.org/calendar/team_123.ics"],
+        //["Basketball - Boys Middle School A", "http://www.pingry.org/calendar/team_124.ics"],
+        //["Basketball - Boys Middle School B", "http://www.pingry.org/calendar/team_207.ics"],
+        //["Basketball - Boys Middle School C", "http://www.pingry.org/calendar/team_230.ics"],
+        ["Basketball - Boys Varsity", "http://www.pingry.org/calendar/team_125.ics"],
+        ["Basketball - Girls Junior Varsity", "http://www.pingry.org/calendar/team_126.ics"],
+        //["Basketball - Girls Middle School A", "http://www.pingry.org/calendar/team_205.ics"],
+        //["Basketball - Girls Middle School B", "http://www.pingry.org/calendar/team_206.ics"],
+        ["Basketball - Girls Varsity", "http://www.pingry.org/calendar/team_127.ics"],
+        ["Cross Country -  Frosh", "http://www.pingry.org/calendar/team_251.ics"],
+        ["Cross Country - Boys Junior Varsity", "http://www.pingry.org/calendar/team_249.ics"],
+        ["Cross Country - Boys Varsity", "http://www.pingry.org/calendar/team_97.ics"],
+        //["Cross Country - Coed MS", "http://www.pingry.org/calendar/team_99.ics"],
+        ["Cross Country - Girls Junior Varsity", "http://www.pingry.org/calendar/team_250.ics"],
+        ["Cross Country - Girls Varsity", "http://www.pingry.org/calendar/team_100.ics"],
+        ["Fencing - Boys Varsity", "http://www.pingry.org/calendar/team_129.ics"],
+        //["Fencing - Coed MS", "http://www.pingry.org/calendar/team_130.ics"],
+        ["Fencing - Girls Varsity", "http://www.pingry.org/calendar/team_132.ics"],
+        ["Field Hockey - Girls Junior Varsity", "http://www.pingry.org/calendar/team_37.ics"],
+        //["Field Hockey - Girls MS", "http://www.pingry.org/calendar/team_38.ics"],
+        ["Field Hockey - Girls Varsity", "http://www.pingry.org/calendar/team_39.ics"],
+        ["Football - Boys Junior Varsity", "http://www.pingry.org/calendar/team_34.ics"],
+        //["Football - Boys MS", "http://www.pingry.org/calendar/team_35.ics"],
+        ["Football - Boys Varsity", "http://www.pingry.org/calendar/team_36.ics"],
+        ["Golf - Boys Junior Varsity", "http://www.pingry.org/calendar/team_212.ics"],
+        ["Golf - Boys Varsity", "http://www.pingry.org/calendar/team_135.ics"],
+        ["Golf - Girls Junior Varsity", "http://www.pingry.org/calendar/team_213.ics"],
+        ["Golf - Girls Varsity", "http://www.pingry.org/calendar/team_138.ics"],
+        ["Ice Hockey - Boys Junior Varsity", "http://www.pingry.org/calendar/team_139.ics"],
+        ["Ice Hockey - Boys Varsity", "http://www.pingry.org/calendar/team_140.ics"],
+        //["Ice Hockey - Coed MS", "http://www.pingry.org/calendar/team_141.ics"],
+        ["Ice Hockey - Girls Varsity", "http://www.pingry.org/calendar/team_142.ics"],
+        ["Lacrosse - Boys Frosh", "http://www.pingry.org/calendar/team_143.ics"],
+        ["Lacrosse - Boys Junior Varsity", "http://www.pingry.org/calendar/team_144.ics"],
+        //["Lacrosse - Boys Middle School A", "http://www.pingry.org/calendar/team_214.ics"],
+        //["Lacrosse - Boys Middle School B", "http://www.pingry.org/calendar/team_215.ics"],
+        //["Lacrosse - Boys MS", "http://www.pingry.org/calendar/team_145.ics"],
+        ["Lacrosse - Boys Varsity", "http://www.pingry.org/calendar/team_146.ics"],
+        ["Lacrosse - Girls Frosh", "http://www.pingry.org/calendar/team_147.ics"],
+        ["Lacrosse - Girls Junior Varsity", "http://www.pingry.org/calendar/team_148.ics"],
+        //["Lacrosse - Girls Middle School A", "http://www.pingry.org/calendar/team_216.ics"],
+        //["Lacrosse - Girls Middle School B", "http://www.pingry.org/calendar/team_217.ics"],
+        //["Lacrosse - Girls MS", "http://www.pingry.org/calendar/team_224.ics"],
+        ["Lacrosse - Girls Varsity", "http://www.pingry.org/calendar/team_150.ics"],
+        ["Ski Team - Boys Junior Varsity", "http://www.pingry.org/calendar/team_228.ics"],
+        ["Ski Team - Boys Varsity", "http://www.pingry.org/calendar/team_201.ics"],
+        ["Ski Team - Girls Junior Varsity", "http://www.pingry.org/calendar/team_229.ics"],
+        ["Ski Team - Girls Varsity", "http://www.pingry.org/calendar/team_202.ics"],
+        ["Soccer - Boys Frosh", "http://www.pingry.org/calendar/team_59.ics"],
+        ["Soccer - Boys Junior Varsity", "http://www.pingry.org/calendar/team_6.ics"],
+        //["Soccer - Boys Middle School A", "http://www.pingry.org/calendar/team_155.ics"],
+        //["Soccer - Boys Middle School B", "http://www.pingry.org/calendar/team_203.ics"],
+        //["Soccer - Boys Middle School C", "http://www.pingry.org/calendar/team_234.ics"],
+        ["Soccer - Boys Varsity", "http://www.pingry.org/calendar/team_61.ics"],
+        ["Soccer - Girls Frosh", "http://www.pingry.org/calendar/team_248.ics"],
+        ["Soccer - Girls Junior Varsity", "http://www.pingry.org/calendar/team_63.ics"],
+        //["Soccer - Girls MS", "http://www.pingry.org/calendar/team_226.ics"],
+        ["Soccer - Girls Varsity", "http://www.pingry.org/calendar/team_5.ics"],
+        ["Softball - Girls Junior Varsity", "http://www.pingry.org/calendar/team_151.ics"],
+        //["Softball - Girls Middle School A", "http://www.pingry.org/calendar/team_218.ics"],
+        //["Softball - Girls Middle School B", "http://www.pingry.org/calendar/team_219.ics"],
+        //["Softball - Girls MS", "http://www.pingry.org/calendar/team_225.ics"],
+        ["Softball - Girls Varsity", "http://www.pingry.org/calendar/team_153.ics"],
+        ["Squash - Boys Varsity", "http://www.pingry.org/calendar/team_158.ics"],
+        ["Squash - Coed Junior Varsity", "http://www.pingry.org/calendar/team_194.ics"],
+        ["Squash - Coed Varsity", "http://www.pingry.org/calendar/team_161.ics"],
+        ["Squash - Girls Varsity", "http://www.pingry.org/calendar/team_162.ics"],
+        ["Swimming - Boys Varsity", "http://www.pingry.org/calendar/team_163.ics"],
+        //["Swimming - Coed MS", "http://www.pingry.org/calendar/team_165.ics"],
+        ["Swimming - Girls Varsity", "http://www.pingry.org/calendar/team_166.ics"],
+        ["Tennis - Boys Junior Varsity", "http://www.pingry.org/calendar/team_167.ics"],
+        //["Tennis - Boys MS", "http://www.pingry.org/calendar/team_168.ics"],
+        ["Tennis - Boys Varsity", "http://www.pingry.org/calendar/team_169.ics"],
+        ["JV-2 Girls Tennis", "http://www.pingry.org/calendar/team_235.ics"],
+        ["Tennis - Girls Junior Varsity", "http://www.pingry.org/calendar/team_77.ics"],
+        //["Tennis - Girls MS", "http://www.pingry.org/calendar/team_78.ics"],
+        ["Tennis - Girls Varsity", "http://www.pingry.org/calendar/team_79.ics"],
+        ["Track - Boys Varsity", "http://www.pingry.org/calendar/team_171.ics"],
+        //["Track - Coed MS", "http://www.pingry.org/calendar/team_173.ics"],
+        ["Track - Girls Varsity", "http://www.pingry.org/calendar/team_175.ics"],
+        ["Water Polo - Coed Junior Varsity", "http://www.pingry.org/calendar/team_89.ics"],
+        //["Water Polo - Coed MS", "http://www.pingry.org/calendar/team_220.ics"],
+        ["Water Polo - Coed Varsity", "http://www.pingry.org/calendar/team_221.ics"],
+        ["Winter Track - Boys Varsity", "http://www.pingry.org/calendar/team_208.ics"],
+        ["Winter Track - Girls Varsity", "http://www.pingry.org/calendar/team_209.ics"],
+        ["Wrestling - Boys Junior Varsity", "http://www.pingry.org/calendar/team_179.ics"],
+        //["Wrestling - Boys MS", "http://www.pingry.org/calendar/team_180.ics"],
+        ["Wrestling - Boys Varsity", "http://www.pingry.org/calendar/team_181.ics"]
+      ];
+    }
+  }
+})
+
 //Settings storage
 .factory("Settings", function(){
   var athleticMaps = localStorage.getItem("athleticMaps");
@@ -1364,6 +1492,13 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
     athleticMaps = true;
   }else{
     athleticMaps = false;
+  }
+
+
+  var athleticSubscription = localStorage.getItem("athleticSubscription");
+
+  if(athleticSubscription == "" || athleticSubscription == undefined){
+    athleticSubscription = "";
   }
 
   //Super Mode (Easter Egg!)
@@ -1385,7 +1520,6 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
   function refreshExtraOptions(){
     console.log(extraOptions);
     if(extraOptions.includes("hackerTheme")){
-      console.log("yes");
       var elem = document.createElement("link");
       elem.rel = "stylesheet";
       elem.href = "css/hackerStyles.css";
@@ -1398,9 +1532,31 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
     }
   }
 
+  var athleticSubscriptionChanged = false;
+
   refreshExtraOptions();
 
   return {
+    getAthleticSubscription: function(){
+      return athleticSubscription;
+    },
+
+    setAthleticSubscription: function(newVal){
+      athleticSubscription = newVal;
+      athleticSubscriptionChanged = true;
+      localStorage.setItem("athleticSubscription", athleticSubscription);
+      localStorage.setItem("athleticEvents", null);
+      localStorage.setItem("athleticEventsRefreshTime", "");
+    },
+
+    getAthleticSubscriptionChanged: function(){
+      return athleticSubscriptionChanged;
+    },
+
+    setAthleticSubscriptionChanged: function(val){
+      athleticSubscriptionChanged = val;
+    },
+
     //Gets whether or not athletic maps are enabled
     getAthleticMaps: function(){
       return athleticMaps;

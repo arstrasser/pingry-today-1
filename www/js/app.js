@@ -11,7 +11,6 @@ Device
 Dialogs
 Notification
 InAppBrowser
-Network Information
 Splashscreen
 DeviceFeedback
 Whitelist

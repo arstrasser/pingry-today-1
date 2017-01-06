@@ -1,6 +1,10 @@
 var monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 var weekDays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
+function isLetter(str){
+  return str == "A" || str == "B" || str == "C" || str == "D" || str == "E" || str == "F" || str == "G";
+}
+
 angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
 
 //Controller for the side menu
@@ -108,8 +112,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   };
 })
 
-.controller('ScheduleCtrl', function($scope, $cordovaNetwork, $cordovaDialogs, Schedule, LetterDay, MySchedule, $ionicSideMenuDelegate, $ionicGesture, Messages, $cordovaDatePicker, $cordovaDeviceFeedback) {
-  console.log($scope);
+.controller('ScheduleCtrl', function($scope, $cordovaDialogs, Schedule, LetterDay, MySchedule, $ionicSideMenuDelegate, $ionicGesture, Messages, $cordovaDatePicker, $cordovaDeviceFeedback) {
   //Set up triggers to change the day on swipe
   var elem = angular.element(document.querySelector("#scheduleContent"));
   $ionicGesture.on("swipeleft", $scope.nextDay, elem);
@@ -146,7 +149,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     //Stores the letter day
     $scope.letter = LetterDay.letter();
     //If today is a valid letter day
-    if($scope.letter !== undefined && $scope.letter.length == 1){
+    if($scope.letter !== undefined && $scope.letter.length == 1 && isLetter($scope.letter)){
       for(i = 0; i < Schedule.getToday().length; i++){
         //Fix pass by refrence by converting it to and back from a string
         var tClass = JSON.parse(JSON.stringify(Schedule.get(i)));
@@ -295,15 +298,11 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     else{
       //If there is no stored letter day schedule
       if($scope.letter == "empty"){
-        //TODO: improve this system to use variables
         //If not connected to the internet
-        if($cordovaNetwork.connection == "none" || $cordovaNetwork.connection == undefined){
-          Messages.showError("Please connect to the internet!");
-        }
-        //Otherwise tells user that we are refreshing
-        else{
-          Messages.showNormal("Refreshing...");
-        }
+        Messages.showError("Please connect to the internet!");
+      }
+      else if($scope.letter == "refreshing"){
+        Messages.showNormal("Refreshing...");
       }
       //set the letter to be empty
       $scope.letter = "";
@@ -397,7 +396,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
 })
 
 //Nothing in the lunch controller because it is currently implemented through an in app browser in the menu controller
-.controller('LunchCtrl', function($scope, $ionicGesture){
+.controller('LunchCtrl', function($scope){
   //Old HTML code is in lunch.html
 })
 
@@ -470,12 +469,11 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
 })
 
 //Settings controller
-.controller('SettingsCtrl', function($scope, $cordovaDialogs, MySchedule, Schedule, LetterDay, Messages, Settings) {
+.controller('SettingsCtrl', function($scope, $cordovaDialogs, MySchedule, Schedule, LetterDay, Messages, Settings, AthleticCalendars) {
   //Stops refresh overload from spam since refreshes are fairly processor intensive
   var refreshEnable = true;
 
   $scope.scheduleOverrideHelp = function(){
-    console.log("Test");
     $cordovaDialogs.alert("Use this option only if you have an incorrect schedule shown in the Schedule menu.\n"+
       "It overrides all schedule types for school days to be the given type.\n"+
       "This is useful if an incorrect schedule type is given for a specific day.");
@@ -527,9 +525,16 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   }
 
   //Updates the athletic maps option to true or false
-  $scope.updateAthletic = function(val){
+  $scope.updateAthleticSubscription = function(val){
+    Settings.setAthleticSubscription(val);
+  }
+
+  $scope.updateAthleticMaps = function(val){
     Settings.setAthleticMaps(val);
   }
+
+  $scope.athleticCalendars = AthleticCalendars.getCalendars();
+  $scope.selectedAthleticCalendar = Settings.getAthleticSubscription();
 
   //Adds an extra feature
   $scope.addExtra = function(option){
@@ -796,10 +801,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
 })
 
 //Athletics Controller
-.controller("AthleticsCtrl", function($scope, $http, $cordovaInAppBrowser, $ionicLoading, icalFeed, Messages, Settings){
-  //Keep track of downloads so that a reload can be both synchronous and asynchronous (download everything at once, THEN finish loading)
-  var curDownloads = 0;
-
+.controller("AthleticsCtrl", function($scope, $http, $cordovaInAppBrowser, $ionicLoading, icalFeed, Messages, Settings, AthleticCalendars){
   //Formats a 24 hour time in 12 hour format
   function fixTime(hours, minutes){
     var AM = true;
@@ -833,7 +835,6 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
 
   //Resorts the list of events
   function resort(events){
-    console.log(events);
     //Iterate over the events to fix Javscript Time objecs and such (also removing past events)
     for(var i = 0; i < events.length; i++){
       //Time type event
@@ -863,7 +864,6 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
         }
       }
     }
-    console.log(events);
 
     //Add descriptions for each event and fix titles
     for(var i = 0; i < events.length; i++){
@@ -896,154 +896,65 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     if(events.length > 25){
       events = events.slice(0,25);
     }
-    console.log(events);
-    console.log(JSON.stringify(events));
     //Update local storage
     localStorage.setItem("athleticEvents", JSON.stringify(events));
     localStorage.setItem("athleticEventsRefreshTime", Date.now());
-    console.log(events);
     $scope.events = events;
     $ionicLoading.hide();
     $scope.$broadcast('scroll.refreshComplete');
   }
 
-  /*
-    Short javascript to run in the console on (http://www.pingry.org/cf_athletics/cms_athletic_feeds.cfm) to get a list of the links:
-    for(var i = 0; i < document.getElementsByClassName("athletics_alert_btn").length; i++){
-      var t = document.getElementsByClassName("athletics_alert_btn")[i].parentNode.children[2].getAttribute("href");
-      console.log('"http://www.pingry.org/calendar/team_'+t.substring(t.indexOf("eventid=")+8)+'.ics",  //'+document.getElementsByClassName("athletics_alert_btn")[i].parentNode.children[0].innerHTML)
-    }
-  */
+  
   $scope.rawEvents = [];
+  $scope.calendars = AthleticCalendars.getCalendars();
   //Refreshes from all the calendars
   $scope.refresh = function(){
     $scope.rawEvents = [];
-    //List of athletic calendars (See above for details on how I got it) (Middle school calendars are manually commented out)
-    var calendars = [
-      "http://www.pingry.org/calendar/team_119.ics",  //Baseball - Boys Junior Varsity
-//      "http://www.pingry.org/calendar/team_210.ics",  //Baseball - Boys Middle School A
-//      "http://www.pingry.org/calendar/team_211.ics",  //Baseball - Boys Middle School B
-//      "http://www.pingry.org/calendar/team_223.ics",  //Baseball - Boys MS
-      "http://www.pingry.org/calendar/team_121.ics",  //Baseball - Boys Varsity
-      "http://www.pingry.org/calendar/team_222.ics",  //Basketball - Boys Frosh
-      "http://www.pingry.org/calendar/team_123.ics",  //Basketball - Boys Junior Varsity
-//      "http://www.pingry.org/calendar/team_124.ics",  //Basketball - Boys Middle School A
-//      "http://www.pingry.org/calendar/team_207.ics",  //Basketball - Boys Middle School B
-//      "http://www.pingry.org/calendar/team_230.ics",  //Basketball - Boys Middle School C
-      "http://www.pingry.org/calendar/team_125.ics",  //Basketball - Boys Varsity
-      "http://www.pingry.org/calendar/team_126.ics",  //Basketball - Girls Junior Varsity
-//      "http://www.pingry.org/calendar/team_205.ics",  //Basketball - Girls Middle School A
-//      "http://www.pingry.org/calendar/team_206.ics",  //Basketball - Girls Middle School B
-      "http://www.pingry.org/calendar/team_127.ics",  //Basketball - Girls Varsity
-      "http://www.pingry.org/calendar/team_251.ics",  //Cross Country -  Frosh
-      "http://www.pingry.org/calendar/team_249.ics",  //Cross Country - Boys Junior Varsity
-      "http://www.pingry.org/calendar/team_97.ics",  //Cross Country - Boys Varsity
-//      "http://www.pingry.org/calendar/team_99.ics",  //Cross Country - Coed MS
-      "http://www.pingry.org/calendar/team_250.ics",  //Cross Country - Girls Junior Varsity
-      "http://www.pingry.org/calendar/team_100.ics",  //Cross Country - Girls Varsity
-      "http://www.pingry.org/calendar/team_129.ics",  //Fencing - Boys Varsity
-//      "http://www.pingry.org/calendar/team_130.ics",  //Fencing - Coed MS
-      "http://www.pingry.org/calendar/team_132.ics",  //Fencing - Girls Varsity
-      "http://www.pingry.org/calendar/team_37.ics",  //Field Hockey - Girls Junior Varsity
-//      "http://www.pingry.org/calendar/team_38.ics",  //Field Hockey - Girls MS
-      "http://www.pingry.org/calendar/team_39.ics",  //Field Hockey - Girls Varsity
-      "http://www.pingry.org/calendar/team_34.ics",  //Football - Boys Junior Varsity
-//      "http://www.pingry.org/calendar/team_35.ics",  //Football - Boys MS
-      "http://www.pingry.org/calendar/team_36.ics",  //Football - Boys Varsity
-      "http://www.pingry.org/calendar/team_212.ics",  //Golf - Boys Junior Varsity
-      "http://www.pingry.org/calendar/team_135.ics",  //Golf - Boys Varsity
-      "http://www.pingry.org/calendar/team_213.ics",  //Golf - Girls Junior Varsity
-      "http://www.pingry.org/calendar/team_138.ics",  //Golf - Girls Varsity
-      "http://www.pingry.org/calendar/team_139.ics",  //Ice Hockey - Boys Junior Varsity
-      "http://www.pingry.org/calendar/team_140.ics",  //Ice Hockey - Boys Varsity
-//      "http://www.pingry.org/calendar/team_141.ics",  //Ice Hockey - Coed MS
-      "http://www.pingry.org/calendar/team_142.ics",  //Ice Hockey - Girls Varsity
-      "http://www.pingry.org/calendar/team_143.ics",  //Lacrosse - Boys Frosh
-      "http://www.pingry.org/calendar/team_144.ics",  //Lacrosse - Boys Junior Varsity
-//      "http://www.pingry.org/calendar/team_214.ics",  //Lacrosse - Boys Middle School A
-//      "http://www.pingry.org/calendar/team_215.ics",  //Lacrosse - Boys Middle School B
-//      "http://www.pingry.org/calendar/team_145.ics",  //Lacrosse - Boys MS
-      "http://www.pingry.org/calendar/team_146.ics",  //Lacrosse - Boys Varsity
-      "http://www.pingry.org/calendar/team_147.ics",  //Lacrosse - Girls Frosh
-      "http://www.pingry.org/calendar/team_148.ics",  //Lacrosse - Girls Junior Varsity
-//      "http://www.pingry.org/calendar/team_216.ics",  //Lacrosse - Girls Middle School A
-//      "http://www.pingry.org/calendar/team_217.ics",  //Lacrosse - Girls Middle School B
-//      "http://www.pingry.org/calendar/team_224.ics",  //Lacrosse - Girls MS
-      "http://www.pingry.org/calendar/team_150.ics",  //Lacrosse - Girls Varsity
-      "http://www.pingry.org/calendar/team_228.ics",  //Ski Team - Boys Junior Varsity
-      "http://www.pingry.org/calendar/team_201.ics",  //Ski Team - Boys Varsity
-      "http://www.pingry.org/calendar/team_229.ics",  //Ski Team - Girls Junior Varsity
-      "http://www.pingry.org/calendar/team_202.ics",  //Ski Team - Girls Varsity
-      "http://www.pingry.org/calendar/team_59.ics",  //Soccer - Boys Frosh
-      "http://www.pingry.org/calendar/team_6.ics",  //Soccer - Boys Junior Varsity
-//      "http://www.pingry.org/calendar/team_155.ics",  //Soccer - Boys Middle School A
-//      "http://www.pingry.org/calendar/team_203.ics",  //Soccer - Boys Middle School B
-//      "http://www.pingry.org/calendar/team_234.ics",  //Soccer - Boys Middle School C
-      "http://www.pingry.org/calendar/team_61.ics",  //Soccer - Boys Varsity
-      "http://www.pingry.org/calendar/team_248.ics",  //Soccer - Girls Frosh
-      "http://www.pingry.org/calendar/team_63.ics",  //Soccer - Girls Junior Varsity
-//      "http://www.pingry.org/calendar/team_226.ics",  //Soccer - Girls MS
-      "http://www.pingry.org/calendar/team_5.ics",  //Soccer - Girls Varsity
-//      "http://www.pingry.org/calendar/team_151.ics",  //Softball - Girls Junior Varsity
-//      "http://www.pingry.org/calendar/team_218.ics",  //Softball - Girls Middle School A
-//      "http://www.pingry.org/calendar/team_219.ics",  //Softball - Girls Middle School B
-//      "http://www.pingry.org/calendar/team_225.ics",  //Softball - Girls MS
-      "http://www.pingry.org/calendar/team_153.ics",  //Softball - Girls Varsity
-      "http://www.pingry.org/calendar/team_158.ics",  //Squash - Boys Varsity
-      "http://www.pingry.org/calendar/team_194.ics",  //Squash - Coed Junior Varsity
-      "http://www.pingry.org/calendar/team_161.ics",  //Squash - Coed Varsity
-      "http://www.pingry.org/calendar/team_162.ics",  //Squash - Girls Varsity
-      "http://www.pingry.org/calendar/team_163.ics",  //Swimming - Boys Varsity
-//      "http://www.pingry.org/calendar/team_165.ics",  //Swimming - Coed MS
-      "http://www.pingry.org/calendar/team_166.ics",  //Swimming - Girls Varsity
-      "http://www.pingry.org/calendar/team_167.ics",  //Tennis - Boys Junior Varsity
-//      "http://www.pingry.org/calendar/team_168.ics",  //Tennis - Boys MS
-      "http://www.pingry.org/calendar/team_169.ics",  //Tennis - Boys Varsity
-      "http://www.pingry.org/calendar/team_235.ics",  //JV-2 Girls Tennis
-      "http://www.pingry.org/calendar/team_77.ics",  //Tennis - Girls Junior Varsity
-//      "http://www.pingry.org/calendar/team_78.ics",  //Tennis - Girls MS
-      "http://www.pingry.org/calendar/team_79.ics",  //Tennis - Girls Varsity
-      "http://www.pingry.org/calendar/team_171.ics",  //Track - Boys Varsity
-//      "http://www.pingry.org/calendar/team_173.ics",  //Track - Coed MS
-      "http://www.pingry.org/calendar/team_175.ics",  //Track - Girls Varsity
-      "http://www.pingry.org/calendar/team_89.ics",  //Water Polo - Coed Junior Varsity
-//      "http://www.pingry.org/calendar/team_220.ics",  //Water Polo - Coed MS
-      "http://www.pingry.org/calendar/team_221.ics",  //Water Polo - Coed Varsity
-      "http://www.pingry.org/calendar/team_208.ics",  //Winter Track - Boys Varsity
-      "http://www.pingry.org/calendar/team_209.ics",  //Winter Track - Girls Varsity
-      "http://www.pingry.org/calendar/team_179.ics",  //Wrestling - Boys Junior Varsity
-//      "http://www.pingry.org/calendar/team_180.ics",  //Wrestling - Boys MS
-      "http://www.pingry.org/calendar/team_181.ics",  //Wrestling - Boys Varsity
-    ]
-    curDownloads = calendars.length;
-    for(var i = 0; i < calendars.length; i++){
-      $http.get(calendars[i]).then(function(data){
-        var obj = icalFeed.parseCalendar(data.data);
-        //List of raw events to be parsed in the resort function
-        $scope.rawEvents = $scope.rawEvents.concat(obj);
-      }, function(err){
-        Messages.showError("Couldn't get calendar: "+err.config.url);
-      }).finally(function(){
-        //Decrement downloads in progress
-        curDownloads--;
-        //If this was the last remaining downoad, resort the events to apply them to the scope
-        if(curDownloads == 0){
-          console.log($scope.rawEvents);
-          resort($scope.rawEvents);
-        }
-      })
+    curDownloads = 0;
+    totalDownloads = 0;
+    errors = 0;
+    for(var i = 0; i < $scope.calendars.length; i++){
+      if(Settings.getAthleticSubscription() == "" || Settings.getAthleticSubscription() == $scope.calendars[i][1]){
+        curDownloads++;
+        totalDownloads++;
+        $http.get($scope.calendars[i][1]).then(function(data){
+          var obj = icalFeed.parseCalendar(data.data);
+          //List of raw events to be parsed in the resort function
+          $scope.rawEvents = $scope.rawEvents.concat(obj);
+        }, function(err){
+          //Messages.showError("Couldn't get calendar: "+err.config.url);
+          console.log("Couldn't get calendar: "+err.config.url);
+          errors++;
+        }).finally(function(){
+          //Decrement downloads in progress
+          curDownloads--;
+          //If this was the last remaining downoad, resort the events to apply them to the scope
+          if(curDownloads == 0){
+            if(errors/totalDownloads < 0.5){ //Less than a 50% loss rate
+              resort($scope.rawEvents);
+            }
+            else {
+              Messages.showError("Couldn't connect!");
+              $scope.events = [];
+              $ionicLoading.hide();
+              $scope.$broadcast('scroll.refreshComplete');
+            }
+          }
+        })
+      }
     }
   };
 
   //Refresh from local storage
   $scope.localRefresh = function(){
     var obj = localStorage.getItem("athleticEvents");
-    if(obj != undefined){
+    if(obj != undefined && JSON.parse(obj) != undefined){
       events = JSON.parse(obj);
       resort(events);
       $scope.events = events;
     }else{
-      Messages.showError("Couldn't connect to the internet!");
+      Messages.showError("Couldn't connect!");
+      $scope.events = [];
     }
   };
 
@@ -1061,4 +972,13 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     $ionicLoading.show({template: 'Loading...'});
     $scope.refresh();
   }
+
+  $scope.$on("$ionicView.enter", function(){
+    if(Settings.getAthleticSubscriptionChanged()){
+      $scope.events = [];
+      $ionicLoading.show({template: 'Loading...'});
+      $scope.refresh();
+      Settings.setAthleticSubscriptionChanged(false);
+    }
+  });
 });
