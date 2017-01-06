@@ -1,16 +1,15 @@
-<ion-view title="Athletics">
+<ion-view title="Athletic Events">
 	<ion-content padding="true" class="has-header">
 		<ion-refresher
 	    	pulling-text="Pull to refresh..."
 	    	on-refresh="refresh();">
 	  	</ion-refresher>
 		<div class="list">
-			<div class="item" class="athleticEvent" ng-repeat="event in events track by $index" ng-click="openMapsLocation(event.location)">
-				<!--<i id="rss-close-{{$index}}" style="" class="icon ion-arrow-right-b"></i>
-				<i id="rss-open-{{$index}}" style="display:none;" class="icon ion-arrow-down-b"></i>-->
+			<h2 style="text-align:center; margin-top:25px" ng-show="events.length == 0">No events found!</h2>
+			<div class="item athleticEvent" ng-class="{'cancelled':event.desc.toLowerCase().indexOf('cancelled')!=-1}" ng-repeat="event in events track by $index" ng-click="openMapsLocation(event.location)">
 				<div class="athleticEventTitle" ng-bind="event.title"></div>
 				<div class="athleticEventTime" ng-bind="formatTime(event.startTime)"></div>
-				<div class="athleticEventDesc" ng-bind="event.desc"></div>
+				<div class="athleticEventDesc" ng-bind="event.desc" ng></div>
 			</div>
 		</div>
 	</ion-content>

@@ -92,6 +92,7 @@ angular.module('app.routes', [])
   })
   .state('main.addClass', {
     url: '/settings/addClass/:clsType/:clsId',
+    cache: false,
     views: {
       'sideMenu': {
         templateUrl: 'templates/add-class.html',
@@ -128,6 +129,6 @@ angular.module('app.routes', [])
   });
 
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/main/home');
+  $urlRouterProvider.otherwise('/main/schedule');
 
 });

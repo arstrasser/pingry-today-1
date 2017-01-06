@@ -118,8 +118,8 @@
 	width:100%;
 }
 
-.athleticEvent {
-
+.athleticEvent.cancelled {
+	color: #F00;
 }
 
 .athleticEventTitle {

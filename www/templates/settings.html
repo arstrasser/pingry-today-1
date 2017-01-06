@@ -14,11 +14,20 @@
 			<div class="item item-toggle">
 				Athletic Event Maps
 				<label class="toggle toggle-balanced">
-			       <input ng-model="athleticMaps" ng-change="updateAthletic(athleticMaps)" type="checkbox">
+			       <input ng-model="athleticMaps" ng-change="updateAthleticMaps(athleticMaps)" type="checkbox">
 			       <div class="track">
 			         <div class="handle"></div>
 			       </div>
 			    </label>
+			</div>
+			<div class="item">
+				<span class="input-label">Athletic Team Subscriptions: </span>
+				<label class="item-select item" style="height:44px">
+				    <select ng-change="updateAthleticSubscription(selectedAthleticCalendar)" ng-model="selectedAthleticCalendar">
+				    	<option value="">All Calendars</option>
+				      	<option ng-repeat="cal in athleticCalendars track by $index" value="{{cal[1]}}" ng-bind="cal[0]" ng-selected="cal[0] == selectedAthleticCalendar"></option>
+				    </select>
+				</label>
 			</div>
 			<div class="item" ng-click="forceRefresh()">Force Calendar Refresh</div>
 			<div class="item" ng-click="letterRefresh()">Force Letter Day Refresh</div>
