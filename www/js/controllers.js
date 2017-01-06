@@ -565,7 +565,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   //Colors configuration
   $scope.colors = ["#DC143C", "#FF3E96", "#EE00EE", "#4876FF", "#8EE5EE", "#00EE76", "#71C671", "#EEEE00", "#EE9A00", "#CDB7B5", "#666"];
 
-  //Resets the 
+  //Resets the view
   $scope.resetView = function(){
     //Resets the view to a new class
     if(!modify){
@@ -633,7 +633,8 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     //if the class is a block
     if(cls.type == "block"){
       //Makes sure you have a period selected and it's not a flex period
-      return cls.time.id != "" && cls.time.id != false && cls.time.id !== true && MySchedule.get("block", cls.time.id) == undefined;
+      return cls.time.id != "" && cls.time.id != false && cls.time.id !== true && (MySchedule.get("block", cls.time.id) == undefined || 
+        (modify && $stateParams.clsType == "block" && MySchedule.getAll()[$stateParams.clsType][parseInt($stateParams.clsId)].type == "block" && MySchedule.getAll()[$stateParams.clsType][parseInt($stateParams.clsId)].time.id == cls.time.id));
     }
     //If the class is a flex or a CP
     if(cls.type == "flex" || cls.type == "CP"){
@@ -658,8 +659,6 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     modify = true;
     //Get the class
     $scope.cls = JSON.parse(JSON.stringify(MySchedule.getAll()[$stateParams.clsType][parseInt($stateParams.clsId)]));
-    //Shouldn't be necessary in newer app versions
-    $scope.cls.type = $stateParams.clsType;
   }
   $scope.modify = modify;
 })
