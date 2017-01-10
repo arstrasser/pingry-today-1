@@ -882,6 +882,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
         if(event.indexOf("LOCATION") != -1){
           loc = event.substring(event.indexOf("LOCATION:")+9);
           loc = loc.substring(0, Math.min(loc.indexOf("\r"), loc.indexOf("\n")));
+          loc = loc.replace(/\\/g, "");
         }
         //Start time of the event
         var dtstart = event.substring(event.indexOf("DTSTART")+7);
