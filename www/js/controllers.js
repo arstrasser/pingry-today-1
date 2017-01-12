@@ -144,7 +144,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   };
 })
 
-.controller('ScheduleCtrl', function($scope, $cordovaDialogs, Schedule, LetterDay, MySchedule, $ionicSideMenuDelegate, $ionicGesture, Messages, $cordovaDatePicker, $cordovaDeviceFeedback) {
+.controller('ScheduleCtrl', function($scope, $cordovaDialogs, Schedule, LetterDay, MySchedule, $ionicSideMenuDelegate, $ionicGesture, Messages, $cordovaDatePicker, $cordovaDeviceFeedback, $ionicPlatform) {
   //Set up triggers to change the day on swipe
   var elem = angular.element(document.querySelector("#scheduleContent"));
   $ionicGesture.on("swipeleft", $scope.nextDay, elem);
@@ -361,20 +361,21 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
       LetterDay.setChanged(false);
       MySchedule.setChanged(false);
     }
-    updateDate();
-
-    checker = window.setInterval(
-      //Checks every second to see if anything that matters to the schedule has changed
-      function(){
-        if(Schedule.wasChanged() || MySchedule.isChanged() || LetterDay.isChanged()){
-          refresh();
-          Schedule.setChanged(false);
-          LetterDay.setChanged(false);
-          MySchedule.setChanged(false);
-        }
-      },
-      1000
-    );
+    $ionicPlatform.ready(function(){
+      updateDate();
+      checker = window.setInterval(
+        //Checks every second to see if anything that matters to the schedule has changed
+        function(){
+          if(Schedule.wasChanged() || MySchedule.isChanged() || LetterDay.isChanged()){
+            refresh();
+            Schedule.setChanged(false);
+            LetterDay.setChanged(false);
+            MySchedule.setChanged(false);
+          }
+        },
+        1000
+      );
+    })
   })
 
   $scope.$on('$ionicView.leave', function(){
@@ -705,7 +706,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
 })
 
 //About controller
-.controller("AboutCtrl", function($scope, $cordovaAppVersion, Settings, Messages){
+.controller("AboutCtrl", function($scope, $cordovaInAppBrowser, $cordovaAppVersion, Settings, Messages){
   $scope.appVersion = "Loading...";
   //Set the app version
   $cordovaAppVersion.getVersionNumber().then(function (version) {
@@ -721,6 +722,9 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
       //Activates super mode if you click 15 times on my name (no more, no less)
       window.setTimeout(function(){if(clicks == 15){Settings.setSuperMode(true);$cordovaDeviceFeedback.haptic(0);Messages.showNormal("Super Mode Activated!");}}, 2000);
     }
+  }
+  $scope.openEmail = function(){
+    $cordovaInAppBrowser.open("mailto:astrasser2019@pingry.org", '_system');
   }
 })
 
