@@ -83,7 +83,7 @@ function parseStringForDate(str){
       parseStringForTime(d, str);
     }
   }else if(str.substring(3,4) == ","){
-    str = str.substring(4);
+    str = str.substring(5);
     d.setDate(parseInt(str.substring(0,2)));
     d.setMonth(monthNameToInt(str.substring(3,6)));
     d.setYear(parseInt(str.substring(7,11)));
@@ -804,6 +804,9 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
             img = desc.substring(desc.indexOf("<")+1, desc.indexOf(">"));
             img = img.substring(img.indexOf('src="')+5);
             img = img.substring(0,img.indexOf('"'));
+            if(img.substring(0,7) != "http://" && img.substring(0,8) != "https://"){
+              img = 'http://www.pingry.org'+img;
+            }
           }else if(desc.substring(desc.indexOf("<")+1, desc.indexOf(">")+3) == "br"){
             desc = desc.substring(0, desc.indexOf("<"))+"\n"+desc.substring(desc.indexOf("<"));
           }
@@ -812,10 +815,11 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
         }
 
         //Published date of the article (NOT YET IMPLEMENTED)
-        var date = new Date(data.substring(data.indexOf("<pubDate>")+9, data.indexOf("</pubDate")));
+        var date = parseStringForDate(data.substring(data.indexOf("<pubDate>")+9, data.indexOf("</pubDate")));
+        console.log(date);
         data = data.substring(data.indexOf("</item>")+7); //updates the parse to avoid readding the same item
         //Image uses an inline if statement so that it returns the word "none" as a url if there is no image, or it returns the correct URL with pingry.org added
-        list.push({"title":title, "image":img==""?'none':'http://www.pingry.org'+img, "link":link, "description":desc, "rawDescription":rawDesc, "date":date});
+        list.push({"title":title, "image":img==""?'none':img, "link":link, "description":desc, "rawDescription":rawDesc, "date":date.getTime()});
       }
       return list;
     },
@@ -829,8 +833,10 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
         desc += parse.substring(0,parse.indexOf("src=")+5);
         //Updates parse to avoid infinite loop over the same item
         parse = parse.substring(parse.indexOf("src=")+5);
-        //Insert the extra portion needed in the URL
-        desc += "http://www.pingry.org";
+        if(parse.substring(0,7) != "http://" && parse.substring(0,8) != "https://"){
+          //Insert the extra portion needed in the URL
+          desc += "http://www.pingry.org";
+        }
       }
       desc += parse; //Add the remaining portion to the end of the string
       return desc;

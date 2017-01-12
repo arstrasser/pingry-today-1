@@ -2,7 +2,7 @@
 	<ion-content padding="true" class="has-header">
 		<ion-refresher
 	    	pulling-text="Pull to refresh..."
-	    	on-refresh="forceRefresh();">
+	    	on-refresh="externalRefresh();">
 	  	</ion-refresher>
 		<div class="list">
 			<a ng-repeat="feedItem in rss track by $index" class="item item-thumbnail-left" href="#/main/home/article/{{$index}}">

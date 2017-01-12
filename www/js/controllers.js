@@ -25,35 +25,67 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     $cordovaInAppBrowser.open(addr, '_system');
   }
 
-  $scope.forceRefresh = function(){
+  function finalizeRefresh(allEvents){
+    console.log(allEvents[0]);
+    allEvents.sort(function(a, b){
+      return parseInt(a.date) < parseInt(b.date) ? 1: -1;
+    })
+    for(var i = 0; i < allEvents.length; i++){
+      console.log(new Date(allEvents[i].date));
+    }
+    //Store the object
+    localStorage.setItem("newsRSS", JSON.stringify(allEvents));
+    localStorage.setItem("newsRSSRefreshTime", Date.now());
+    //Update the scope
+    $scope.rss = allEvents;
+    //Tells the refresher to stop spinning
+    $scope.$broadcast('scroll.refreshComplete');
+    console.log("done");
+  }
+
+  $scope.externalRefresh = function(errorCallback){
+    var allEvents = [];
+    var curDownloads = 2;
+    var errors = false;
     //Currently pulling from the RSS feed of trending events (Easy to change)
     $http.get("http://www.pingry.org/rss.cfm?news=14").then(function(data){
       var obj = rssFeed.parseXML(data.data);
-      //Store the object
-      localStorage.setItem("newsRSS", JSON.stringify(obj));
-      localStorage.setItem("newsRSSRefreshTime", Date.now());
-      //Update the scope
-      $scope.rss = obj;
+      allEvents = allEvents.concat(obj);
     }, function(){
-      Messages.showError("Couldn't connect to the internet!");
+      errors = true;
     }).finally(function(){
-      //Tells the refresher to stop spinning
-      $scope.$broadcast('scroll.refreshComplete');
+      curDownloads--;
+      if(curDownloads == 0){
+        if(errors == false){
+          finalizeRefresh(allEvents);
+        }else{
+          Messages.showError("Couldn't connect to the internet!");
+          if(!!errorCallback){
+            errorCallback();
+          }
+        }
+      }
     });
-  }
 
-  //Refresh the local feed
-  function externalRefresh(){
-    //Currently pulling from the RSS feed of trending events (Easy to change)
-    return $http.get("http://www.pingry.org/rss.cfm?news=14").then(function(data){
+    $http.get("http://www.pingry.org/rss.cfm?news=13").then(function(data){
       var obj = rssFeed.parseXML(data.data);
-      //Store the object
-      localStorage.setItem("newsRSS", JSON.stringify(obj));
-      localStorage.setItem("newsRSSRefreshTime", Date.now());
-      //Update the scope
-      $scope.rss = obj;
-    }, localRefresh);
-  };
+      allEvents = allEvents.concat(obj);
+    }, function(){
+      errors = true;
+    }).finally(function(){
+      curDownloads--;
+      if(curDownloads == 0){
+        if(errors == false){
+          finalizeRefresh(allEvents);
+        }else{
+          Messages.showError("Couldn't connect to the internet!");
+          if(!!errorCallback){
+            errorCallback();
+          }
+        }
+      }
+    })
+  }
 
   function localRefresh(){
     var obj = localStorage.getItem("newsRSS");
@@ -69,12 +101,12 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   if(lastRefresh != null && lastRefresh != ""){
     //Refresh if it's been an hour
     if(parseInt(lastRefresh) + 360000 < Date.now()){
-      externalRefresh();
+      $scope.externalRefresh(localRefresh);
     }else{
       localRefresh();
     }
   }else{
-    externalRefresh();
+    $scope.externalRefresh(localRefresh);
   }
 
 })
@@ -933,8 +965,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
               resort($scope.rawEvents);
             }
             else {
-              Messages.showError("Couldn't connect!");
-              $scope.events = [];
+              $scope.localRefresh();
               $ionicLoading.hide();
               $scope.$broadcast('scroll.refreshComplete');
             }
