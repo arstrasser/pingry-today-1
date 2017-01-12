@@ -1,17 +1,19 @@
 <ion-view title="Schedule">
 	<ion-content padding="true" class="has-header" id="scheduleContent" on-swipe-right="prevDay()" on-swipe-left="nextDay()">
-		<div id="changeDayMenu">
-			<div id="changeDayLeft" ng-click="prevDay()"><i class="icon ion-arrow-left-b"></i></div>
-			<div id="currentDay" ng-bind="displayDate" ng-click="openDatePicker()" on-hold="resetDate()"></div>
-			<div id="changeDayRight" ng-click="nextDay()"><i class="icon ion-arrow-right-b"></i></div>
-		</div>
-		<div id="letterMenu" ng-hide="letter==''">
-			<div id="letter" ng-bind="letter"></div>
-			<div id="periods" ng-bind="periodList"></div>
+		<div style="display:block">
+			<div id="changeDayMenu">
+				<div id="changeDayLeft" ng-click="prevDay()"><i class="icon ion-arrow-left-b"></i></div>
+				<div id="currentDay" ng-bind="displayDate" ng-click="openDatePicker()" on-hold="resetDate()"></div>
+				<div id="changeDayRight" ng-click="nextDay()"><i class="icon ion-arrow-right-b"></i></div>
+			</div>
+			<div id="letterMenu" ng-hide="letter==''">
+				<div id="letter" ng-bind="letter"></div>
+				<div id="periods" ng-bind="periodList"></div>
+			</div>
 		</div>
 		<div id="nonSchoolDay" ng-show="letter==''">No school!</div>
 		<div id="mySchedule" class="list">
-			<div ng-repeat="cls in classes track by $index" class="item row class-{{cls.type}}" style="background-color: {{cls.color}}">
+			<div ng-repeat="cls in classes track by $index" class="item row class-{{cls.type}}" style="background-color: {{cls.color}}; border-bottom:0px;border-top:0px;">
 				<div class="col col-33 class-time">
 					<div style="display: inline" class="startTime" ng-bind="formatTime(cls.startTime)"></div>
 					<div style="display: inline" ng-show="cls.type == 'block'"><br><br></div>

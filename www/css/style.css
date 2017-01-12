@@ -84,7 +84,7 @@
 	background-color:#ddd;
 	padding:10px;
 	padding-bottom:0px;
-	width:61px;
+	max-width:61px;
 }
 
 #letter {
