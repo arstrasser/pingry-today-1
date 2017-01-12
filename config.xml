@@ -2,7 +2,7 @@
 <widget id="com.ionicframework.pingryapp193434" version="0.0.21" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
   <name>Pingry Today</name>
   <description>
-        An Ionic Framework and Cordova project.
+        Pingry Today - Any students' necessities at Pingry (By Alex Strasser)
     </description>
   <author email="astrasser2019@pingry.org" href="http://pingry.org/">
       Alex Strasser
