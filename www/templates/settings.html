@@ -6,8 +6,8 @@
 				<span ng-click="scheduleOverrideHelp()" class="input-label" style="width:55%;">Schedule Override: <i class="icon ion-help-circled"></i></span>
 				<label class="item-select item" style="height:44px">
 				    <select ng-change="setScheduleType(overrideSett)" ng-model="overrideSett">
-				    	<option value="-1">Disabled</option>
-				      	<option ng-repeat="sched in scheduleTypes track by $index" value="{{$index}}" ng-bind="sched[0]" ng-selected="$index == scheduleType" ng-hide="$last"></option>
+				    	<option value="-1" ng-selected="this.value == overrideSett">Disabled</option>
+				      	<option ng-repeat="sched in scheduleTypes track by $index" value="{{$index}}" ng-bind="sched[0]" ng-selected="$index == overrideSett" ng-hide="$last"></option>
 				    </select>
 				</label>
 			</div>
