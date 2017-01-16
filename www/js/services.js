@@ -404,6 +404,23 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
     {"name":"CP", "type":"CP", "startTime":"14:45", "endTime":"15:25"}
   ];
 
+  var assembly40Schedule = [
+    {"name":"Attendance", "type":"Other", "startTime":"08:05", "endTime":"08:10"},
+    {"name":"Period 1", "type":"block", "id":"1", "startTime":"08:10", "endTime":"09:15"},
+    {"name":"Flex 1", "type":"flex", "id":"1", "startTime":"09:15", "endTime":"09:30"},
+    {"name":"Assembly", "type":"CT", "startTime":"09:35", "endTime":"10:15"},
+    {"name":"Period 2", "type":"block", "id":"2", "startTime":"10:20", "endTime":"11:25"},
+    {"name":"Swappable 1", "type":"swap", "options":[
+      {"name":"First Lunch", "type":"Lunch", "startTime":"11:30", "endTime":"12:00"},
+      {"name":"Period 3", "type":"block", "id":"3", "startTime":"11:30", "endTime":"12:35"}]},
+    {"name":"Swappable 2", "type":"swap", "options":[
+      {"name":"Period 3", "type":"block", "id":"3", "startTime":"12:00", "endTime":"13:05"},
+      {"name":"Second Lunch", "type":"Lunch", "startTime":"12:35", "endTime":"13:05"}]},
+    {"name":"Flex 2", "type":"flex", "id":"0", "startTime":"13:10", "endTime":"13:25"},
+    {"name":"Period 4", "type":"block", "id":"4", "startTime":"13:30", "endTime":"14:35"},
+    {"name":"CP", "type":"CP", "startTime":"14:40", "endTime":"15:25"}
+  ]
+
   var winterFestivalSchedule = [
     {"name":"Attendance", "type":"Other", "startTime":"08:05", "endTime":"08:10"},
     {"name":"Period 1", "type":"block", "id":"1", "startTime":"08:10", "endTime":"09:10"},
@@ -443,7 +460,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
   var curDay = new Date();
 
   //Variable to store all the schedule types
-  var typeList = [["Normal",normalSchedule], ["Faculty Collaboration",facultyCollabSchedule], ["Assembly 30 Minutes", assembly30Schedule], ["Assembly 35 Mintues", assembly35Schedule], ["Assembly 60 Minutes",assembly60Schedule], ["Winter Festival", winterFestivalSchedule], ["Unknown Assembly", unknownSchedule]];
+  var typeList = [["Normal",normalSchedule], ["Faculty Collaboration",facultyCollabSchedule], ["Assembly 30 Minutes", assembly30Schedule], ["Assembly 35 Mintues", assembly35Schedule], ["Assembly 40 Minutes", assembly40Schedule], ["Assembly 60 Minutes",assembly60Schedule], ["Winter Festival", winterFestivalSchedule], ["Unknown Assembly", unknownSchedule]];
 
   var refreshing = false;
 
@@ -591,6 +608,8 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
               case 35:  //35 minutes
                 specialSchedule[dateToDayString(calEvents[i].endTime)] = "Assembly 35 Minutes";
                 break;
+              case 40:
+                specialSchedule[dateToDayString(calEvents[i].endTime)] = "Assembly 40 Minutes";
               default:  //Else
                 //Check for Winter Festival Schedule
                 if(calEvents[i].title.indexOf("Winter Festival") != -1){
