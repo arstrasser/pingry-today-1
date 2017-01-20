@@ -601,7 +601,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
           else if(calEvents[i].title.indexOf("Assembly") != -1){
 
             //Switch based on assembly length
-            switch ((calEvents[i].endTime - calEvents[i].startTime)/60000){
+            switch ((calEvents[i].endTime.getTime() - calEvents[i].startTime.getTime())/60000){
               case 60:  //60 minutes
                 specialSchedule[dateToDayString(calEvents[i].endTime)] = "Assembly 60 Minutes";
                 break;
@@ -610,6 +610,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
                 break;
               case 40:
                 specialSchedule[dateToDayString(calEvents[i].endTime)] = "Assembly 40 Minutes";
+                break;
               default:  //Else
                 //Check for Winter Festival Schedule
                 if(calEvents[i].title.indexOf("Winter Festival") != -1){
@@ -619,6 +620,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
                 else{
                   console.log("Unknown Assembly:");
                   console.log(calEvents[i]);
+                  console.log((calEvents[i].endTime.getTime() - calEvents[i].startTime.getTime())/60000);
                   specialSchedule[dateToDayString(calEvents[i].endTime)] = "Unknown Assembly";
                 }
                 break;
