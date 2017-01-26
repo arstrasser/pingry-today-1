@@ -853,11 +853,11 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
 
   //Formats a date and time
   $scope.formatTime = function(time){
-    time = new Date(time.getTime());
-    if(time.getHours() == 0 && time.getMinutes() == 0){
-      return (time.getMonth()+1)+"/"+time.getDate()
+    var jsTime = new Date(time);
+    if(jsTime.getHours() == 0 && jsTime.getMinutes() == 0){
+      return (jsTime.getMonth()+1)+"/"+jsTime.getDate()
     }
-    return fixTime(time.getHours(), time.getMinutes())+" "+(time.getMonth()+1)+"/"+time.getDate();
+    return fixTime(jsTime.getHours(), jsTime.getMinutes())+" "+(jsTime.getMonth()+1)+"/"+jsTime.getDate();
   }
 
   //Opens a map location on click
@@ -870,15 +870,13 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
 
   //Resorts the list of events
   function resort(events){
+    console.log(events);
     //Iterate over the events to fix Javscript Time objecs and such (also removing past events)
     for(var i = 0; i < events.length; i++){
       //Time type event
       if(events[i].type == "time"){
-        events[i].startTime = parseStringForDate(events[i].startTime);
-        if(!!events[i].endTime)
-          events[i].endTime = parseStringForDate(events[i].endTime);
         //If the event end time is less than the current time
-        if(events[i].startTime.getTime() < Date.now()){
+        if(events[i].startTime < Date.now()){
           //Remove the event
           events.splice(i,1);
           i--;
@@ -886,9 +884,8 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
       }
       //Day type event
       else if(events[i].type == "day"){
-        events[i].time = parseStringForDate(events[i].time);
         //If the event's time is less than the current time and the event isn't today
-        if(events[i].time.getTime() < Date.now() && dateToDayString(events[i].time) != dateToDayString(new Date())){
+        if(events[i].time < Date.now() && dateToDayString(parseStringForDate(events[i].time)) != dateToDayString(new Date())){
           //Remove the event
           events.splice(i,1);
           i--;
@@ -914,7 +911,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     //Sorts the event by time, then by title, then by description
     events.sort(
       function(a,b){
-        if(a.startTime.getTime()==b.startTime.getTime()){
+        if(a.startTime==b.startTime){
           if(a.title == b.title){
             return a.desc.localeCompare(b.desc);
           }else{
@@ -922,7 +919,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
           }
         }
         else{
-          return a.startTime.getTime()>b.startTime.getTime()?1:-1
+          return a.startTime>b.startTime?1:-1;
         }
       }
     );
@@ -966,12 +963,21 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
           //If this was the last remaining downoad, resort the events to apply them to the scope
           if(curDownloads == 0){
             if(errors/totalDownloads < 0.5){ //Less than a 50% loss rate
+              for(var i = 0; i < $scope.rawEvents.length; i++){
+                if(!!$scope.rawEvents[i].startTime){
+                  $scope.rawEvents[i].startTime = $scope.rawEvents[i].startTime.getTime();
+                }
+                if(!!$scope.rawEvents[i].endTime){
+                  $scope.rawEvents[i].endTime = $scope.rawEvents[i].endTime.getTime();
+                }
+              }
               resort($scope.rawEvents);
             }
             else {
               $scope.localRefresh();
               $ionicLoading.hide();
               $scope.$broadcast('scroll.refreshComplete');
+              Messages.showError("Couldn't refresh!")
             }
           }
         })
