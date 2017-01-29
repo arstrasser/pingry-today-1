@@ -5,7 +5,7 @@
 	    	on-refresh="externalRefresh();">
 	  	</ion-refresher>
 		<div class="list">
-			<a ng-repeat="feedItem in rss track by $index" class="item item-thumbnail-left" href="#/main/home/article/{{$index}}">
+			<a ng-repeat="feedItem in rss track by $index" class="item item-thumbnail-left" href="#/main/news/article/{{$index}}">
 		      <img fallback-src="build/img/logo2.jpg" ng-src="{{feedItem.image}}">
 		      <b>{{feedItem.title}}</b>
 		    </a>

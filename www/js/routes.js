@@ -18,17 +18,17 @@ angular.module('app.routes', [])
 
   // Each tab has its own nav history stack:
 
-  .state('main.home', {
-    url: '/home',
+  .state('main.news', {
+    url: '/news',
     views: {
       'sideMenu': {
-        templateUrl: 'templates/home.html',
-        controller: 'HomeCtrl'
+        templateUrl: 'templates/news.html',
+        controller: 'NewsCtrl'
       }
     }
   })
   .state('main.article', {
-    url: '/home/article/:articleId',
+    url: '/news/article/:articleId',
     views: {
       'sideMenu': {
         templateUrl: 'templates/article.html',
