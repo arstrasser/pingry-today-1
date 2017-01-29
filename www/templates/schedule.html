@@ -1,12 +1,12 @@
 <ion-view title="Schedule">
 	<ion-content padding="true" class="has-header" id="scheduleContent" on-swipe-right="prevDay()" on-swipe-left="nextDay()">
 		<div style="display:block">
-			<div id="changeDayMenu">
-				<div id="changeDayLeft" ng-click="prevDay()"><i class="icon ion-arrow-left-b"></i></div>
-				<div id="currentDay" ng-bind="displayDate" ng-click="openDatePicker()" on-hold="resetDate()"></div>
-				<div id="changeDayRight" ng-click="nextDay()"><i class="icon ion-arrow-right-b"></i></div>
+			<div id="changeDayMenu" on-hold="resetDate()">
+				<div id="changeDayLeft" on-tap="prevDay()"><i class="icon ion-arrow-left-b"></i></div>
+				<div id="currentDay" ng-bind="displayDate" on-tap="openDatePicker()"></div>
+				<div id="changeDayRight" on-tap="nextDay()"><i class="icon ion-arrow-right-b"></i></div>
 			</div>
-			<div id="letterMenu" ng-hide="letter==''">
+			<div id="letterMenu" ng-show="isLetter(letter)">
 				<div id="letter" ng-bind="letter"></div>
 				<div id="periods" ng-bind="periodList"></div>
 			</div>

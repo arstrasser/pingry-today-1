@@ -16,23 +16,21 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   $scope.openLocalLink = function(addr){
     $cordovaInAppBrowser.open(addr, '_blank', {location:"yes",enableViewportScale:"yes"});
   }
+
+  $scope.superMode = Settings.getSuperMode();
 })
 
 //Home screen controller (News feed)
-.controller("HomeCtrl", function($scope, $http, $cordovaInAppBrowser, rssFeed, Messages){
+.controller("NewsCtrl", function($scope, $http, $cordovaInAppBrowser, rssFeed, Messages, $q){
   //Open a link in another app
   $scope.openForeignLink = function(addr){
     $cordovaInAppBrowser.open(addr, '_system');
   }
 
   function finalizeRefresh(allEvents){
-    console.log(allEvents[0]);
     allEvents.sort(function(a, b){
       return parseInt(a.date) < parseInt(b.date) ? 1: -1;
     })
-    for(var i = 0; i < allEvents.length; i++){
-      console.log(new Date(allEvents[i].date));
-    }
     //Store the object
     localStorage.setItem("newsRSS", JSON.stringify(allEvents));
     localStorage.setItem("newsRSSRefreshTime", Date.now());
@@ -40,7 +38,6 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     $scope.rss = allEvents;
     //Tells the refresher to stop spinning
     $scope.$broadcast('scroll.refreshComplete');
-    console.log("done");
   }
 
   $scope.externalRefresh = function(errorCallback){
@@ -48,40 +45,29 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     var curDownloads = 2;
     var errors = false;
     //Currently pulling from the RSS feed of trending events (Easy to change)
-    $http.get("http://www.pingry.org/rss.cfm?news=14").then(function(data){
-      var obj = rssFeed.parseXML(data.data);
-      allEvents = allEvents.concat(obj);
-    }, function(){
-      errors = true;
-    }).finally(function(){
-      curDownloads--;
-      if(curDownloads == 0){
-        if(errors == false){
-          finalizeRefresh(allEvents);
-        }else{
-          Messages.showError("Couldn't connect to the internet!");
-          if(!!errorCallback){
-            errorCallback();
-          }
-        }
-      }
-    });
+    return $q.all([
+      $http.get("http://www.pingry.org/rss.cfm?news=14").then(function(data){
+        var obj = rssFeed.parseXML(data.data);
+        allEvents = allEvents.concat(obj);
+        return true;
+      }, function(){
+        return false;
+      }),
 
-    $http.get("http://www.pingry.org/rss.cfm?news=13").then(function(data){
-      var obj = rssFeed.parseXML(data.data);
-      allEvents = allEvents.concat(obj);
-    }, function(){
-      errors = true;
-    }).finally(function(){
-      curDownloads--;
-      if(curDownloads == 0){
-        if(errors == false){
-          finalizeRefresh(allEvents);
-        }else{
-          Messages.showError("Couldn't connect to the internet!");
-          if(!!errorCallback){
-            errorCallback();
-          }
+      $http.get("http://www.pingry.org/rss.cfm?news=13").then(function(data){
+        var obj = rssFeed.parseXML(data.data);
+        allEvents = allEvents.concat(obj);
+        return true;
+      }, function(){
+        return false;
+      })
+    ]).then(function(errors){
+      if(!errors.includes(false)){
+        finalizeRefresh(allEvents);
+      }else{
+        Messages.showError("Couldn't connect to the internet!");
+        if(!!errorCallback){
+          errorCallback();
         }
       }
     })
@@ -180,6 +166,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     $scope.classes = [];
     //Stores the letter day
     $scope.letter = LetterDay.letter();
+    console.log($scope.letter);
     //If today is a valid letter day
     if($scope.letter !== undefined && $scope.letter.length == 1 && isLetter($scope.letter)){
       for(i = 0; i < Schedule.getToday().length; i++){
@@ -331,13 +318,21 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
       //If there is no stored letter day schedule
       if($scope.letter == "empty"){
         //If not connected to the internet
-        Messages.showError("Please connect to the internet!");
+        //Messages.showError("Please connect to the internet!");
+        Schedule.refresh().then(function(val){
+          if(!val){
+            Messages.showError("Couldn't connect to the internet!");
+          }
+        });
+        LetterDay.refresh().then(function(val){
+          if(!val){
+            Messages.showError("Couldn't connect to the internet!");
+          }
+        });
       }
       else if($scope.letter == "refreshing"){
-        Messages.showNormal("Refreshing...");
+        //Messages.showNormal("Refreshing...");
       }
-      //set the letter to be empty
-      $scope.letter = "";
     }
     //Sets the display date
     $scope.displayDate = formatDate(curDay);
@@ -351,36 +346,31 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     refresh();
   }
 
-  var checker;
   //Resets the current day to today
   $scope.$on('$ionicView.beforeEnter', function(){
     //resets the schedule to the current date
     curDay = new Date();
-    if(Schedule.wasChanged() || MySchedule.isChanged() || LetterDay.isChanged()){
-      Schedule.setChanged(false);
-      LetterDay.setChanged(false);
-      MySchedule.setChanged(false);
-    }
-    $ionicPlatform.ready(function(){
+    $ionicPlatform.ready(function() {
       updateDate();
-      checker = window.setInterval(
-        //Checks every second to see if anything that matters to the schedule has changed
-        function(){
-          if(Schedule.wasChanged() || MySchedule.isChanged() || LetterDay.isChanged()){
-            refresh();
-            Schedule.setChanged(false);
-            LetterDay.setChanged(false);
-            MySchedule.setChanged(false);
-          }
-        },
-        1000
-      );
-    })
+    });
   })
 
-  $scope.$on('$ionicView.leave', function(){
-    window.clearInterval(checker);
-  });
+
+  $scope.$on("scheduleRefreshComplete", function(e, args){
+    if(args.success || $scope.letter == "refreshing"){
+      refresh();
+    }else{
+      //Messages.showError("Couldn't connect to the internet!");
+    }
+  })
+
+  $scope.$on("letterRefreshComplete", function(e, args){
+    if(args.success){
+      refresh();
+    }else{
+      //Messages.showError("Couldn't connect to the internet!");
+    }
+  })
 
   //Reset the current day to today
   $scope.resetDate = function(){
@@ -388,6 +378,8 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     $cordovaDeviceFeedback.haptic(0);
     updateDate();
   }
+
+  $scope.isLetter = isLetter;
 
   //Opens the date picker to pick a day to jump to
   $scope.openDatePicker = function(){
@@ -490,7 +482,8 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     }else{
       $scope.localRefresh();
     }
-  }else{
+  }
+  else{
     $scope.refresh();
   }
 
@@ -507,24 +500,25 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   var refreshEnable = true;
 
   $scope.scheduleOverrideHelp = function(){
-    $cordovaDialogs.alert("Use this option only if you have an incorrect schedule shown in the Schedule menu.\n"+
-      "It overrides all schedule types for school days to be the given type.\n"+
-      "This is useful if an incorrect schedule type is given for a specific day.");
+    $cordovaDialogs.alert(
+      "A schedule override allows you to fix incorrect schedules.\n"+
+      "If you select a schedule here, it changes every single day to have that schedule."
+    );
   }
 
-  //Refresh teh calendar events
+  //Refresh the calendar events
   $scope.forceRefresh = function(){
     //Only refresh if not currently refreshing
     if(refreshEnable){
       Messages.showNormal("Refreshing...");
       refreshEnable = false;
-      Schedule.refresh().then(
-      function(){ //Success
+      Schedule.refresh().then(function(val){
+        if(val){
+          Messages.showSuccess("Success!");
+        }else{
+          Messages.showError("Couldn't connect to the internet!");
+        }
         refreshEnable = true;
-        Messages.showSuccess("Complete!");
-      }, function(){ //Error
-        refreshEnable = true;
-        Messages.showError("Couldn't connect");
       });
     }
   }
@@ -535,13 +529,13 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     if(refreshEnable){
       Messages.showNormal("Refreshing...");
       refreshEnable = false;
-      LetterDay.refresh().then(
-      function(){ //Success
+      LetterDay.refresh().then(function(val){
+        if(val){
+          Messages.showSuccess("Success!");
+        }else{
+          Messages.showError("Couldn't connect to the internet!");
+        }
         refreshEnable = true;
-        Messages.showSuccess("Complete!");
-      }, function(){ //Failure
-        refreshEnable = true;
-        Messages.showError("Couldn't connect");
       });
     }
   }
@@ -836,7 +830,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
 })
 
 //Athletics Controller
-.controller("AthleticsCtrl", function($scope, $http, $cordovaInAppBrowser, $ionicLoading, icalFeed, Messages, Settings, AthleticCalendars){
+.controller("AthleticsCtrl", function($scope, $http, $cordovaInAppBrowser, $ionicLoading, icalFeed, Messages, Settings, AthleticCalendars, $q){
   //Formats a 24 hour time in 12 hour format
   function fixTime(hours, minutes){
     var AM = true;
@@ -870,7 +864,6 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
 
   //Resorts the list of events
   function resort(events){
-    console.log(events);
     //Iterate over the events to fix Javscript Time objecs and such (also removing past events)
     for(var i = 0; i < events.length; i++){
       //Time type event
@@ -942,47 +935,47 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   //Refreshes from all the calendars
   $scope.refresh = function(){
     $scope.rawEvents = [];
-    curDownloads = 0;
-    totalDownloads = 0;
-    errors = 0;
+    var queuedEvents = [];
     for(var i = 0; i < $scope.calendars.length; i++){
       if(Settings.getAthleticSubscription() == "" || Settings.getAthleticSubscription() == $scope.calendars[i][1]){
-        curDownloads++;
-        totalDownloads++;
-        $http.get($scope.calendars[i][1]).then(function(data){
-          var obj = icalFeed.parseCalendar(data.data);
-          //List of raw events to be parsed in the resort function
-          $scope.rawEvents = $scope.rawEvents.concat(obj);
-        }, function(err){
-          //Messages.showError("Couldn't get calendar: "+err.config.url);
-          console.log("Couldn't get calendar: "+err.config.url);
-          errors++;
-        }).finally(function(){
-          //Decrement downloads in progress
-          curDownloads--;
-          //If this was the last remaining downoad, resort the events to apply them to the scope
-          if(curDownloads == 0){
-            if(errors/totalDownloads < 0.5){ //Less than a 50% loss rate
-              for(var i = 0; i < $scope.rawEvents.length; i++){
-                if(!!$scope.rawEvents[i].startTime){
-                  $scope.rawEvents[i].startTime = $scope.rawEvents[i].startTime.getTime();
-                }
-                if(!!$scope.rawEvents[i].endTime){
-                  $scope.rawEvents[i].endTime = $scope.rawEvents[i].endTime.getTime();
-                }
-              }
-              resort($scope.rawEvents);
-            }
-            else {
-              $scope.localRefresh();
-              $ionicLoading.hide();
-              $scope.$broadcast('scroll.refreshComplete');
-              Messages.showError("Couldn't refresh!")
-            }
-          }
-        })
+        queuedEvents.push(
+          $http.get($scope.calendars[i][1]).then(function(data){
+            var obj = icalFeed.parseCalendar(data.data);
+            //List of raw events to be parsed in the resort function
+            $scope.rawEvents = $scope.rawEvents.concat(obj);
+            return true;
+          }, function(err){
+            //Messages.showError("Couldn't get calendar: "+err.config.url);
+            console.log("Couldn't get calendar: "+err.config.url);
+            return false;
+          })
+        );
       }
     }
+    $q.all(queuedEvents).then(function(errors){
+      count = 0;
+      for(var i = 0; i < errors.length; i++){
+        if(!errors[i]){
+          count++;
+        }
+      }
+      if(count/errors.length < 0.3){
+        for(var i = 0; i < $scope.rawEvents.length; i++){
+          if(!!$scope.rawEvents[i].startTime){
+            $scope.rawEvents[i].startTime = $scope.rawEvents[i].startTime.getTime();
+          }
+          if(!!$scope.rawEvents[i].endTime){
+            $scope.rawEvents[i].endTime = $scope.rawEvents[i].endTime.getTime();
+          }
+        }
+        resort($scope.rawEvents);
+      }else{
+        $scope.localRefresh();
+        $ionicLoading.hide();
+        $scope.$broadcast('scroll.refreshComplete');
+        Messages.showError("Couldn't refresh!");
+      }
+    })
   };
 
   //Refresh from local storage
@@ -990,7 +983,6 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     var obj = localStorage.getItem("athleticEvents");
     if(obj != undefined && JSON.parse(obj) != undefined){
       events = JSON.parse(obj);
-      resort(events);
       $scope.events = events;
     }else{
       Messages.showError("Couldn't connect!");

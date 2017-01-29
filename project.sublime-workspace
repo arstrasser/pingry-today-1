@@ -4,6 +4,10 @@
 		"selected_items":
 		[
 			[
+				"assembly",
+				"assembly40Schedule"
+			],
+			[
 				"athleticSubsc",
 				"athleticSubscriptionChanged"
 			],
@@ -179,7 +183,7 @@
 			"file": "www/js/controllers.js",
 			"settings":
 			{
-				"buffer_size": 33905,
+				"buffer_size": 35047,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -188,25 +192,16 @@
 			"file": "config.xml",
 			"settings":
 			{
-				"buffer_size": 5560,
+				"buffer_size": 5590,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "www/js/routes.js",
+			"file": "www/templates/menu.html",
 			"settings":
 			{
-				"buffer_size": 3019,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "www/js/services.js",
-			"settings":
-			{
-				"buffer_size": 69882,
+				"buffer_size": 1594,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -215,16 +210,16 @@
 			"file": "www/templates/settings.html",
 			"settings":
 			{
-				"buffer_size": 2118,
+				"buffer_size": 2159,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "www/templates/athletics.html",
+			"file": "www/js/services.js",
 			"settings":
 			{
-				"buffer_size": 771,
+				"buffer_size": 71651,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -273,23 +268,23 @@
 	],
 	"file_history":
 	[
-		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/menu.html",
-		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/js/routes.js",
 		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/config.xml",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/about.html",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/athletics.html",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/js/routes.js",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/css/style.css",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/schedule.html",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/home.html",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/settings.html",
+		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/menu.html",
 		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/index.html",
 		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/js/app.js",
-		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/settings.html",
 		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/announcement-popup.html",
-		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/css/style.css",
-		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/athletics.html",
 		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/add-class.html",
 		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/announcements.html",
 		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/js/controllers.js",
 		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/portal.html",
-		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/home.html",
-		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/schedule.html",
 		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/css/hackerStyles.css",
-		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/about.html",
 		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/js/services.js",
 		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/reminders.html",
 		"/C/Users/arstr/Documents/Coding/CurrentProject/PingryApp/www/templates/add-reminder.html",
@@ -396,6 +391,12 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"Assembly 40 Minutes",
+			"Assembly",
+			"cordovaInApp",
+			" Date",
+			"type",
+			"refresh",
 			"icalFeed",
 			"Settings",
 			"console.log",
@@ -517,13 +518,7 @@
 			"addClassForm",
 			"classAdded",
 			"print",
-			"classCreated",
-			"addClassForm",
-			".errors",
-			"classCreated",
-			"userfinfo",
-			"classes",
-			"http"
+			"classCreated"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -584,7 +579,7 @@
 	"groups":
 	[
 		{
-			"selected": 3,
+			"selected": 1,
 			"sheets":
 			[
 				{
@@ -593,15 +588,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 33905,
+						"buffer_size": 35047,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								31121,
-								31129
+								33431,
+								33431
 							]
 						],
 						"settings":
@@ -610,11 +605,11 @@
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": 0.0,
-						"translation.y": 33431.0,
+						"translation.x": 5.0,
+						"translation.y": 33714.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 1,
 					"type": "text"
 				},
 				{
@@ -623,7 +618,7 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 5560,
+						"buffer_size": 5590,
 						"regions":
 						{
 						},
@@ -644,34 +639,34 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
 					"buffer": 2,
-					"file": "www/js/routes.js",
+					"file": "www/templates/menu.html",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3019,
+						"buffer_size": 1594,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2166,
-								2166
+								856,
+								856
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
-							"tab_size": 2,
+							"syntax": "Packages/HTML/HTML.sublime-syntax",
+							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 2699.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 3,
@@ -679,19 +674,48 @@
 				},
 				{
 					"buffer": 3,
-					"file": "www/js/services.js",
+					"file": "www/templates/settings.html",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 69882,
+						"buffer_size": 2159,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								36960,
-								36960
+								762,
+								762
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "www/js/services.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 71651,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								51130,
+								51130
 							]
 						],
 						"settings":
@@ -700,69 +724,11 @@
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": 0.0,
-						"translation.y": 32932.0,
+						"translation.x": 112.0,
+						"translation.y": 42554.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "www/templates/settings.html",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2118,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1450,
-								1450
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HTML/HTML.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "www/templates/athletics.html",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 771,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								513,
-								513
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HTML/HTML.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 5,
+					"stack_index": 2,
 					"type": "text"
 				}
 			]
@@ -807,7 +773,7 @@
 	"project": "project.sublime-project",
 	"replace":
 	{
-		"height": 120.0
+		"height": 88.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -845,7 +811,7 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 449.0,
+	"side_bar_width": 435.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{

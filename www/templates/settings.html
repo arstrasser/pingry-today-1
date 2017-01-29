@@ -2,7 +2,7 @@
 	<ion-content padding="true" class="has-header">
 		<div class="list">
 			<a class="item" ui-sref="main.classManage">Class Management</a>
-			<div class="item">
+			<div class="item"  ng-show="superMode">
 				<span ng-click="scheduleOverrideHelp()" class="input-label" style="width:55%;">Schedule Override: <i class="icon ion-help-circled"></i></span>
 				<label class="item-select item" style="height:44px">
 				    <select ng-change="setScheduleType(overrideSett)" ng-model="overrideSett">

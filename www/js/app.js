@@ -43,5 +43,9 @@ angular.module('app', ['ionic', 'ionic.native', 'ngCordova', 'app.routes', 'app.
       // org.apache.cordova.statusbar required
       StatusBar.styleDefault();
     }
+
+    LetterDay.refresh();
+    Schedule.refresh();
+
   });
 });

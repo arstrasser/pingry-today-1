@@ -137,10 +137,9 @@ function dateToDayString(d){
 
 angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
 
-.factory('LetterDay', function($http, icalFeed, Schedule) {
+.factory('LetterDay', function($http, icalFeed, Schedule, $rootScope) {
   var time = localStorage.getItem("lastLetterRefresh");
   var dates = localStorage.getItem("letterDayDates");
-  var isChanged = false; //variable to tell whether or not the letterday schedule has been updated
 
   if(time == null || time == undefined || parseInt(time) + 604800000 < Date.now() ){ //Refresh if not refreshed or if it's been a week
     refreshData();
@@ -199,12 +198,16 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
       times[5].dates = obj.F;
       times[6].dates = obj.G;
 
-      //Set isChanged to true so that the current schedule refreshs
-      isChanged = true;
       //Updates the letter day if there are different letter days for the current date
       updateDay(d);
       refreshing = false;
-    },function(){refreshing=false;});
+      $rootScope.$broadcast("letterRefreshComplete", {success: true});
+      return true;
+    },function(){
+      refreshing = false;
+      $rootScope.$broadcast("letterRefreshComplete", {success:false});
+      return false;
+    });
   }
 
   //Function to get the index of the current date in one of the date arrays
@@ -264,14 +267,14 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
       if(curDay != -1){
         return times[curDay].letter;
       }
+      else if(times[0].dates.length== 0 && (refreshing || Schedule.isRefreshing())){
+        return "refreshing";
+      }
       //If the schedule isn't updated, return an empty string
       else if(times[0].dates.length == 0){
         return "empty";
       }
-      else if(refreshing || Schedule.isRefreshing()){
-        return "refreshing";
-      }
-      return undefined;
+      return "";
     },
     changeDay: function(day){updateDay(day);}, //Changes the current day to the given date
     letterOf: function(day){ //Returns what letter a given date would be
@@ -295,23 +298,9 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
     },
     dayOfWeek: function(){ //Returns the current date's day of the week
       return d.getDay();
-    },
-    isChanged: function(){ //Returns whether or not the schedule has been updated recently
-      return isChanged;
-    },
-    setChanged: function(val){ //Modifies the isChanged once the schedule has been updated
-      isChanged = val;
     }
   };
-}).factory('Schedule', function($http, icalFeed){
-  var time = localStorage.getItem("lastScheduleRefresh");
-  if(time == null || time == undefined || parseInt(time) + 604800000 < Date.now()){ //Refresh if not ever loaded or if it's been a week
-    refreshData();
-  }
-
-  //Schedule override mode disables dynamic schedule determination
-  var schedOverride = false;
-
+}).factory('Schedule', function($http, icalFeed, $rootScope, $q){
   /*
       Schedule types are listed below
     Format: an array of classes
@@ -455,14 +444,23 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
     {"name":"Period 4", "type":"block", "id":"4", "startTime":"13:30", "endTime":"14:35"},
     {"name":"CP", "type":"CP", "startTime":"14:40", "endTime":"15:25"}
   ];
+  //Variable to store all the schedule types
+  var typeList = [["Normal",normalSchedule], ["Faculty Collaboration",facultyCollabSchedule], ["Assembly 30 Minutes", assembly30Schedule], ["Assembly 35 Mintues", assembly35Schedule], ["Assembly 40 Minutes", assembly40Schedule], ["Assembly 60 Minutes",assembly60Schedule], ["Winter Festival", winterFestivalSchedule], ["Unknown Assembly", unknownSchedule]];
+
 
   //Initializes the current day to be the system current day
   var curDay = new Date();
 
-  //Variable to store all the schedule types
-  var typeList = [["Normal",normalSchedule], ["Faculty Collaboration",facultyCollabSchedule], ["Assembly 30 Minutes", assembly30Schedule], ["Assembly 35 Mintues", assembly35Schedule], ["Assembly 40 Minutes", assembly40Schedule], ["Assembly 60 Minutes",assembly60Schedule], ["Winter Festival", winterFestivalSchedule], ["Unknown Assembly", unknownSchedule]];
-
+  //Variable to count how many schedules are currently active
   var refreshing = false;
+
+  var time = localStorage.getItem("lastScheduleRefresh");
+  if(time == null || time == undefined || parseInt(time) + 604800000 < Date.now()){ //Refresh if not ever loaded or if it's been a week
+    refreshData();
+  }
+
+  //Schedule override mode disables dynamic schedule determination
+  var schedOverride = false;
 
   //Community Time event schedule
   var CTSchedule = localStorage.getItem("CTSchedule");
@@ -475,8 +473,6 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
 
   //Initialize current schedule to be the normal schedule
   var curSchedule = 0;
-  //Initialize that wasChanged variable to false since the schedule is up to date
-  var wasChanged = false;
 
   //Error catching and JSON parsing from the local storage
   if(CTSchedule != null){CTSchedule = JSON.parse(CTSchedule);}
@@ -517,161 +513,167 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
 
   //Refreshes the schedule from the calendar
   function refreshData(){
-    refreshing = true;
     //Google school calendar URL
     var specialScheduleURL = "http://calendar.google.com/calendar/ical/pingry.org_kg3ab8ps5pa70oj41igegj9kjo%40group.calendar.google.com/public/basic.ics";
     //Faculty Collaboration day calendar URL
     var collabDatesURL = "http://www.pingry.org/calendar/calendar_388.ics";
 
-    //Faculty collaboration day schedule refresh
-    $http.get(collabDatesURL).then(function(data){
-      //Parses the calendar
-      var calEvents = icalFeed.parseCalendar(data.data);
-      var days = [];
-      //Iterate over the events
-      for(i=0; i<calEvents.length; i++){
-        //If the event title contains the text Faculty Collaboration Day
-        if(calEvents[i].title.indexOf("Faculty Collaboration Day") != -1){
-          //Add the date string to a temporary array
-          days.push(dateToDayString(calEvents[i].time));
+    refreshing = true;
+    return $q.all([
+      //Faculty collaboration day schedule refresh
+      $http.get(collabDatesURL).then(function(data){
+        //Parses the calendar
+        var calEvents = icalFeed.parseCalendar(data.data);
+        var days = [];
+        //Iterate over the events
+        for(i=0; i<calEvents.length; i++){
+          //If the event title contains the text Faculty Collaboration Day
+          if(calEvents[i].title.indexOf("Faculty Collaboration Day") != -1){
+            //Add the date string to a temporary array
+            days.push(dateToDayString(calEvents[i].time));
+          }
         }
-      }
-      //Update the current faculty collab days
-      facultyCollabDays = days;
+        //Update the current faculty collab days
+        facultyCollabDays = days;
 
-      wasChanged = true;
-      //Update the local storage
-      localStorage.setItem("facultyCollabDays", JSON.stringify(days));
-    })
-    //Returns the larger parse so that we can call .then on the function and using async
-    return $http.get(specialScheduleURL).then(function(data){
-      //Initialize variables:
-      var calEvents = icalFeed.parseCalendar(data.data);
-      var collabDays = [];
-      var CT = {};
-      var CP = {};
-      var specialSchedule = {};
+        //Update the local storage
+        localStorage.setItem("facultyCollabDays", JSON.stringify(days));
+        return true;
+      }, function(){return false;}) ,
+    
+      //Returns the larger parse so that we can call .then on the function and using async
+      $http.get(specialScheduleURL).then(function(data){
+        //Initialize variables:
+        var calEvents = icalFeed.parseCalendar(data.data);
+        var collabDays = [];
+        var CT = {};
+        var CP = {};
+        var specialSchedule = {};
 
-      //Iterate over the calendar events
-      for(i=0; i < calEvents.length; i++){
-        //If it's a timed event (not a day-long event)
-        if(calEvents[i].type == "time" && !!calEvents[i].endTime){
-          //Community Time
-          if(
-            ((calEvents[i].startTime.getHours() == 9 && calEvents[i].startTime.getMinutes() == 45) ||   //Starts at 9:45
-              (calEvents[i].startTime.getHours() == 9 && calEvents[i].startTime.getMinutes() == 50)) && //  or      9:50
-            ((calEvents[i].endTime.getHours() == 10 && calEvents[i].endTime.getMinutes() == 10) ||      //Ends   at 10:10
-              (calEvents[i].endTime.getHours() == 10 && calEvents[i].endTime.getMinutes() == 15))) {    //  or      10:15
+        //Iterate over the calendar events
+        for(i=0; i < calEvents.length; i++){
+          //If it's a timed event (not a day-long event)
+          if(calEvents[i].type == "time" && !!calEvents[i].endTime){
+            //Community Time
+            if(
+              ((calEvents[i].startTime.getHours() == 9 && calEvents[i].startTime.getMinutes() == 45) ||   //Starts at 9:45
+                (calEvents[i].startTime.getHours() == 9 && calEvents[i].startTime.getMinutes() == 50)) && //  or      9:50
+              ((calEvents[i].endTime.getHours() == 10 && calEvents[i].endTime.getMinutes() == 10) ||      //Ends   at 10:10
+                (calEvents[i].endTime.getHours() == 10 && calEvents[i].endTime.getMinutes() == 15))) {    //  or      10:15
 
-            //If community time already has an event scheduled, appends event name
-            if(CT[dateToDayString(calEvents[i].startTime)]) {
+              //If community time already has an event scheduled, appends event name
+              if(CT[dateToDayString(calEvents[i].startTime)]) {
 
-              //Fixes Duplicate events - TODO: Figure out why this bug occurs
-              if(CT[dateToDayString(calEvents[i].startTime)] != calEvents[i].title){
-                CT[dateToDayString(calEvents[i].startTime)] += " & "+calEvents[i].title;
+                //Fixes Duplicate events - TODO: Figure out why this bug occurs
+                if(CT[dateToDayString(calEvents[i].startTime)] != calEvents[i].title){
+                  CT[dateToDayString(calEvents[i].startTime)] += " & "+calEvents[i].title;
+                }
+              }
+              //Otherwise, just set the variable to the event title
+              else {
+                CT[dateToDayString(calEvents[i].startTime)] = calEvents[i].title;
               }
             }
-            //Otherwise, just set the variable to the event title
-            else {
-              CT[dateToDayString(calEvents[i].startTime)] = calEvents[i].title;
+
+            //CP
+            else if(
+                ((calEvents[i].startTime.getHours() == 14 && calEvents[i].startTime.getMinutes() == 45) || //Starts at 2:45
+                (calEvents[i].startTime.getHours() == 14 && calEvents[i].startTime.getMinutes() == 40) ||  //  or      2:40
+                (calEvents[i].startTime.getHours() == 14 && calEvents[i].startTime.getMinutes() == 35))    //  or      2:35
+
+              && ((calEvents[i].endTime.getHours() == 15 && calEvents[i].endTime.getMinutes() == 25) ||    //Ends at   3:25
+                (calEvents[i].endTime.getHours() == 15 && calEvents[i].endTime.getMinutes() == 30) ||      //  or      3:30
+                (calEvents[i].endTime.getHours() == 15 && calEvents[i].endTime.getMinutes() == 15))){      //  or      3:15
+
+              //If CP already has an event scheduled, append current event name
+              if(CP[dateToDayString(calEvents[i].startTime)]){
+                CP[dateToDayString(calEvents[i].startTime)] += " & "+calEvents[i].title;
+              }
+              //Otherwise, just set the variable to the event title
+              else{
+                CP[dateToDayString(calEvents[i].startTime)] = calEvents[i].title;
+              }
             }
+
+            //Assembly
+            else if(calEvents[i].title.indexOf("Assembly") != -1){
+
+              //Switch based on assembly length
+              switch ((calEvents[i].endTime.getTime() - calEvents[i].startTime.getTime())/60000){
+                case 60:  //60 minutes
+                  specialSchedule[dateToDayString(calEvents[i].endTime)] = "Assembly 60 Minutes";
+                  break;
+                case 35:  //35 minutes
+                  specialSchedule[dateToDayString(calEvents[i].endTime)] = "Assembly 35 Minutes";
+                  break;
+                case 40:
+                  specialSchedule[dateToDayString(calEvents[i].endTime)] = "Assembly 40 Minutes";
+                  break;
+                default:  //Else
+                  //Check for Winter Festival Schedule
+                  if(calEvents[i].title.indexOf("Winter Festival") != -1){
+                    specialSchedule[dateToDayString(calEvents[i].endTime)] = "Winter Festival";
+                  }
+                  //Unknown assembly
+                  else{
+                    console.log("Unknown Assembly:");
+                    console.log(calEvents[i]);
+                    console.log((calEvents[i].endTime.getTime() - calEvents[i].startTime.getTime())/60000);
+                    specialSchedule[dateToDayString(calEvents[i].endTime)] = "Unknown Assembly";
+                  }
+                  break;
+              }
+            }else{
+              //console.log("Unknown: "+calEvents[i].startTime.getHours() +" : "+calEvents[i].startTime.getMinutes()+" - "+calEvents[i].endTime.getHours() +" : "+calEvents[i].endTime.getMinutes());
+            }
+
           }
-
-          //CP
-          else if(
-              ((calEvents[i].startTime.getHours() == 14 && calEvents[i].startTime.getMinutes() == 45) || //Starts at 2:45
-              (calEvents[i].startTime.getHours() == 14 && calEvents[i].startTime.getMinutes() == 40) ||  //  or      2:40
-              (calEvents[i].startTime.getHours() == 14 && calEvents[i].startTime.getMinutes() == 35))    //  or      2:35
-
-            && ((calEvents[i].endTime.getHours() == 15 && calEvents[i].endTime.getMinutes() == 25) ||    //Ends at   3:25
-              (calEvents[i].endTime.getHours() == 15 && calEvents[i].endTime.getMinutes() == 30) ||      //  or      3:30
-              (calEvents[i].endTime.getHours() == 15 && calEvents[i].endTime.getMinutes() == 15))){      //  or      3:15
-
-            //If CP already has an event scheduled, append current event name
-            if(CP[dateToDayString(calEvents[i].startTime)]){
-              CP[dateToDayString(calEvents[i].startTime)] += " & "+calEvents[i].title;
-            }
-            //Otherwise, just set the variable to the event title
-            else{
-              CP[dateToDayString(calEvents[i].startTime)] = calEvents[i].title;
-            }
+          //If it's a day type event (occurs for the whole day)
+          else if(calEvents[i].type == "day"){
+            /*
+            // Faculty Collaboration day implementation commented out since using alternate calendar.
+            // For faster performance but lower accuracy, uncomment this and remove the first calendar parse.
+            if(calEvents[i].title.indexOf("Collab") != -1 && calEvents[i].title.indexOf("Fac") != -1){
+              collabDays.push(dateToDayString(calEvents[i].time));
+            }*/
           }
-
-          //Assembly
-          else if(calEvents[i].title.indexOf("Assembly") != -1){
-
-            //Switch based on assembly length
-            switch ((calEvents[i].endTime.getTime() - calEvents[i].startTime.getTime())/60000){
-              case 60:  //60 minutes
-                specialSchedule[dateToDayString(calEvents[i].endTime)] = "Assembly 60 Minutes";
-                break;
-              case 35:  //35 minutes
-                specialSchedule[dateToDayString(calEvents[i].endTime)] = "Assembly 35 Minutes";
-                break;
-              case 40:
-                specialSchedule[dateToDayString(calEvents[i].endTime)] = "Assembly 40 Minutes";
-                break;
-              default:  //Else
-                //Check for Winter Festival Schedule
-                if(calEvents[i].title.indexOf("Winter Festival") != -1){
-                  specialSchedule[dateToDayString(calEvents[i].endTime)] = "Winter Festival";
-                }
-                //Unknown assembly
-                else{
-                  console.log("Unknown Assembly:");
-                  console.log(calEvents[i]);
-                  console.log((calEvents[i].endTime.getTime() - calEvents[i].startTime.getTime())/60000);
-                  specialSchedule[dateToDayString(calEvents[i].endTime)] = "Unknown Assembly";
-                }
-                break;
-            }
-          }else{
-            //console.log("Unknown: "+calEvents[i].startTime.getHours() +" : "+calEvents[i].startTime.getMinutes()+" - "+calEvents[i].endTime.getHours() +" : "+calEvents[i].endTime.getMinutes());
+          else{
+            //Unknown event type
+            console.log("Unknown type: ");
+            console.log(calEvents[i]);
           }
-
         }
-        //If it's a day type event (occurs for the whole day)
-        else if(calEvents[i].type == "day"){
-          /*
-          // Faculty Collaboration day implementation commented out since using alternate calendar.
-          // For faster performance but lower accuracy, uncomment this and remove the first calendar parse.
-          if(calEvents[i].title.indexOf("Collab") != -1 && calEvents[i].title.indexOf("Fac") != -1){
-            collabDays.push(dateToDayString(calEvents[i].time));
-          }*/
-        }
-        else{
-          //Unknown event type
-          console.log("Unknown type: ");
-          console.log(calEvents[i]);
-        }
-      }
-      //Community time schedule update in storage and in runtime
-      localStorage.setItem("CTSchedule", JSON.stringify(CT));
-      CTSchedule = CT;
+        //Community time schedule update in storage and in runtime
+        localStorage.setItem("CTSchedule", JSON.stringify(CT));
+        CTSchedule = CT;
 
-      //CP Schedule update in storage and in runtime
-      localStorage.setItem("CPSchedule", JSON.stringify(CP));
-      CPSchedule = CP
+        //CP Schedule update in storage and in runtime
+        localStorage.setItem("CPSchedule", JSON.stringify(CP));
+        CPSchedule = CP
 
-      //Special Schedule update in storage and in runtime
-      localStorage.setItem("ScheduledDays", JSON.stringify(specialSchedule));
-      scheduledDays = specialSchedule;
+        //Special Schedule update in storage and in runtime
+        localStorage.setItem("ScheduledDays", JSON.stringify(specialSchedule));
+        scheduledDays = specialSchedule;
 
-      //Update the last refresh time
-      localStorage.setItem("lastScheduleRefresh", Date.now());
+        //Update the last refresh time
+        localStorage.setItem("lastScheduleRefresh", Date.now());
 
-      //Updates the current schedule type to reflect new information
-      updateCurrentSchedule();
-
-      //Update wasChanged variable to trigger a schedule refresh
-      wasChanged = true;
+        //Updates the current schedule type to reflect new information
+        updateCurrentSchedule();
+        return true;
+      }, function(){
+        return false;
+      })
+    ])
+    .then(function(values){
+      success = !values.includes(false);
       refreshing = false;
-    },function(){refreshing=false;});
+      $rootScope.$broadcast("scheduleRefreshComplete", {success:(success)});
+      return success;
+    });
   }
   
   return {
-    wasChanged: function(){return wasChanged;}, //WasChanged Accessor
-    setChanged: function(val){wasChanged=val;}, //WasChanged Modfier
     isRefreshing: function(){return refreshing;},
     refresh: refreshData,  //Triggers a full schedule refresh from the internet
     get: function(id){
@@ -837,7 +839,6 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
 
         //Published date of the article (NOT YET IMPLEMENTED)
         var date = parseStringForDate(data.substring(data.indexOf("<pubDate>")+9, data.indexOf("</pubDate")));
-        console.log(date);
         data = data.substring(data.indexOf("</item>")+7); //updates the parse to avoid readding the same item
         //Image uses an inline if statement so that it returns the word "none" as a url if there is no image, or it returns the correct URL with pingry.org added
         list.push({"title":title, "image":img==""?'none':img, "link":link, "description":desc, "rawDescription":rawDesc, "date":date.getTime()});
