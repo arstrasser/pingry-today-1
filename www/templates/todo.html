@@ -1,0 +1,24 @@
+<ion-view title="To Do List">
+	<ion-content padding="true" class="has-header">
+		<div class="todo-class" ng-repeat="cls in classes">
+			<span class="todo-class-title">{{cls.name}}</span>
+			<div class="todo-list">
+				<div class="todo-list-element" ng-repeat="task in cls.tasks track by $index">
+					<i class="icon ion-android-checkbox-outline-blank todo-list-box" ng-hide="task.completed" ng-click="task.completed=!task.completed; removeTask($index, $parent.$index, $event)"></i>
+					<i class="icon ion-android-checkbox todo-list-box" ng-show="task.completed" ng-click="task.completed=!task.completed"></i>
+					<div class="todo-assignment">
+						<div class="todo-assignment-name">{{task.name}}</div>
+						<div class="todo-assignment-date" ng-bind="formatDate(task.date)" ng-show="task.date!=''"></div>
+					</div>
+				</div>
+				<div class="todo-list-element todo-new-element todo-background-new-assignment">
+					<i class="icon ion-android-checkbox-outline-blank todo-list-box"></i>
+					<div class="todo-assignment">
+						<input type="text" class="todo-assignment-name todo-new-assignment-name" ng-model="this.value" ng-blur="addTask($index,$event);" ng-focus="newTaskFocus($event)"></div>
+						<div class="todo-assignment-date" ng-bind="formatDate(task.date)" ng-show="task.date!=''"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</ion-content>
+</ion-view>

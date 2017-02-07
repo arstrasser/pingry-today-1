@@ -136,3 +136,46 @@
 	display:block;
 	white-space:normal;
 }
+
+.todo-class-title {
+	font-size:22px;
+	font-weight:bold;
+}
+
+.todo-list-element {
+	margin-left:10px;
+	margin-right:5px;
+	margin-top:10px;
+	margin-bottom:10px;
+	font-size:18px;
+}
+
+.todo-list-box {
+	padding:10px;
+}
+
+.todo-assignment {
+	display:inline-block;
+	width:calc(100% - 45px);
+}
+
+.todo-new-assignment-name {
+	font-size: 18px !important;
+}
+
+.todo-background-new-assignment {
+	opacity:0.5;
+}
+
+.todo-new-assignment-name {
+	border-bottom: 1px solid black !important;
+}
+
+.todo-assignment-name {
+	display:inline-block;
+}
+
+.todo-assignment-date {
+	display:inline-block;
+	float:right;
+}

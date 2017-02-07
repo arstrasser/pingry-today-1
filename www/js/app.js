@@ -24,13 +24,15 @@ Keyboard
 
 angular.module('app', ['ionic', 'ionic.native', 'ngCordova', 'app.routes', 'app.controllers', 'app.services', 'app.directives'])
 
-.run(function($ionicPlatform, $cordovaToast, $ionicHistory, $window, LetterDay, Schedule, Settings) {
+.run(function($ionicPlatform, $cordovaToast, $ionicHistory, $window, LetterDay, Schedule, Settings, $cordovaAppVersion, $q, $cordovaDeviceFeedback) {
   $ionicPlatform.ready(function() {
     //Override the cordova toast functionality if on computer or unsupported platform
     if($window.plugins == undefined){
       $cordovaToast.show = function(msg){console.log(msg);}
       $cordovaToast.showShortBottom = function(msg){console.log(msg);}
       $cordovaToast.showWithOptions = function(obj){console.log(obj.message);}
+      $cordovaAppVersion.getVersionNumber = function(){return $q.when("0.0.0")};
+      $cordovaDeviceFeedback.haptic = function(a){console.log("bzzt");};
     }
 
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
