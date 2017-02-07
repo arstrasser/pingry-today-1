@@ -357,6 +357,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
 
 
   $scope.$on("scheduleRefreshComplete", function(e, args){
+    console.log(("triggerred"));
     if(args.success || $scope.letter == "refreshing"){
       refresh();
     }else{
@@ -502,7 +503,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   $scope.scheduleOverrideHelp = function(){
     $cordovaDialogs.alert(
       "A schedule override allows you to fix incorrect schedules.\n"+
-      "If you select a schedule here, it changes every single day to have that schedule."
+      "If you select a schedule here, it changes every day to have that schedule."
     );
   }
 
@@ -597,7 +598,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     //Resets the view to a new class
     if(!modify){
       //Resets the values
-      $scope.cls = {"name":"", "color":"", "type":"", "firstLunch":false, "takesFlex":false, "firstFlex":true, "timeType":"", "time":{"day":"", "id":false}};
+      $scope.cls = {"name":"", "color":"", "type":"", "firstLunch":false, "takesFlex":false, "firstFlex":true, "timeType":"", "time":{"day":"", "id":false}, "tasks":[]};
     }
   }
 
@@ -680,7 +681,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   if($stateParams.clsType == undefined || $stateParams.clsType == "" || MySchedule.getAll()[$stateParams.clsType] == undefined || MySchedule.getAll()[$stateParams.clsType].length <= parseInt($stateParams.clsId)){
     modify = false;
     //Default class config
-    $scope.cls = {"name":"", "color":"", "type":"", "firstLunch":false, "takesFlex":false, "firstFlex":true, "timeType":"", "time":{"day":"", "id":false}};
+    $scope.cls = {"name":"", "color":"", "type":"", "firstLunch":false, "takesFlex":false, "firstFlex":true, "timeType":"", "time":{"day":"", "id":false}, "tasks":[]};
   }else{
     //Modify a class
     modify = true;
@@ -1013,4 +1014,126 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
       Settings.setAthleticSubscriptionChanged(false);
     }
   });
+})
+
+.controller("TodoCtrl", function($scope, MySchedule, LetterDay, Schedule){
+  $scope.formatDate = function(str){
+    if(!str){
+      return "";
+    }
+    return parseInt(str.substring(4, 6))+"/"+parseInt(str.substring(6,8));
+  }
+
+  $scope.addTask = function(clsIndex, e){
+    elem = angular.element(e.currentTarget);
+    if(elem.val() != ""){
+      $scope.classes[clsIndex].tasks.push({name:elem.val(), date:"", completed:false});
+      elem.val("");
+    }
+    elem.parent().parent().addClass('todo-background-new-assignment');
+    MySchedule.save();
+  }
+
+  $scope.removeTask = function(taskIndex, clsIndex, e) {
+    //angular.element(e.currentTarget).animate("opacity:0", 100, function(){$scope.classes[clsIndex].tasks.splice(taskIndex,1)});
+  }
+
+  $scope.newTaskFocus = function(e) {
+    angular.element(e.currentTarget).parent().parent().removeClass('todo-background-new-assignment')
+  }
+
+  function refresh() {
+    var classOrder = [];
+    var nextDate = LetterDay.nextLetterDayDate(new Date());
+    console.log(nextDate);
+    var loop = true;
+    var scheduleCurrentDay = Schedule.getCurrentDay();
+    while(loop){
+      var classes = LetterDay.classesOf(nextDate);
+      if(dateToDayString(nextDate) == dateToDayString(new Date())){
+        var sched = Schedule.getForDay(nextDate);
+        for(var j = 0; j < sched.length; j++){
+          thisClass = sched[j];
+          if(sched[j].type == "swap"){
+            if(!MySchedule.get("block", classes[2]) || MySchedule.get("block", classes[2]).firstLunch){
+              thisClass = thisClass.options[0];
+            }else{
+              thisClass = thisClass.options[1];
+            }
+          }
+          if(thisClass.type == "block"){
+            var d = new Date();
+            d.setHours(parseInt(thisClass.endTime.substring(0,2)));
+            d.setMinutes(parseInt(thisClass.endTime.substring(3,5)));
+            if(d.getTime() > nextDate.getTime()){
+              if(classOrder.includes(classes[i])){
+                loop = false;
+                break;
+              }else{
+                classOrder.push(classes[parseInt(thisClass.id) - 1]);
+              }
+            }
+          }
+        }
+      }
+      else{
+        for(var i = 0; i < classes.length; i++){
+          
+          if(classOrder.includes(classes[i])){
+            loop = false;
+            break;
+          }
+          classOrder.push(classes[i]);
+        }
+      }
+      if(loop){
+        nextDate.setDate(nextDate.getDate() + 1);
+        nextDate = LetterDay.nextLetterDayDate(nextDate);
+      }
+    }
+    Schedule.changeDay(scheduleCurrentDay);
+
+
+    var allClasses = MySchedule.getAllType("block");
+    var classList = [];
+    for(var i = 0; i < classOrder.length; i++){
+      var thisClass = MySchedule.get("block", classOrder[i]);
+      if(thisClass != undefined){
+        classList.push(thisClass);
+      }
+    }
+
+    console.log(classList);
+
+    $scope.classes = classList;
+  }
+
+  
+  refresh();
+
+  $scope.$on('$ionicView.enter', function(){
+    if(MySchedule.isChanged()){
+      refresh();
+    }
+  })
 });
+
+/*
+[
+  {
+    name:""
+    tasks:[
+      {
+        name:""
+        date:""
+        completed:false
+      }
+      {
+        name:""
+        date:""
+        completed:true
+      }
+    ]
+  }
+]
+*/

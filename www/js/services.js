@@ -279,7 +279,11 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
     changeDay: function(day){updateDay(day);}, //Changes the current day to the given date
     letterOf: function(day){ //Returns what letter a given date would be
       var dayString = dateToDayString(day);
-      return times[getIndexOf(dayString)].letter;
+      var index = getIndexOf(dayString);
+      if(index == -1){
+        return "";
+      }
+      return times[index].letter;
     },
     classes: function() { //Returns an array of class numbers for the current day
       if(curDay != -1){
@@ -298,6 +302,12 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
     },
     dayOfWeek: function(){ //Returns the current date's day of the week
       return d.getDay();
+    },
+    nextLetterDayDate: function(d){
+      while(getIndexOf(dateToDayString(d)) == -1){
+        d.setDate(d.getDate()+1);
+      }
+      return d;
     }
   };
 }).factory('Schedule', function($http, icalFeed, $rootScope, $q){
@@ -691,6 +701,15 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
       }
       return "CP";
     },
+    getForDay: function(d){
+      var oldDay = curDay;
+      curDay = d;
+      updateCurrentSchedule();
+      var temp = curSchedule;
+      curDay = oldDay;
+      updateCurrentSchedule();
+      return typeList[temp][1];
+    },
     getTypes: function(){
       return typeList; //Returns the schedule type list
     },
@@ -709,6 +728,9 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
     changeDay: function(day){ //updates the current date
       curDay = day;
       updateCurrentSchedule();
+    },
+    getCurrentDay: function(){
+      return curDay;
     }
   }
 }).factory('MySchedule', function(Schedule, LetterDay){
