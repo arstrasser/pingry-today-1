@@ -389,8 +389,10 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
       date:curDay,
       todayText:"Today"
     }).then(function(date){
-      curDay = date;
-      updateDate();
+      if(!!date){
+        curDay = date;
+        updateDate();
+      }
     });
   }
 
