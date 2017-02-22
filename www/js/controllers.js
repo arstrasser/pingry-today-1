@@ -721,7 +721,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     }
   }
   $scope.openEmail = function(){
-    $cordovaInAppBrowser.open("mailto:astrasser2019@pingry.org", '_system');
+    $cordovaInAppBrowser.open("http://www.pingry.org/hp/pingry-today-app-support", '_system');
   }
 })
 
