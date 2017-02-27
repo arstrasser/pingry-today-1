@@ -307,7 +307,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
       }
       $scope.periodList = c;
 
-      if(Schedule.getTypes()[Schedule.getCurrentType()][0] == "Unknown Assembly"){
+      if(Schedule.getCurrentScheduleName() == "Unknown Assembly"){
         $cordovaDialogs.alert("This day has an assembly schedule that is not recognized.\n"+
               "A normal schedule is shown, but please only use it as a guideline.")
       }
@@ -586,8 +586,6 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   $scope.hackerTheme = Settings.getExtraOptions().includes("hackerTheme");
   $scope.overrideSett = "-1";
   $scope.scheduleTypes = Schedule.getTypes();
-  $scope.scheduleType = Schedule.getCurrentType();
-
 })
 
 //Add or Modify Class controller
