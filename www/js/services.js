@@ -377,9 +377,9 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
     {"name":"Period 2", "type":"block", "id":"2", "startTime":"10:20", "endTime":"11:20"},
     {"name":"Swappable 1", "type":"swap", "options":[
       {"name":"First Lunch", "type":"Lunch", "startTime":"11:25", "endTime":"11:55"},
-      {"name":"Period 3", "type":"block", "id":"3", "startTime":"11:25", "endTime":"12:30"}]},
+      {"name":"Period 3", "type":"block", "id":"3", "startTime":"11:25", "endTime":"12:25"}]},
     {"name":"Swappable 2", "type":"swap", "options":[
-      {"name":"Period 3", "type":"block", "id":"3", "startTime":"11:55", "endTime":"13:00"},
+      {"name":"Period 3", "type":"block", "id":"3", "startTime":"12:00", "endTime":"13:00"},
       {"name":"Second Lunch", "type":"Lunch", "startTime":"12:30", "endTime":"13:00"}]},
     {"name":"Flex 2", "type":"flex", "id":"0", "startTime":"13:05", "endTime":"13:30"},
     {"name":"Period 4", "type":"block", "id":"4", "startTime":"13:35", "endTime":"14:35"},
@@ -455,7 +455,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
     {"name":"CP", "type":"CP", "startTime":"14:40", "endTime":"15:25"}
   ];
   //Variable to store all the schedule types
-  var typeList = [["Normal",normalSchedule], ["Faculty Collaboration",facultyCollabSchedule], ["Assembly 30 Minutes", assembly30Schedule], ["Assembly 35 Mintues", assembly35Schedule], ["Assembly 40 Minutes", assembly40Schedule], ["Assembly 60 Minutes",assembly60Schedule], ["Winter Festival", winterFestivalSchedule], ["Unknown Assembly", unknownSchedule]];
+  var typeList = [["Normal",normalSchedule], ["Faculty Collaboration",facultyCollabSchedule], ["Assembly 30 Minutes", assembly30Schedule], ["Assembly 35 Minutes", assembly35Schedule], ["Assembly 40 Minutes", assembly40Schedule], ["Assembly 60 Minutes",assembly60Schedule], ["Winter Festival", winterFestivalSchedule], ["Unknown Assembly", unknownSchedule]];
 
 
   //Initializes the current day to be the system current day
@@ -467,6 +467,14 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
   var time = localStorage.getItem("lastScheduleRefresh");
   if(time == null || time == undefined || parseInt(time) + 604800000 < Date.now()){ //Refresh if not ever loaded or if it's been a week
     refreshData();
+  }
+
+  var manualOverriddenSchedules = localStorage.getItem("manualOverriddenSchedules");
+  if(manualOverriddenSchedules == null || manualOverriddenSchedules == undefined){
+    manualOverriddenSchedules = {};
+    localStorage.setItem("manualOverriddenSchedules", "{}");
+  }else{
+    manualOverriddenSchedules = JSON.parse(manualOverriddenSchedules);
   }
 
   //Schedule override mode disables dynamic schedule determination
@@ -482,7 +490,9 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
   var facultyCollabDays = localStorage.getItem("facultyCollabDays");
 
   //Initialize current schedule to be the normal schedule
-  var curSchedule = 0;
+  var curSchedule = typeList[0][1];
+
+  var curScheduleName = typeList[0][0];
 
   //Error catching and JSON parsing from the local storage
   if(CTSchedule != null){CTSchedule = JSON.parse(CTSchedule);}
@@ -495,13 +505,19 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
     //If not in Schedule override mode
     if(!schedOverride){
       //If today has a special schedule
-      curSchedule = 0;
-      if(scheduledDays != null && scheduledDays[dateToDayString(curDay)] != undefined){
+      curSchedule = typeList[0][1];
+      curScheduleName = typeList[0][0];
+      if(manualOverriddenSchedules[dateToDayString(curDay)] != undefined){
+        curSchedule = manualOverriddenSchedules[dateToDayString(curDay)];
+        curScheduleName = "manual";
+      }
+      else if(scheduledDays != null && scheduledDays[dateToDayString(curDay)] != undefined){
         //Iterate over the schedule types
         for(i = 0; i < typeList.length; i++){
           //if found the respective schedule for the day
           if(typeList[i][0] == scheduledDays[dateToDayString(curDay)]){
-            curSchedule = i;
+            curSchedule = typeList[i][1];
+            curScheduleName = typeList[i][0];
             break;
           }
         }
@@ -510,7 +526,8 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
       else if(facultyCollabDays != null){
         for(var i = 0; i < facultyCollabDays.length; i++){
           if(facultyCollabDays[i] == dateToDayString(curDay)){
-            curSchedule = 1;
+            curSchedule = typeList[1][1];
+            curScheduleName = typeList[i][0];
             break;
           }
         }
@@ -527,6 +544,8 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
     var specialScheduleURL = "http://calendar.google.com/calendar/ical/pingry.org_kg3ab8ps5pa70oj41igegj9kjo%40group.calendar.google.com/public/basic.ics";
     //Faculty Collaboration day calendar URL
     var collabDatesURL = "http://www.pingry.org/calendar/calendar_388.ics";
+
+    var assemblyOverrideURL = "http://mirror.pingry.k12.nj.us/software/AssemblyScheduleOverride.json";
 
     refreshing = true;
     return $q.all([
@@ -673,6 +692,28 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
         return true;
       }, function(){
         return false;
+      }).then(function(value){
+        if(value == false){
+          return false;
+        }
+        return $http.get(assemblyOverrideURL).then(function(data){
+            list = data.data
+            manualOverriddenSchedules = {};
+            for(var i = 0; i < list.length; i++){
+              var day = list[i].date;
+              var type = list[i].type;
+              if(type == "automatic"){
+                console.log(list[i].name);
+                scheduledDays[day] = list[i].name;
+              }else if(type == "manual"){
+                scheduledDays[day] = "manual";
+                manualOverriddenSchedules[day] = list[i].classes;
+              }
+            }
+            localStorage.setItem("ScheduledDays", JSON.stringify(scheduledDays));
+            localStorage.setItem("manualOverriddenSchedules", JSON.stringify(manualOverriddenSchedules));
+            return true;
+          },function(){return false;});
       })
     ])
     .then(function(values){
@@ -687,7 +728,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
     isRefreshing: function(){return refreshing;},
     refresh: refreshData,  //Triggers a full schedule refresh from the internet
     get: function(id){
-      return typeList[curSchedule][1][id];  //returns the current schedule list element of index id
+      return curSchedule[id];  //returns the current schedule list element of index id
     },
     getCTSchedule: function(){ //Returns the scheduled activity for community time for the current day
       if(CTSchedule != null && CTSchedule[dateToDayString(curDay)] != undefined){
@@ -708,16 +749,16 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
       var temp = curSchedule;
       curDay = oldDay;
       updateCurrentSchedule();
-      return typeList[temp][1];
+      return temp;
     },
     getTypes: function(){
       return typeList; //Returns the schedule type list
     },
     getToday: function(){
-      return typeList[curSchedule][1]; //Returns the current full Schedule for today
+      return curSchedule; //Returns the current full Schedule for today
     },
-    getCurrentType: function(){ //returns the current schedule type index
-      return curSchedule;
+    getCurrentScheduleName: function(){ //returns the current schedule type index
+      return curScheduleName;
     },
     setCurrentType: function(newSched){ //sets the current schedule type to the given type
       curSchedule =  newSched;
