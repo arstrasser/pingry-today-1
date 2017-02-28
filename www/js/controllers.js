@@ -1094,6 +1094,10 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
             }
           }
         }
+        if(startingClass == undefined){
+          nextDate.setDate(nextDate.getDate()+1);
+          startingClass = LetterDay.classesOf(nextDate)[0];
+        }
       }
       else{
         startingClass = classes[0];
@@ -1126,9 +1130,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   }
 
   $scope.$on('$ionicView.beforeEnter', function(){
-    if(MySchedule.isChanged()){
-      refresh();
-    }
+    refresh();
   })
 
   $scope.$on('$ionicView.enter', function(){
