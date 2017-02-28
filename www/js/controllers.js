@@ -288,11 +288,11 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
           }else if(tClass.type == "flex"){
             tClass.color = "#fff";
           }else if(tClass.type == "CT"){
-            tClass.color = "#6ff";
+            tClass.color = "#bfffff";
           }else if(tClass.type == "Lunch"){
-            tClass.color = "#ff3";
+            tClass.color = "#ddd";
           }else if(tClass.type == "CP"){
-            tClass.color = "#fb6";
+            tClass.color = "#bdfdc8";
           }else {
             tClass.color = "#ddd";
           }
@@ -600,7 +600,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
 //Add or Modify Class controller
 .controller('AddClassCtrl', function($scope, MySchedule, $cordovaDialogs, $stateParams, $ionicHistory, Messages) {
   //Colors configuration
-  $scope.colors = ["#DC143C", "#FF3E96", "#EE00EE", "#4876FF", "#8EE5EE", "#00EE76", "#71C671", "#EEEE00", "#EE9A00", "#CDB7B5", "#666"];
+  $scope.colors = ["#E41010", "#EE9A00", "#fff705", "#00e000", "#40ff9f", "#57efff", "#0066ff", "#c826f1", "#FF3E96", "#e2e2e2", "#fff"];
 
   //Resets the view
   $scope.resetView = function(){

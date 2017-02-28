@@ -132,7 +132,7 @@ angular.module('app.routes', [])
     views: {
       'sideMenu': {
         templateUrl: 'templates/todo.html',
-        controller: 'ToDoCtrl'
+        controller: 'TodoCtrl'
       }
     }
   });
