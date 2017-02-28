@@ -13,7 +13,7 @@
 		</div>
 		<div id="nonSchoolDay" ng-show="letter==''">No school!</div>
 		<div id="mySchedule" class="list">
-			<div ng-repeat="cls in classes track by $index" class="item row class-{{cls.type}}" style="background-color: {{cls.color}}; border-bottom:0px;border-top:0px;">
+			<div ng-repeat="cls in classes track by $index" on-tap="clickedClass(cls);" class="item row class-{{cls.type}}" style="background-color: {{cls.color}}; border-bottom:0px;border-top:0px;">
 				<div class="col col-33 class-time">
 					<div style="display: inline" class="startTime" ng-bind="formatTime(cls.startTime)"></div>
 					<div style="display: inline" ng-show="cls.type == 'block'"><br><br></div>

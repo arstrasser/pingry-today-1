@@ -126,6 +126,15 @@ angular.module('app.routes', [])
         controller: 'AthleticsCtrl'
       }
     }
+  })
+  .state('main.todo', {
+    url: '/todo/:blockNum',
+    views: {
+      'sideMenu': {
+        templateUrl: 'templates/todo.html',
+        controller: 'ToDoCtrl'
+      }
+    }
   });
 
   // if none of the above states are matched, use this as the fallback
