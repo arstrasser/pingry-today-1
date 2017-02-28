@@ -130,9 +130,10 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   };
 })
 
-.controller('ScheduleCtrl', function($scope, $cordovaDialogs, Schedule, LetterDay, MySchedule, $ionicSideMenuDelegate, $ionicGesture, Messages, $cordovaDatePicker, $cordovaDeviceFeedback, $ionicPlatform) {
+.controller('ScheduleCtrl', function($scope, $cordovaDialogs, Schedule, LetterDay, MySchedule, $ionicSideMenuDelegate, $ionicGesture, Messages, $cordovaDatePicker, $cordovaDeviceFeedback, $ionicPlatform, Settings, $window) {
   //Set up triggers to change the day on swipe
-  var elem = angular.element(document.querySelector("#scheduleContent"));
+  //var elem = angular.element(document.querySelector("#scheduleContent"));
+  var elem = $("#scheduleContent");
   $ionicGesture.on("swipeleft", $scope.nextDay, elem);
   $ionicGesture.on("swiperight", $scope.prevDay, elem);
   
@@ -192,6 +193,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
           }else{
             tClass.color = MySchedule.get("block", blockNum).color;
             tClass.name = MySchedule.get("block", blockNum).name;
+            tClass.clickUrl = "#/main/todo/"+MySchedule.get("block", blockNum).time.id;
           }
         }
         //If you have a Community Time type class
@@ -421,6 +423,13 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     curDay.setDate(curDay.getDate()-1);
     updateDate();
   }
+
+  $scope.clickedClass = function(cls){
+    if(!!cls.clickUrl && Settings.getSuperMode()){
+      $window.location.href=cls.clickUrl;
+    }
+  }
+
 })
 
 //Nothing in the lunch controller because it is currently implemented through an in app browser in the menu controller
@@ -1016,7 +1025,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   });
 })
 
-.controller("TodoCtrl", function($scope, MySchedule, LetterDay, Schedule){
+.controller("TodoCtrl", function($scope, MySchedule, LetterDay, Schedule, $stateParams, $ionicScrollDelegate, $timeout, $location){
   $scope.formatDate = function(str){
     if(!str){
       return "";
@@ -1025,7 +1034,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   }
 
   $scope.addTask = function(clsIndex, e){
-    elem = angular.element(e.currentTarget);
+    var elem = $(e.currentTarget.children[0]);
     if(elem.val() != ""){
       $scope.classes[clsIndex].tasks.push({name:elem.val(), date:"", completed:false});
       elem.val("");
@@ -1035,7 +1044,23 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   }
 
   $scope.removeTask = function(taskIndex, clsIndex, e) {
-    //angular.element(e.currentTarget).animate("opacity:0", 100, function(){$scope.classes[clsIndex].tasks.splice(taskIndex,1)});
+        $(e.target.parentNode).animate({opacity:0}, 1000, "swing", 
+      function(){
+        if($(e.target).is(":visible")){
+          $(e.target.parentNode).css("opacity", 1);
+        }
+        else{
+          $(e.target.parentNode).hide();
+          $scope.classes[clsIndex].removeOffset++;
+          $scope.$apply();
+          MySchedule.save();
+        }
+      }
+    );
+  }
+
+  $scope.newTaskUnfocus = function(e) {
+    $(e.target).parent().parent().parent().addClass('todo-background-new-assignment');
   }
 
   $scope.newTaskFocus = function(e) {
@@ -1043,12 +1068,11 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   }
 
   function refresh() {
-    var classOrder = [];
+    var startingClass;
     var nextDate = LetterDay.nextLetterDayDate(new Date());
-    console.log(nextDate);
     var loop = true;
     var scheduleCurrentDay = Schedule.getCurrentDay();
-    while(loop){
+    if(nextDate !== undefined){
       var classes = LetterDay.classesOf(nextDate);
       if(dateToDayString(nextDate) == dateToDayString(new Date())){
         var sched = Schedule.getForDay(nextDate);
@@ -1066,56 +1090,68 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
             d.setHours(parseInt(thisClass.endTime.substring(0,2)));
             d.setMinutes(parseInt(thisClass.endTime.substring(3,5)));
             if(d.getTime() > nextDate.getTime()){
-              if(classOrder.includes(classes[i])){
-                loop = false;
-                break;
-              }else{
-                classOrder.push(classes[parseInt(thisClass.id) - 1]);
-              }
+              startingClass = classes[parseInt(thisClass.id) - 1];
             }
           }
         }
       }
       else{
-        for(var i = 0; i < classes.length; i++){
-          
-          if(classOrder.includes(classes[i])){
-            loop = false;
-            break;
-          }
-          classOrder.push(classes[i]);
-        }
+        startingClass = classes[0];
       }
-      if(loop){
-        nextDate.setDate(nextDate.getDate() + 1);
-        nextDate = LetterDay.nextLetterDayDate(nextDate);
-      }
+      Schedule.changeDay(scheduleCurrentDay);
+    }else{
+      startingClass = 1;
     }
-    Schedule.changeDay(scheduleCurrentDay);
-
 
     var allClasses = MySchedule.getAllType("block");
     var classList = [];
-    for(var i = 0; i < classOrder.length; i++){
-      var thisClass = MySchedule.get("block", classOrder[i]);
+    for(var i = 0; i < 7; i++){
+      var thisClass = MySchedule.get("block", (startingClass-1+i)%7 + 1);
       if(thisClass != undefined){
         classList.push(thisClass);
       }
     }
 
-    console.log(classList);
+    for(var i = 0; i < classList.length; i++){
+      for(var j = 0; j < classList[i].tasks.length; j++){
+        if(classList[i].tasks[j].completed == true){
+          classList[i].tasks.splice(j, 1);
+          j--;
+        }
+      }
+    }
+
 
     $scope.classes = classList;
   }
 
-  
-  refresh();
-
-  $scope.$on('$ionicView.enter', function(){
+  $scope.$on('$ionicView.beforeEnter', function(){
     if(MySchedule.isChanged()){
       refresh();
     }
   })
+
+  $scope.$on('$ionicView.enter', function(){
+    if($stateParams.blockNum != ""){
+      $timeout(function(){
+        $location.hash("todo-class-"+$stateParams.blockNum);
+        $ionicScrollDelegate.anchorScroll(true);
+        $timeout(function(){
+          $("#todo-class-"+$stateParams.blockNum).animate({backgroundColor:"#4298f4"}, 300);
+          $("#todo-class-"+$stateParams.blockNum).animate({backgroundColor:"#FFF"}, 1300);
+        }, 300);
+      });
+    }
+  });
+
+  $scope.$on("letterRefreshComplete", function(e, args){
+    if(args.success){
+      refresh();
+    }else{
+      //Messages.showError("Couldn't connect to the internet!");
+    }
+  });
+
 });
 
 /*

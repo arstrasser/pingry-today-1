@@ -137,6 +137,11 @@
 	white-space:normal;
 }
 
+.todo-class {
+	background-color: #fff;
+    padding:10px;
+}
+
 .todo-class-title {
 	font-size:22px;
 	font-weight:bold;
