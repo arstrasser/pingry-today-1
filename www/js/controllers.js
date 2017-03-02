@@ -1059,12 +1059,29 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     );
   }
 
-  $scope.newTaskUnfocus = function(e) {
-    $(e.target).parent().parent().parent().addClass('todo-background-new-assignment');
+  /*$(".todo-new-assignment-name").keypress(function(event){
+    console.log(event.keyCode);
+    if(event.keyCode == 13){
+      elem = $(event.target);
+      if(elem.val() != ""){
+        $scope.classes[elem.parent().parent().parent().parent().attr("clsId")].tasks.push({name:elem.val(), date:"", completed:false});
+        elem.val("");
+      }
+      elem.parent().parent().addClass('todo-background-new-assignment');
+    }
+  });*/
+
+  $scope.newTaskUnfocus = function() {
+    elem = $(event.target);
+    if(elem.val() != ""){
+      $scope.classes[elem.parent().parent().parent().parent().attr("clsId")].tasks.push({name:elem.val(), date:"", completed:false});
+      elem.val("");
+    }
+    elem.parent().parent().addClass('todo-background-new-assignment');
   }
 
-  $scope.newTaskFocus = function(e) {
-    angular.element(e.currentTarget).parent().parent().removeClass('todo-background-new-assignment')
+  $scope.newTaskFocus = function() {
+    $(event.currentTarget).parent().parent().removeClass('todo-background-new-assignment')
   }
 
   function refresh() {
