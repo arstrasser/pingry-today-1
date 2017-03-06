@@ -425,7 +425,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   }
 
   $scope.clickedClass = function(cls){
-    if(!!cls.clickUrl && Settings.getSuperMode()){
+    if(!!cls.clickUrl){
       $window.location.href=cls.clickUrl;
     }
   }
@@ -1059,7 +1059,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     );
   }
 
-  /*$(".todo-new-assignment-name").keypress(function(event){
+  $scope.classKeypress = function(){
     console.log(event.keyCode);
     if(event.keyCode == 13){
       elem = $(event.target);
@@ -1069,7 +1069,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
       }
       elem.parent().parent().addClass('todo-background-new-assignment');
     }
-  });*/
+  };
 
   $scope.newTaskUnfocus = function() {
     elem = $(event.target);
@@ -1078,6 +1078,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
       elem.val("");
     }
     elem.parent().parent().addClass('todo-background-new-assignment');
+    MySchedule.save();
   }
 
   $scope.newTaskFocus = function() {
