@@ -1,6 +1,6 @@
 <ion-view title="To Do List">
 	<ion-content padding="true" class="has-header">
-		<div class="todo-class" ng-repeat="cls in classes" clsId="{{$index}}">
+		<div id="todo-class-{{$index}}" class="todo-class" ng-repeat="cls in classes" clsId="{{$index}}">
 			<span class="todo-class-title">{{cls.name}}</span>
 			<div class="todo-list">
 				<div class="todo-list-element" ng-repeat="task in cls.tasks track by $index">
@@ -14,7 +14,7 @@
 				<div class="todo-list-element todo-new-element todo-background-new-assignment">
 					<i class="icon ion-android-checkbox-outline-blank todo-list-box"></i>
 					<div class="todo-assignment">
-						<input type="text" class="todo-assignment-name todo-new-assignment-name" ng-model="this.value" ng-blur="newTaskUnfocus();" ng-focus="newTaskFocus();"></div>
+						<input type="text" class="todo-assignment-name todo-new-assignment-name" ng-model="this.value" ng-blur="newTaskUnfocus();" ng-focus="newTaskFocus();" ng-keyup="classKeypress();"></div>
 						<div class="todo-assignment-date" ng-bind="formatDate(task.date)" ng-show="task.date!=''"></div>
 					</div>
 				</div>
