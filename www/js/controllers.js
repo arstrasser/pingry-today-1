@@ -425,7 +425,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   }
 
   $scope.clickedClass = function(cls){
-    if(!!cls.clickUrl && Settings.getSuperMode()){
+    if(!!cls.clickUrl && todoEnabled){
       $window.location.href=cls.clickUrl;
     }
   }
