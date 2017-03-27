@@ -425,7 +425,11 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   }
 
   $scope.clickedClass = function(cls){
+<<<<<<< HEAD
     if(!!cls.clickUrl){
+=======
+    if(!!cls.clickUrl && todoEnabled){
+>>>>>>> 300e0df3aa8694f6122d4ca6c49deb8ce85caa0a
       $window.location.href=cls.clickUrl;
     }
   }

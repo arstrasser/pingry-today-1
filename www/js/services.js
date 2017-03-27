@@ -774,17 +774,24 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
       return curDay;
     }
   }
-}).factory('MySchedule', function(Schedule, LetterDay){
+}).factory('MySchedule', function(Schedule, LetterDay, $localForage){
   var myClasses;
   var modified = false; //modified variable to update the main schedule interface
 
   function reload(){
     myClasses = JSON.parse(localStorage.getItem("myClasses"));
     //If invalid storage or myClasses
-    if(!myClasses || !myClasses.block){
-      //Initialize myClasses to defaults
+    if(!!myClasses && !!myClasses.block){
+      localStorage.setItem("myClasses", null);
+      $localForage.setItem("myClasses", myClasses);
+    }else{
       myClasses = {"block":[], "flex":[], "CP":[]};
-      localStorage.setItem("myClasses", JSON.stringify(myClasses));
+      $localForage.getItem("myClasses").then(function(value){
+        if(value != null){
+          console.log(JSON.stringify(value));
+          myClasses = value;
+        }
+      })
     }
   }
 
@@ -848,7 +855,8 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
       myClasses[type].push(cls);
     },
     save: function(){
-      localStorage.setItem("myClasses", JSON.stringify(myClasses));
+      $localForage.setItem("myClasses", myClasses);
+      //localStorage.setItem("myClasses", JSON.stringify(myClasses));
       modified = true;
     }
   }
