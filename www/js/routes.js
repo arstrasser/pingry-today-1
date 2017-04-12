@@ -135,6 +135,15 @@ angular.module('app.routes', [])
         controller: 'TodoCtrl'
       }
     }
+  })
+  .state('main.clubCalendar', {
+    url: '/clubCalendar',
+    views: {
+      'sideMenu': {
+        templateUrl: 'templates/club-calendar.html',
+        controller: 'ClubCtrl'
+      }
+    }
   });
 
   // if none of the above states are matched, use this as the fallback

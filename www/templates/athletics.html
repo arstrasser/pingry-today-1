@@ -9,7 +9,7 @@
 			<div class="item athleticEvent" ng-class="{'cancelled':event.desc.toLowerCase().indexOf('cancelled')!=-1}" ng-repeat="event in events track by $index" ng-click="openMapsLocation(event.location)">
 				<div class="athleticEventTitle" ng-bind="event.title"></div>
 				<div class="athleticEventTime" ng-bind="formatTime(event.startTime)"></div>
-				<div class="athleticEventDesc" ng-bind="event.desc" ng></div>
+				<div class="athleticEventDesc" ng-bind="event.desc"></div>
 			</div>
 		</div>
 	</ion-content>

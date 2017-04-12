@@ -1,0 +1,16 @@
+<ion-view title="Club Calendar">
+	<ion-content padding="true" class="has-header">
+		<ion-refresher
+	    	pulling-text="Pull to refresh..."
+	    	on-refresh="refresh();">
+	  	</ion-refresher>
+		<div class="list">
+			<h2 style="text-align:center; margin-top:25px" ng-show="events.length == 0">No meetings found!</h2>
+			<div class="item athleticEvent" ng-repeat="event in events track by $index">
+				<div class="athleticEventTitle" ng-bind="event.title"></div>
+				<div class="athleticEventTime" ng-bind="formatTime(event.startTime)"></div>
+				<div class="athleticEventDesc" ng-bind="event.location"></div>
+			</div>
+		</div>
+	</ion-content>
+</ion-view>

@@ -1,5 +1,6 @@
 var monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 var weekDays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+var shortWeekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 function isLetter(str){
   return str == "A" || str == "B" || str == "C" || str == "D" || str == "E" || str == "F" || str == "G";
@@ -425,7 +426,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   }
 
   $scope.clickedClass = function(cls){
-    if(!!cls.clickUrl && todoEnabled){
+    if(!!cls.clickUrl){
       $window.location.href=cls.clickUrl;
     }
   }
@@ -1044,19 +1045,23 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   }
 
   $scope.removeTask = function(taskIndex, clsIndex, e) {
-        $(e.target.parentNode).animate({opacity:0}, 1000, "swing", 
+    $(e.target.parentNode).animate({opacity:0}, 1000, "swing", 
       function(){
         if($(e.target).is(":visible")){
           $(e.target.parentNode).css("opacity", 1);
         }
-        else{
+        //else{
           $(e.target.parentNode).hide();
-          $scope.classes[clsIndex].removeOffset++;
+          //$scope.classes[clsIndex].removeOffset++;
           $scope.$apply();
           MySchedule.save();
-        }
+        //}
       }
     );
+  }
+
+  $scope.readdTask = function(taskIndex, clsIndex, e) {
+    $(e.target.parentNode).stop(true, false).css("opacity", 1);
   }
 
   $scope.classKeypress = function(){
@@ -1068,6 +1073,8 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
         elem.val("");
       }
       elem.parent().parent().addClass('todo-background-new-assignment');
+    }else if($(event.target).val() != ""){
+      $(event.currentTarget).parent().parent().removeClass('todo-background-new-assignment')
     }
   };
 
@@ -1154,8 +1161,10 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   $scope.$on('$ionicView.enter', function(){
     if($stateParams.blockNum != ""){
       $timeout(function(){
-        $location.hash("todo-class-"+$stateParams.blockNum);
-        $ionicScrollDelegate.anchorScroll(true);
+        $timeout(function(){
+          $location.hash("todo-class-"+$stateParams.blockNum);
+          $ionicScrollDelegate.anchorScroll(true);
+        })
         $timeout(function(){
           $("#todo-class-"+$stateParams.blockNum).animate({backgroundColor:"#4298f4"}, 300);
           $("#todo-class-"+$stateParams.blockNum).animate({backgroundColor:"#FFF"}, 1300);
@@ -1172,7 +1181,131 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     }
   });
 
-});
+})
+
+.controller("ClubCtrl", function($scope, $http, $ionicLoading, icalFeed, Messages, Settings, $q){
+  //Formats a 24 hour time in 12 hour format
+  function fixTime(hours, minutes){
+    var AM = true;
+    if(hours > 12){
+      hours -= 12;
+      AM = false;
+    }else if(hours == 12){
+      AM = false;
+    }else if(hours == 0){
+      hours = 12;
+    }
+    return (hours) + ":" + ((minutes<10)?"0":"")+minutes+" "+(AM?"AM":"PM");
+  }
+
+  //Formats a date and time
+  $scope.formatTime = function(time){
+    var jsTime = new Date(time);
+    if(jsTime.getHours() == 0 && jsTime.getMinutes() == 0){
+      return (jsTime.getMonth()+1)+"/"+jsTime.getDate()
+    }
+    return fixTime(jsTime.getHours(), jsTime.getMinutes())+"   "+shortWeekDays[jsTime.getDay()]+" "+(jsTime.getMonth()+1)+"/"+jsTime.getDate();
+  }
+
+  //Resorts the list of events
+  function resort(events){
+    //Iterate over the events to fix Javscript Time objecs and such (also removing past events)
+    for(var i = 0; i < events.length; i++){
+      //Time type event
+      if(events[i].type == "time"){
+        //If the event end time is less than the current time
+        if(events[i].startTime < Date.now()){
+          //Remove the event
+          events.splice(i,1);
+          i--;
+        }
+      }
+      //Day type event
+      else if(events[i].type == "day"){
+        //If the event's time is less than the current time and the event isn't today
+        if(events[i].time < Date.now() && dateToDayString(parseStringForDate(events[i].time)) != dateToDayString(new Date())){
+          //Remove the event
+          events.splice(i,1);
+          i--;
+        }
+        else{
+          //Set the start time to be the time (makes for easier sorting and display)
+          events[i].startTime = events[i].time;
+        }
+      }
+    }
+
+    //Sorts the event by time, then by title, then by description
+    events.sort(
+      function(a,b){
+        if(a.startTime==b.startTime){
+          if(a.title == b.title){
+            return a.location.localeCompare(b.location);
+          }else{
+            return a.title.localeCompare(b.title);
+          }
+        }
+        else{
+          return a.startTime>b.startTime?1:-1;
+        }
+      }
+    );
+
+    //Only take the first 15 events
+    if(events.length > 25){
+      events = events.slice(0,25);
+    }
+    //Update local storage
+    localStorage.setItem("clubEvents", JSON.stringify(events));
+    localStorage.setItem("clubEventsRefreshTime", Date.now());
+    $scope.events = events;
+    $ionicLoading.hide();
+    $scope.$broadcast('scroll.refreshComplete');
+  }
+
+
+  $scope.refresh = function(){
+    var queuedEvents = [];
+    $http.get("http://www.pingry.org/calendar/calendar_391.ics").then(function(data){
+      var events = icalFeed.parseCalendar(data.data);
+
+      //List of raw events to be parsed in the resort function
+      for(var i = 0; i < events.length; i++){
+        if(!!events[i].startTime){
+          events[i].startTime = events[i].startTime.getTime();
+        }
+        if(!!events[i].endTime){
+          events[i].endTime = events[i].endTime.getTime();
+        }
+      }
+      resort(events);
+      return true;
+    }, function(err){
+      console.log("Couldn't get calendar: "+err.config.url);
+      $scope.localRefresh();
+      $ionicLoading.hide();
+      $scope.$broadcast('scroll.refreshComplete');
+      Messages.showError("Couldn't refresh!");
+      return false;
+    })
+  };
+
+  //Refresh from local storage
+  $scope.localRefresh = function(){
+    var obj = localStorage.getItem("clubEvents");
+    if(obj != undefined && JSON.parse(obj) != undefined){
+      events = JSON.parse(obj);
+      $scope.events = events;
+    }else{
+      Messages.showError("Couldn't connect!");
+      $scope.events = [];
+    }
+  };
+
+
+  $ionicLoading.show({template: 'Loading...'});
+  $scope.refresh();
+})
 
 /*
 [
