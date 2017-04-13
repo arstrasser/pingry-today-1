@@ -7,7 +7,7 @@
 					<i class="icon ion-android-checkbox-outline-blank todo-list-box" ng-hide="task.completed" ng-click="task.completed=!task.completed; removeTask($index, $parent.$index, $event)"></i>
 					<i class="icon ion-android-checkbox todo-list-box" ng-show="task.completed" ng-click="task.completed=!task.completed; readdTask($index, $parent.$index, $event)"></i>
 					<div class="todo-assignment">
-						<div class="todo-assignment-name">{{task.name}}</div>
+						<input type="text" class="todo-assignment-name" ng-model="task.name" ng-blur="saveTasks()"></div>
 						<div class="todo-assignment-date" ng-bind="formatDate(task.date)" ng-show="task.date!=''"></div>
 					</div>
 				</div>

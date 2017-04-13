@@ -1064,6 +1064,10 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     $(e.target.parentNode).stop(true, false).css("opacity", 1);
   }
 
+  $scope.saveTasks = function(){
+    MySchedule.save();
+  }
+
   $scope.classKeypress = function(){
     console.log(event.keyCode);
     if(event.keyCode == 13){
