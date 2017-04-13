@@ -788,7 +788,6 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
       myClasses = {"block":[], "flex":[], "CP":[]};
       $localForage.getItem("myClasses").then(function(value){
         if(value != null){
-          console.log(JSON.stringify(value));
           myClasses = value;
         }
       })

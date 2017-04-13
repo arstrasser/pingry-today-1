@@ -1,6 +1,6 @@
 <ion-view title="To Do List" cache-view="false">
 	<ion-content padding="true" class="has-header">
-		<div id="todo-class-{{cls.time.id}}" class="todo-class" ng-repeat="cls in classes" clsId="{{$index}}">
+		<div id="todo-class-{{cls.time.id}}" class="todo-class" ng-repeat="cls in classes track by $index" clsId="{{$index}}">
 			<span class="todo-class-title">{{cls.name}}</span>
 			<div class="todo-list">
 				<div class="todo-list-element" ng-repeat="task in cls.tasks track by $index">

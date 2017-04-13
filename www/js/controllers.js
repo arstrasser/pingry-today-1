@@ -1095,7 +1095,6 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   function refresh() {
     var startingClass;
     var nextDate = LetterDay.nextLetterDayDate(new Date());
-    var loop = true;
     var scheduleCurrentDay = Schedule.getCurrentDay();
     if(nextDate !== undefined){
       var classes = LetterDay.classesOf(nextDate);
@@ -1114,7 +1113,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
             var d = new Date();
             d.setHours(parseInt(thisClass.endTime.substring(0,2)));
             d.setMinutes(parseInt(thisClass.endTime.substring(3,5)));
-            if(d.getTime() > nextDate.getTime()){
+            if(d.getTime() > new Date().getTime()){
               startingClass = classes[parseInt(thisClass.id) - 1];
             }
           }
@@ -1166,7 +1165,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
           $ionicScrollDelegate.anchorScroll(true);
         })
         $timeout(function(){
-          $("#todo-class-"+$stateParams.blockNum).animate({backgroundColor:"#4298f4"}, 300);
+          $("#todo-class-"+$stateParams.blockNum).animate({backgroundColor:MySchedule.get("block", parseInt($stateParams.blockNum)).color}, 300);
           $("#todo-class-"+$stateParams.blockNum).animate({backgroundColor:"#FFF"}, 1300);
         }, 300);
       });
