@@ -6,6 +6,8 @@ function isLetter(str){
   return str == "A" || str == "B" || str == "C" || str == "D" || str == "E" || str == "F" || str == "G";
 }
 
+var ScheduleRefreshOverride = false;
+
 angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
 
 //Controller for the side menu
@@ -349,13 +351,18 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     refresh();
   }
 
+  $scope.$on('$ionicView.loaded', function(){
+    curDay = new Date();
+    updateDate();
+  });
   //Resets the current day to today
   $scope.$on('$ionicView.beforeEnter', function(){
     //resets the schedule to the current date
-    curDay = new Date();
-    $ionicPlatform.ready(function() {
+    if(!ScheduleRefreshOverride){
+      curDay = new Date();
       updateDate();
-    });
+    }
+    ScheduleRefreshOverride = false;
   })
 
 
@@ -1034,8 +1041,8 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     return parseInt(str.substring(4, 6))+"/"+parseInt(str.substring(6,8));
   }
 
-  $scope.addTask = function(clsIndex, e){
-    var elem = $(e.currentTarget.children[0]);
+  $scope.addTask = function(clsIndex){
+    var elem = $(event.currentTarget.children[0]);
     if(elem.val() != ""){
       $scope.classes[clsIndex].tasks.push({name:elem.val(), date:"", completed:false});
       elem.val("");
@@ -1050,30 +1057,35 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
         if($(e.target).is(":visible")){
           $(e.target.parentNode).css("opacity", 1);
         }
-        //else{
-          $(e.target.parentNode).hide();
-          //$scope.classes[clsIndex].removeOffset++;
-          $scope.$apply();
-          MySchedule.save();
-        //}
+        $(e.target.parentNode).hide();
+        MySchedule.save();
       }
     );
   }
 
-  $scope.readdTask = function(taskIndex, clsIndex, e) {
-    $(e.target.parentNode).stop(true, false).css("opacity", 1);
+  $scope.readdTask = function(taskIndex, clsIndex) {
+    $(event.target.parentNode).stop(true, false).css("opacity", 1);
   }
 
-  $scope.saveTasks = function(){
+  $scope.oldTaskUnfocus = function(taskIndex, clsIndex){
+    if($(event.target).val() == ""){
+      $(event.target).parent().parent().hide();
+      $scope.classes[clsIndex].tasks[taskIndex].completed = true;
+    }
     MySchedule.save();
   }
 
-  $scope.classKeypress = function(){
-    console.log(event.keyCode);
+  $scope.oldClassKeypress = function(taskIndex, clsIndex){
+    if(event.keyCode == 13){
+      $(event.target).blur();
+    }
+  }
+
+  $scope.newClassKeypress = function(){
     if(event.keyCode == 13){
       elem = $(event.target);
       if(elem.val() != ""){
-        $scope.classes[elem.parent().parent().parent().parent().attr("clsId")].tasks.push({name:elem.val(), date:"", completed:false});
+        $scope.classes[elem.attr("clsId")].tasks.push({name:elem.val(), date:"", completed:false});
         elem.val("");
       }
       elem.parent().parent().addClass('todo-background-new-assignment');
@@ -1085,7 +1097,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   $scope.newTaskUnfocus = function() {
     elem = $(event.target);
     if(elem.val() != ""){
-      $scope.classes[elem.parent().parent().parent().parent().attr("clsId")].tasks.push({name:elem.val(), date:"", completed:false});
+      $scope.classes[elem.attr("clsId")].tasks.push({name:elem.val(), date:"", completed:false});
       elem.val("");
     }
     elem.parent().parent().addClass('todo-background-new-assignment');
@@ -1119,12 +1131,18 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
             d.setMinutes(parseInt(thisClass.endTime.substring(3,5)));
             if(d.getTime() > new Date().getTime()){
               startingClass = classes[parseInt(thisClass.id) - 1];
+              break;
             }
           }
         }
         if(startingClass == undefined){
           nextDate.setDate(nextDate.getDate()+1);
-          startingClass = LetterDay.classesOf(nextDate)[0];
+          nextDate = LetterDay.nextLetterDayDate(nextDate);
+          if(nextDate == undefined){
+            startingClass = 1;
+          }else{
+            startingClass = LetterDay.classesOf(nextDate)[0];
+          }
         }
       }
       else{
@@ -1169,11 +1187,26 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
           $ionicScrollDelegate.anchorScroll(true);
         })
         $timeout(function(){
-          $("#todo-class-"+$stateParams.blockNum).animate({backgroundColor:MySchedule.get("block", parseInt($stateParams.blockNum)).color}, 300);
-          $("#todo-class-"+$stateParams.blockNum).animate({backgroundColor:"#FFF"}, 1300);
+          var color = MySchedule.get("block", parseInt($stateParams.blockNum)).color;
+          if(color == "#fff" || color == "#FFF" || color == "#ffffff" || color == "#FFFFFF"){
+            $("#todo-class-"+$stateParams.blockNum).css("border", "1px solid white");
+            $("#todo-class-"+$stateParams.blockNum).animate({borderColor:"#000"}, 300);
+            $("#todo-class-"+$stateParams.blockNum).animate({borderColor:"#fff"}, 1300);
+          }else{
+            $("#todo-class-"+$stateParams.blockNum).animate({backgroundColor:color}, 300);
+            $("#todo-class-"+$stateParams.blockNum).animate({backgroundColor:"#fff"}, 1300);
+          }
         }, 300);
       });
     }
+  });
+
+  $scope.$on('$ionicView.afterEnter', function(){
+    ScheduleRefreshOverride = true;
+  });
+
+  $scope.$on('$ionicView.afterLeave', function(){
+    ScheduleRefreshOverride = false;
   });
 
   $scope.$on("letterRefreshComplete", function(e, args){

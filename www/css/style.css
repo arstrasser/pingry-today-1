@@ -183,6 +183,7 @@
 .todo-assignment-name {
 	display:inline-block;
 	background-color: rgba(255, 255, 255, 0);
+	font-size:17px !important;
 }
 
 .todo-assignment-date {
