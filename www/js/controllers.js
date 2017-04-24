@@ -84,7 +84,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
       Messages.showError("Couldn't connect to the internet!");
     }
   };
-  
+
 
   var lastRefresh = localStorage.getItem("pingryNewsRSSRefreshTime");
   if(lastRefresh != null && lastRefresh != ""){
@@ -139,7 +139,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   var elem = $("#scheduleContent");
   $ionicGesture.on("swipeleft", $scope.nextDay, elem);
   $ionicGesture.on("swiperight", $scope.prevDay, elem);
-  
+
   //Disable menu dragging in the schedule so that we can swipe the schedule to change days
   $scope.$on('$ionicView.enter', function(){$ionicSideMenuDelegate.canDragContent(false);})
   $scope.$on('$ionicView.leave', function(){$ionicSideMenuDelegate.canDragContent(true);});
@@ -434,6 +434,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
 
   $scope.clickedClass = function(cls){
     if(!!cls.clickUrl){
+      ScheduleRefreshOverride = true;
       $window.location.href=cls.clickUrl;
     }
   }
@@ -678,7 +679,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     //if the class is a block
     if(cls.type == "block"){
       //Makes sure you have a period selected and it's not a flex period
-      return cls.time.id != "" && cls.time.id != false && cls.time.id !== true && (MySchedule.get("block", cls.time.id) == undefined || 
+      return cls.time.id != "" && cls.time.id != false && cls.time.id !== true && (MySchedule.get("block", cls.time.id) == undefined ||
         (modify && $stateParams.clsType == "block" && MySchedule.getAll()[$stateParams.clsType][parseInt($stateParams.clsId)].type == "block" && MySchedule.getAll()[$stateParams.clsType][parseInt($stateParams.clsId)].time.id == cls.time.id));
     }
     //If the class is a flex or a CP
@@ -725,7 +726,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     $scope.appVersion = version;
   });
 
-  
+
   $scope.$on("$ionicView.enter", function(){clicks = 0;})
   var clicks = 0;
   $scope.addClick = function(){
@@ -947,7 +948,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
     $scope.$broadcast('scroll.refreshComplete');
   }
 
-  
+
   $scope.rawEvents = [];
   $scope.calendars = AthleticCalendars.getCalendars();
   //Refreshes from all the calendars
@@ -1052,7 +1053,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
   }
 
   $scope.removeTask = function(taskIndex, clsIndex, e) {
-    $(e.target.parentNode).animate({opacity:0}, 1000, "swing", 
+    $(e.target.parentNode).animate({opacity:0}, 1000, "swing",
       function(){
         if($(e.target).is(":visible")){
           $(e.target.parentNode).css("opacity", 1);
@@ -1199,10 +1200,6 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
         }, 300);
       });
     }
-  });
-
-  $scope.$on('$ionicView.afterEnter', function(){
-    ScheduleRefreshOverride = true;
   });
 
   $scope.$on('$ionicView.afterLeave', function(){

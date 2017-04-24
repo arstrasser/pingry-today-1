@@ -105,6 +105,23 @@
 	font-size:10px;
 }
 
+.ddd-icon-container {
+  width:34px;
+  height:34px;
+  position:absolute;
+  top:5px;
+  right:10px;
+  z-index:2;
+}
+
+.ddd-icon {
+  width:100%;
+  height:100%;
+  display:none;
+}
+
+
+
 .rssTitle {
 	text-overflow: ellipsis;
 	overflow: hidden;
