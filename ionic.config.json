@@ -1,4 +1,5 @@
 {
   "name": "Pingry",
-  "app_id": "org.pingry.pingryapp"
+  "app_id": "org.pingry.pingryapp",
+  "type": "ionic1"
 }

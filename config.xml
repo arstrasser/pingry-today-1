@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<widget id="org.pingry.pingryappandroidbeta" version="1.4.4 Beta" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="org.pingry.pingryappandroid" version="1.5" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
   <name>Pingry Today</name>
   <description>
         Pingry Today - Any students' necessities at Pingry (By Alex Strasser)

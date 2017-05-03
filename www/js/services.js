@@ -68,7 +68,7 @@ function parseStringForDate(str){
     return str;
   }
   var d = new Date(0);
-  
+
   //Replace all dashes
   str = str.substring(0,10).replace(/-/g, "") + str.substring(10);
   if(str.indexOf(" ") == -1){
@@ -144,22 +144,22 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
   if(time == null || time == undefined || parseInt(time) + 604800000 < Date.now() ){ //Refresh if not refreshed or if it's been a week
     refreshData();
   }
-  
+
   //Fix undefined dates if necessary, or parse the json string
   if(dates == undefined || dates == null || dates == ""){
     dates = {"A":[], "B":[], "C":[], "D":[], "E":[], "F":[], "G":[]};
   }else{
     dates = JSON.parse(dates);
   }
-  
+
   //Times objects: Contains Letter, Scheduled classes, and the dates of that day
   var times = [
-    {"letter":"A", "schedule":[1,2,3,4], "dates":dates.A}, 
-    {"letter":"B", "schedule":[5,6,7,1], "dates":dates.B}, 
-    {"letter":"C", "schedule":[2,3,4,5], "dates":dates.C}, 
-    {"letter":"D", "schedule":[6,7,1,2], "dates":dates.D}, 
-    {"letter":"E", "schedule":[3,4,5,6], "dates":dates.E}, 
-    {"letter":"F", "schedule":[7,1,2,3], "dates":dates.F}, 
+    {"letter":"A", "schedule":[1,2,3,4], "dates":dates.A},
+    {"letter":"B", "schedule":[5,6,7,1], "dates":dates.B},
+    {"letter":"C", "schedule":[2,3,4,5], "dates":dates.C},
+    {"letter":"D", "schedule":[6,7,1,2], "dates":dates.D},
+    {"letter":"E", "schedule":[3,4,5,6], "dates":dates.E},
+    {"letter":"F", "schedule":[7,1,2,3], "dates":dates.F},
     {"letter":"G", "schedule":[4,5,6,7], "dates":dates.G}
   ];
 
@@ -569,7 +569,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
         localStorage.setItem("facultyCollabDays", JSON.stringify(days));
         return true;
       }, function(){return false;}) ,
-    
+
       //Returns the larger parse so that we can call .then on the function and using async
       $http.get(specialScheduleURL).then(function(data){
         //Initialize variables:
@@ -723,7 +723,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
       return success;
     });
   }
-  
+
   return {
     isRefreshing: function(){return refreshing;},
     refresh: refreshData,  //Triggers a full schedule refresh from the internet
@@ -999,22 +999,22 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
           //Parses the start time and converts it to a javascript date
           dtstart = parseStringForDate(dtstart);
         }
-        
+
         //Normal Time-type event:
         else if(dtstart.substring(0,1) == ":"){
           type="time";
           //Eliminate extra colon
           dtstart = dtstart.substring(1);
           //Parse the strings for javascript dates
-          
+
           dtstart = parseStringForDate(dtstart);
-          
+
 
           //Parse for the event end time
           if(event.indexOf("DTEND") != -1){
             dtend = event.substring(event.indexOf("DTEND:")+6);
             dtend = dtend.substring(0, Math.min(dtend.indexOf("\r"), dtend.indexOf("\n")));
-            dtend = parseStringForDate(dtend); 
+            dtend = parseStringForDate(dtend);
           }else{
             dtend = "";
           }
@@ -1042,7 +1042,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
 
             if(dtend != ""){
               dtend = dtend.substring(17);
-              //dtstart = new Date(dtstart.substring(0,4), parseInt(dtstart.substring(4,6))-1, dtstart.substring(6,8), dtstart.substring(9,11), dtstart.substring(11,13), dtstart.substring(13,15));      
+              //dtstart = new Date(dtstart.substring(0,4), parseInt(dtstart.substring(4,6))-1, dtstart.substring(6,8), dtstart.substring(9,11), dtstart.substring(11,13), dtstart.substring(13,15));
               dtend = parseStringForDate(dtend);
             }
           }else{
@@ -1065,7 +1065,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
           recId = recId.substring(recId.indexOf(":")+1);
           //Parse for JS Date
           recId = new Date(recId.substring(0,4), parseInt(recId.substring(4,6))-1, recId.substring(6,8), recId.substring(9,11), recId.substring(11,13), recId.substring(13,15));
-          
+
           //Add the object to the list to be dealt with later after parsing
           var obj = {"uid":uid, "title":title, "type":type, "location":loc, "recurrenceId":recId};
           if(type == "day"){
@@ -1132,7 +1132,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
                 //Add the date to an array
                 exdates.push(dateToDayString(temp));
                 //Remove the parsed date from the string
-                parse = parse.substring(parse.indexOf("\n")+1);     
+                parse = parse.substring(parse.indexOf("\n")+1);
               }
 
               //Repetition starts at the current day
@@ -1145,7 +1145,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
               while(curDay.getTime() <= until.getTime()){
                 //The month we should be in
                 var curMonth = curDay.getMonth();
-                for(var i=0; i<days.length; i++){
+                for(var i=0; i<byDays.length; i++){
                   curDay.setDate(1);
                   //Gets the nth occurence of a weekday in a month (Credits: Aditya Gollapudi):
                             if(byDays[i] >= curDay.getDay()){
@@ -1203,7 +1203,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
               //Add the date in string form to the array
               exdates.push(dateToDayString(temp));
               //Move to the next event
-              parse = parse.substring(parse.indexOf("\n")+1);     
+              parse = parse.substring(parse.indexOf("\n")+1);
             }
             //gets the start time of the repeating event
             var curDay = dtstart;
@@ -1255,7 +1255,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
               obj.endTime = dtend;
           }else{
             //Log unknown event types to the console
-            //Still adds them but doesn't 
+            //Still adds them but doesn't
             console.log("Unknown event: ");
             console.log(obj);
           }
@@ -1341,7 +1341,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
     $cordovaLocalNotifications.cancelAll();
     //For each reminder
     for(var i = 0; i < reminders.length; i++){
-      
+
       //Weekday repeat type
       if(reminders[i].type == "weekday"){
         //Start with today
@@ -1363,7 +1363,7 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
 
       //Letter Day repeat type
       else if(reminders[i].type == "letter"){
-        //Gets all the future dates of 
+        //Gets all the future dates of
         var dates = LetterDay.getDatesOf(reminders[i].time.day);
         //Amount of notifications scheduled
         var amount = 0;
