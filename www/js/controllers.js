@@ -180,17 +180,26 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
         //If you have a swap class, deals with it by recalling this function with the correct option
         if(tClass.type == "swap"){
           //If you have first lunch
-          if(!MySchedule.get("block", LetterDay.classes()[2]) || MySchedule.get("block", LetterDay.classes()[2]).firstLunch){
-            tClass = tClass.options[0];
-          }
-          else{ //Second Lunch
-            tClass = tClass.options[1];
+          if(!tClass.determinant){
+            if(!MySchedule.get("block", LetterDay.classes()[2]) || MySchedule.get("block", LetterDay.classes()[2]).firstLunch){
+              tClass = tClass.options[0];
+            }
+            else{ //Second Lunch
+              tClass = tClass.options[1];
+            }
+          }else{
+            if(!MySchedule.get("block", tClass.determinant) || MySchedule.get("block", tClass.determinant).firstLunch){
+              tClass = tClass.options[0];
+            }
+            else{ //Second Lunch
+              tClass = tClass.options[1];
+            }
           }
         }
 
         //If you have a block type class
-        if(tClass.type == "block"){
-          var blockNum = LetterDay.classes()[tClass.id-1];
+        if(tClass.type == "block" || tClass.type == "staticblock"){
+          var blockNum = tClass.type=="block"?LetterDay.classes()[tClass.id-1]:tClass.id;
           if(MySchedule.get("block", blockNum) == undefined){
             tClass.name = "Block "+blockNum;
           }else{
@@ -206,7 +215,7 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
           }
         }
         //If you have a flex type class
-        else if(tClass.type == "flex"){
+        else if(tClass.type == "flex" || tClass.type == "specialflex"){
           //Gets all flex classes
           var flexes = MySchedule.getAllType("flex");
           //Variable to check whether to append or overwrite the current name
@@ -224,43 +233,45 @@ angular.module('app.controllers', ['ionic', 'ionic.native', 'ngCordova'])
               tClass.color = flexes[j].color;
             }
           }
-          //If this is first flex
-          if(tClass.id == 1){
-            //Checks to see if first period takes flex
-            var adjBlock = MySchedule.get("block", LetterDay.classes()[0]);
-            if(adjBlock !== undefined && adjBlock.takesFlex){
-              if(modified){
-                tClass.name += " & "+adjBlock.name;
-              }else{
-                tClass.name = adjBlock.name;
-                modified = true;
-              }
-              tClass.color = adjBlock.color;
-            }
-          }
-          //If this is second flex (It's a 0 because addClass persistence requires a boolean value which is either a 0 or a 1)
-          else if(tClass.id == 0){
-            //Checks if 3rd class of the day takes the flex
-            var adjBlock = MySchedule.get("block", LetterDay.classes()[2]);
-            if(adjBlock !== undefined && adjBlock.takesFlex){
-              tClass.color = adjBlock.color;
-              if(modified){
-                tClass.name += " & "+adjBlock.name;
-              }else{
-                tClass.name = adjBlock.name;
-                modified = true;
+          if(tClass.type =="flex"){
+            //If this is first flex
+            if(tClass.id == 1){
+              //Checks to see if first period takes flex
+              var adjBlock = MySchedule.get("block", LetterDay.classes()[0]);
+              if(adjBlock !== undefined && adjBlock.takesFlex){
+                if(modified){
+                  tClass.name += " & "+adjBlock.name;
+                }else{
+                  tClass.name = adjBlock.name;
+                  modified = true;
+                }
+                tClass.color = adjBlock.color;
               }
             }
+            //If this is second flex (It's a 0 because addClass persistence requires a boolean value which is either a 0 or a 1)
+            else if(tClass.id == 0){
+              //Checks if 3rd class of the day takes the flex
+              var adjBlock = MySchedule.get("block", LetterDay.classes()[2]);
+              if(adjBlock !== undefined && adjBlock.takesFlex){
+                tClass.color = adjBlock.color;
+                if(modified){
+                  tClass.name += " & "+adjBlock.name;
+                }else{
+                  tClass.name = adjBlock.name;
+                  modified = true;
+                }
+              }
 
-            //Checks if the 4th class of the day takes the flex
-            adjBlock = MySchedule.get("block", LetterDay.classes()[3]);
-            if(adjBlock !== undefined && adjBlock.takesFlex){
-              tClass.color = adjBlock.color;
-              if(modified){
-                tClass.name += " & "+adjBlock.name;
-              }else{
-                tClass.name = adjBlock.name;
-                modified = true;
+              //Checks if the 4th class of the day takes the flex
+              adjBlock = MySchedule.get("block", LetterDay.classes()[3]);
+              if(adjBlock !== undefined && adjBlock.takesFlex){
+                tClass.color = adjBlock.color;
+                if(modified){
+                  tClass.name += " & "+adjBlock.name;
+                }else{
+                  tClass.name = adjBlock.name;
+                  modified = true;
+                }
               }
             }
           }

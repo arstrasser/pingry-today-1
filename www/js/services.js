@@ -418,6 +418,24 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
     {"name":"Flex 2", "type":"flex", "id":"0", "startTime":"13:10", "endTime":"13:25"},
     {"name":"Period 4", "type":"block", "id":"4", "startTime":"13:30", "endTime":"14:35"},
     {"name":"CP", "type":"CP", "startTime":"14:40", "endTime":"15:25"}
+  ];
+
+  var reviewSchedule = [
+    {"name":"Attendance", "type":"Other", "startTime":"08:00", "endTime":"08:05"},
+    {"name":"Block 1", "type":"staticblock", "id":"1", "startTime":"08:10", "endTime":"08:55"},
+    {"name":"Block 2", "type":"staticblock", "id":"2", "startTime":"09:00", "endTime":"09:45"},
+    {"name":"US Meeting", "type":"CT", "startTime":"09:50", "endTime":"10:10"},
+    {"name":"Block 3", "type":"staticblock", "id":"3", "startTime":"10:15", "endTime":"11:00"},
+    {"name":"Block 4", "type":"staticblock", "id":"4", "startTime":"11:05", "endTime":"11:50"},
+    {"name":"Swappable 1", "type":"swap", "determinant":"5", "options":[
+      {"name":"First Lunch", "type":"Lunch", "startTime":"11:55", "endTime":"12:25"},
+      {"name":"Block 5", "type":"staticblock", "id":"5", "startTime":"11:55", "endTime":"12:40"}]},
+    {"name":"Swappable 2", "type":"swap", "determinant":"5", "options":[
+      {"name":"Period 5", "type":"staticblock", "id":"5", "startTime":"12:30", "endTime":"13:15"},
+      {"name":"Second Lunch", "type":"Lunch", "startTime":"12:45", "endTime":"13:15"}]},
+    {"name":"Flex 2", "type":"specialflex", "id":"0", "startTime":"13:15", "endTime":"13:35"},
+    {"name":"Block 6", "type":"staticblock", "id":"6", "startTime":"13:40", "endTime":"14:25"},
+    {"name":"Block 7", "type":"staticblock", "id":"7", "startTime":"14:30", "endTime":"15:15"},
   ]
 
   var winterFestivalSchedule = [
@@ -455,7 +473,17 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
     {"name":"CP", "type":"CP", "startTime":"14:40", "endTime":"15:25"}
   ];
   //Variable to store all the schedule types
-  var typeList = [["Normal",normalSchedule], ["Faculty Collaboration",facultyCollabSchedule], ["Assembly 30 Minutes", assembly30Schedule], ["Assembly 35 Minutes", assembly35Schedule], ["Assembly 40 Minutes", assembly40Schedule], ["Assembly 60 Minutes",assembly60Schedule], ["Winter Festival", winterFestivalSchedule], ["Unknown Assembly", unknownSchedule]];
+  var typeList = [
+    ["Normal",normalSchedule],
+    ["Faculty Collaboration",facultyCollabSchedule],
+    ["Assembly 30 Minutes", assembly30Schedule],
+    ["Assembly 35 Minutes", assembly35Schedule], 
+    ["Assembly 40 Minutes", assembly40Schedule], 
+    ["Assembly 60 Minutes", assembly60Schedule], 
+    ["Review Day", reviewSchedule], 
+    ["Winter Festival", winterFestivalSchedule], 
+    ["Unknown Assembly", unknownSchedule]
+  ];
 
 
   //Initializes the current day to be the system current day
@@ -659,11 +687,14 @@ angular.module('app.services', ['ionic', 'ionic.native', 'ngCordova'])
           }
           //If it's a day type event (occurs for the whole day)
           else if(calEvents[i].type == "day"){
+            if(calEvents[i].title.toLowerCase().indexOf("review day") != -1){
+              specialSchedule[dateToDayString(calEvents[i].time)] = "Review Day";
+            }
             /*
             // Faculty Collaboration day implementation commented out since using alternate calendar.
             // For faster performance but lower accuracy, uncomment this and remove the first calendar parse.
             if(calEvents[i].title.indexOf("Collab") != -1 && calEvents[i].title.indexOf("Fac") != -1){
-              collabDays.push(dateToDayString(calEvents[i].time));
+              facultyCollabDays.push(dateToDayString(calEvents[i].time));
             }*/
           }
           else{
